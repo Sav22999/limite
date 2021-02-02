@@ -1,0 +1,202 @@
+@font-face {
+    font-family: open-sans;
+    src: url("../font/opensans.ttf");
+}
+
+@font-face {
+    font-family: open-sans-bold;
+    src: url("../font/opensansbold.ttf");
+}
+
+@font-face {
+    font-family: niconne;
+    src: url("../font/niconne.ttf");
+}
+
+* {
+    overflow: hidden;
+    box-sizing: border-box;
+    font-family: open-sans;
+    font-size: 16px;
+}
+
+body {
+    background-color: transparent;
+    color: black;
+    width: auto;
+    /*It's set in js script*/
+    height: auto;
+    overflow: hidden;
+    font-family: twemoji, sans-serif;
+    margin: 0px;
+}
+
+#popup-content {
+    width: auto;
+    /*It's set in js script*/
+    height: auto;
+    /*It's set in js script*/
+    margin: 0px;
+    padding: 0px;
+    border: 0px solid transparent;
+    position: relative;
+}
+
+#website-section, #buy-me-a-coffee-section {
+    position: relative;
+    width: 350px;
+    height: auto;
+    padding: 5px;
+    margin: 0px;
+    background-color: #0080ff;
+    font-size: 16px;
+    color: #ffffff;
+    text-align: center;
+}
+
+#buy-me-a-coffee-section {
+    font-size: 12px;
+    cursor: pointer;
+    border: 0px solid transparent;
+    margin: 0px;
+}
+
+#text-toggle-section {
+    grid-area: text;
+    padding: 10px;
+}
+
+#switch-toggle-section {
+    grid-area: switch;
+    text-align: right;
+    padding: 0px;
+    position: relative;
+}
+
+#toggle-section {
+    position: relative;
+    width: 350px;
+    height: auto;
+    padding: 0px 20px;
+    margin: 0px;
+    background-color: #ffffff;
+    font-size: 18px;
+    color: #000000;
+    text-align: center;
+    border-bottom: 1px solid #0080ff;
+
+    display: grid;
+    grid-template-areas: 'text text text switch';
+    grid-gap: 0px;
+}
+
+#toggle-container {
+    width: 40px;
+    height: 20px;
+    position: relative;
+    border-radius: 10px;
+    cursor: pointer;
+}
+
+#toggle-background {
+    width: 30px;
+    height: 10px;
+    border-radius: 5px;
+    margin: 0px;
+    margin-right: 5px;
+    margin-left: 5px;
+    background-color: #0080ff55;
+    border: 0px solid transparent;
+    position: absolute;
+    top: 5px;
+}
+
+#toggle-thumb {
+    width: 20px;
+    height: 20px;
+    border-radius: 10px;
+    background-color: #0080ff;
+    border: 0px solid transparent;
+    position: absolute;
+    top: 0px;
+    fill: #ffffff;
+    background-size: auto 40%;
+    background-repeat: no-repeat;
+    background-position: center center;
+
+    /*to switch to off, change:
+    left:auto
+    right:0px
+    background-image:url("../img/no.png")*/
+    left: auto;
+    right: 0px;
+    background-image: url("../img/yes.png");
+}
+
+#details-container {
+    position: relative;
+    width: 350px;
+    height: auto;
+    padding: 5px 20px;
+    margin: 0px;
+    background-color: #ffffff;
+    color: #000000;
+    text-align: center;
+    border-bottom: 1px solid #0080ff;
+
+    display: grid;
+    grid-template-areas:
+            'time-spent time-spent time-spent'
+            'text1 text1 value1'
+            'text2 text2 value2';
+    grid-gap: 5px;
+}
+
+.grid-item {
+    padding: 0px 10px;
+}
+
+.grid-item-time-spent {
+    grid-area: time-spent;
+    text-align: center;
+}
+
+.grid-item-text1 {
+    grid-area: text1;
+    border: 0px solid transparent;
+    border-right: 2px solid #0080ff;
+}
+
+.grid-item-value1 {
+    grid-area: value1;
+}
+
+.grid-item-text2 {
+    grid-area: text2;
+    border: 0px solid transparent;
+    border-right: 2px solid #0080ff;
+}
+
+.grid-item-value2 {
+    grid-area: value2;
+}
+
+.bold {
+    font-family: open-sans-bold;
+}
+
+.grey {
+    color: #dddddd;
+}
+
+.limite-text {
+    font-family: niconne;
+}
+
+.font-size-20px {
+    font-size: 20px;
+}
+
+.font-size-24px {
+    font-size: 24px;
+}
