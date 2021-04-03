@@ -154,8 +154,16 @@ function setUIFromData(url) {
                     websites_json = value["websites"];
                     if (websites_json[urlToUse] != undefined) {
                         switchToOnOrOff("toggle-thumb", true, websites_json[urlToUse]["enabled"]);
-                        timeSpentToday = websites_json[urlToUse][getToday()];
-                        timeSpentAlways = websites_json[urlToUse]["always"];
+                        if (websites_json[urlToUse][getToday()] != undefined) {
+                            timeSpentToday = websites_json[urlToUse][getToday()];
+                        } else {
+                            timeSpentToday = 0;
+                        }
+                        if (websites_json[urlToUse]["always"] != undefined) {
+                            timeSpentAlways = websites_json[urlToUse]["always"];
+                        } else {
+                            timeSpentAlways = 0;
+                        }
 
                         document.getElementById("today-time").innerHTML = getTimeConverted(timeSpentToday);
                         document.getElementById("always-time").innerHTML = getTimeConverted(timeSpentAlways);
@@ -256,8 +264,9 @@ function isUrlSupported(url) {
             break;
 
         default:
+            //this disable all unsupported website
             //valueToReturn = false;//todo remove this comment
-            valueToReturn = true;
+            valueToReturn = true;//this is just for testing
     }
     return valueToReturn;
 }
