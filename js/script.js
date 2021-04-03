@@ -128,14 +128,14 @@ function saveUrlToData(enabled, time = 0) {
     document.getElementById("today-time").innerHTML = getTimeConverted(timeSpentToday);
     document.getElementById("always-time").innerHTML = getTimeConverted(timeSpentAlways);
 
-    let value = {};
+    let value = websites_json[urlToUse];
     value["enabled"] = enabled;
     value[getToday()] = timeSpentToday;
     value["always"] = timeSpentAlways;
     websites_json[urlToUse] = value;
 
     browser.storage.local.set({"websites": websites_json}, function () {
-        //console.log("Saved || " + JSON.stringify(websites_json));
+        console.log("Saved || " + JSON.stringify(websites_json));
     });
 }
 
@@ -273,9 +273,10 @@ function isUrlSupported(url) {
 
 function increaseTime(url) {
     if (enabledOrNot) {
+        if (!isInteger(timeSpentToday)) timeSpentToday = 0;
         timeSpentToday++;
+        if (!isInteger(timeSpentAlways)) timeSpentAlways = 0;
         timeSpentAlways++;
-        console.log(timeSpentToday);
         if (url == currentUrl) {
             saveUrlToData(true, 0);
         }
@@ -298,6 +299,15 @@ function getToday() {
 
 function getTimeConverted(time) {
     return time;
+}
+
+function isInteger(value) {
+    if (Number.isNaN(value) == false) {
+        if (Number.isInteger(value)) {
+            return true;
+        }
+    }
+    return false;
 }
 
 loaded();
