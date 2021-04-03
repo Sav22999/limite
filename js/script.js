@@ -130,8 +130,8 @@ function saveUrlToData(enabled, time = 0) {
 
     let value = websites_json[urlToUse];
     value["enabled"] = enabled;
-    value[getToday()] = timeSpentToday;
     value["always"] = timeSpentAlways;
+    value[getToday()] = timeSpentToday;
     websites_json[urlToUse] = value;
 
     browser.storage.local.set({"websites": websites_json}, function () {
