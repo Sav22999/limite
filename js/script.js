@@ -135,7 +135,7 @@ function saveUrlToData(enabled, time = 0) {
     websites_json[urlToUse] = value;
 
     browser.storage.local.set({"websites": websites_json}, function () {
-        console.log("Saved || " + JSON.stringify(websites_json));
+        //console.log("Saved || " + JSON.stringify(websites_json));
     });
 }
 
