@@ -8,12 +8,11 @@ var enabledOrNot = true;
 
 var websites_json = {}
 
-var timer = null;
 var loadUItimer = null;
 
 var firstTime = true;
 
-var globalCounter = 0;
+var changedEdits = false;
 
 const linkReview = ["https://addons.mozilla.org/firefox/addon/limite/"]; //{firefox add-ons}
 const linkDonate = ["https://www.paypal.com/pools/c/8yl6auiU6e", "https://ko-fi.com/saveriomorelli", "https://liberapay.com/Sav22999/donate"]; //{paypal, ko-fi}
@@ -28,12 +27,11 @@ function loaded() {
 
         setUrl(getShortUrl(activeTabUrl), true);
 
-        setFavicon(activeTab.favIconUrl);
+        //setFavicon(activeTab.favIconUrl);
 
         oldUrl = currentUrl;
         fullUrl = activeTabUrl;
         currentUrl = getShortUrl(activeTabUrl);
-        //setUIFromData(activeTabUrl);
         loadUI();
 
         if (loadUItimer == null) {
@@ -53,6 +51,8 @@ function loaded() {
 }
 
 function loadUI() {
+    //load the UI (without set anything)
+
     browser.tabs.query({active: true, currentWindow: true}, function (tabs) {
         // since only one tab should be active and in the current window at once
         // the return variable should only have one entry
@@ -62,18 +62,15 @@ function loadUI() {
 
         setUrl(getShortUrl(activeTabUrl), true);
 
-        setFavicon(activeTab.favIconUrl);
+        //setFavicon(activeTab.favIconUrl);
 
         oldUrl = currentUrl;
         fullUrl = activeTabUrl;
         currentUrl = getShortUrl(activeTabUrl);
 
         let urlToUse = currentUrl;
-        clearInterval(timer);
-        timer = null;
 
-        //disableSwitch(true);//todo remove as comment
-        //disableSwitch(false);//this is just for testing
+        disableSwitch(true);//todo remove as comment
         if (isUrlSupported(fullUrl)) {
             browser.storage.local.get("websites", function (value) {
                     timeSpentToday = 0;
@@ -84,8 +81,7 @@ function loadUI() {
                             if (firstTime == true) {
                                 let enabled = false;
                                 if (websites_json[urlToUse]["enabled"] != undefined) enabled = websites_json[urlToUse]["enabled"];
-                                console.log("Website: " + JSON.stringify(websites_json[urlToUse]));
-                                switchToOnOrOffUI("toggle-thumb", true, enabled);
+                                switchToOnOrOff(false, "toggle-thumb", true, enabled);
                                 firstTime = false;
                             }
                             if (websites_json[urlToUse][getToday()] != undefined) {
@@ -116,11 +112,10 @@ function loadUI() {
 
 function tabUpdated(tabId, changeInfo, tabInfo) {
     setUrl(getShortUrl(tabInfo.url), true);
-    setFavicon(tabInfo.favIconUrl);
+    //setFavicon(tabInfo.favIconUrl);
 
     oldUrl = currentUrl;
     currentUrl = getShortUrl(tabInfo.url);
-    //setUIFromData(tabInfo.url);
     loadUI();
 }
 
@@ -195,19 +190,11 @@ function getTheProtocol(url) {
     return url.split(":")[0];
 }
 
-function switchToOnOrOff(toggleId, forced = false, value = false) {
+function switchToOnOrOff(changeVariable = false, toggleId, forced = false, value = false) {
     if (!forced && document.getElementById(toggleId).style.left == "0px" || forced && value) {
-        switchToOn(toggleId, true);
+        switchToOn(toggleId, changeVariable);
     } else {
-        switchToOff(toggleId, true);
-    }
-}
-
-function switchToOnOrOffUI(toggleId, forced = false, value = false) {
-    if (!forced && document.getElementById(toggleId).style.left == "0px" || forced && value) {
-        switchToOn(toggleId);
-    } else {
-        switchToOff(toggleId);
+        switchToOff(toggleId, changeVariable);
     }
 }
 
@@ -218,28 +205,20 @@ function switchToOn(toggleId, changeVariable = false) {
 
     document.getElementById("details-section").style.display = "block";
 
-    console.log("Popup || Switch to on");
-
     if (changeVariable) {
         browser.storage.local.get("edits", function (value) {
-            if (value["edits"] != undefined) globalCounter = value["edits"]["counter"];
-            if (globalCounter == 0) {
-                globalCounter = 1;
+            if (value["edits"] !== undefined) changedEdits = value["edits"]["counter"];
+            if (!changedEdits) {
+                changedEdits = true;
                 let editsToPush = {};
-                editsToPush["counter"] = globalCounter;
+                editsToPush["counter"] = changedEdits;
                 editsToPush["enabled"] = true;
                 browser.storage.local.set({"edits": editsToPush}, function () {
-                    console.log("Set edits = " + JSON.stringify(editsToPush));
                     enabledOrNot = true;
                 });
             }
         });
     }
-    /*if (timer == null) {
-        timer = setInterval(function () {
-            increaseTime(currentUrl);
-        }, 1000);
-    }*/
 }
 
 function switchToOff(toggleId, changeVariable = false) {
@@ -249,27 +228,20 @@ function switchToOff(toggleId, changeVariable = false) {
 
     document.getElementById("details-section").style.display = "none";
 
-    console.log("Popup || Switch to off");
-
     if (changeVariable) {
         browser.storage.local.get("edits", function (value) {
-            if (value["edits"] != undefined) globalCounter = value["edits"]["counter"];
-            if (globalCounter == 0) {
-                globalCounter = 1;
+            if (value["edits"] !== undefined) changedEdits = value["edits"]["counter"];
+            if (!changedEdits) {
+                changedEdits = true;
                 let editsToPush = {};
-                editsToPush["counter"] = globalCounter;
+                editsToPush["counter"] = changedEdits;
                 editsToPush["enabled"] = false;
                 browser.storage.local.set({"edits": editsToPush}, function () {
-                    console.log("Set edits = " + JSON.stringify(editsToPush));
                     enabledOrNot = false;
                 });
             }
         });
     }
-    /*
-    clearInterval(timer);
-    timer = null;
-    */
 }
 
 function disableSwitch(value) {
@@ -280,7 +252,7 @@ function disableSwitch(value) {
         }
     } else {
         toggleContainer.onclick = function () {
-            switchToOnOrOff("toggle-thumb");
+            switchToOnOrOff(true, "toggle-thumb");
         }
     }
 }
@@ -296,7 +268,7 @@ function isUrlSupported(url) {
 
         default:
             //this disable all unsupported website
-            valueToReturn = false;//todo remove this comment
+            valueToReturn = true;//todo | true->for testing, false->stable release
     }
     return valueToReturn;
 }
@@ -316,7 +288,17 @@ function getToday() {
 }
 
 function getTimeConverted(time) {
-    return time;
+    let timeToReturn = "";
+    if (time >= 60) {
+        if (time / 60 >= 60) {
+            timeToReturn = time + " h";
+        } else {
+            timeToReturn = ((time - (time % 60)) / 60) + " min";
+        }
+    } else {
+        timeToReturn = time + " sec";
+    }
+    return timeToReturn;
 }
 
 function isInteger(value) {

@@ -1,19 +1,3 @@
-browser.tabs.query({active: true, currentWindow: true}, function (tabs) {
-
-    // since only one tab should be active and in the current window at once
-    // the return variable should only have one entry
-    var activeTab = tabs[0];
-    var activeTabId = activeTab.id; // or do whatever you need
-    var activeTabUrl = activeTab.url; // or do whatever you
-
-    //oldUrl = currentUrl;
-    currentUrl = activeTabUrl;
-    console.log(currentUrl)
-    console.log(JSON.stringify(tabs[0]));
-
-});
-
-
 var timeSpentToday = 0;
 var timeSpentAlways = 0;
 
@@ -23,10 +7,9 @@ var enabledOrNot = true;
 
 var websites_json = {}
 
-var timer = null;
 var checkTimer = null;
 
-var globalCounter = 0;
+var changedEdits = false;
 
 const linkReview = ["https://addons.mozilla.org/firefox/addon/limite/"]; //{firefox add-ons}
 const linkDonate = ["https://www.paypal.com/pools/c/8yl6auiU6e", "https://ko-fi.com/saveriomorelli", "https://liberapay.com/Sav22999/donate"]; //{paypal, ko-fi}
@@ -43,9 +26,9 @@ function loaded() {
 
         oldUrl = currentUrl;
         currentUrl = getShortUrl(activeTabUrl);
-        setUIFromData(activeTabUrl);
+        getSavedData(activeTabUrl);
 
-        globalCounter = 0;
+        changedEdits = false;
 
         if (checkTimer == null) {
             checkTimer = setInterval(function () {
@@ -55,7 +38,6 @@ function loaded() {
     });
 
     browser.tabs.onUpdated.addListener(tabUpdated);
-    disableSwitch(true);
 }
 
 function reload() {
@@ -73,21 +55,20 @@ function reload() {
         fullUrl = activeTabUrl;
 
         browser.storage.local.get("edits", function (value) {
-            if (value["edits"]["counter"] == 1) {
+            if (value["edits"]["counter"]) {
                 enabledOrNot = value["edits"]["enabled"];
-                console.log("Updated || Enabled: " + enabledOrNot);
+                //console.log("Updated || Enabled: " + enabledOrNot);
                 let editsToPush = {};
-                editsToPush["counter"] = 0;
+                editsToPush["counter"] = false;
                 editsToPush["enabled"] = enabledOrNot;
                 browser.storage.local.set({"edits": editsToPush}, function () {
-                    console.log("Background || Reset edits = " + JSON.stringify(editsToPush));
+                    //console.log("Background || Reset edits = " + JSON.stringify(editsToPush));
                     checkStatusEnabled(enabledOrNot, true);
-                    globalCounter = 0;
+                    changedEdits = false;
                 });
             } else {
                 checkStatusEnabled(enabledOrNot);
             }
-            console.log("my globalCounter = " + globalCounter)
         });
     });
 }
@@ -104,9 +85,10 @@ function checkStatusEnabled(enabled, force = false) {
         value[getToday()] = timeSpentToday;
         websites_json[urlToUse] = value;
 
-        if (globalCounter == 0) {
+        if (!changedEdits) {
             browser.storage.local.set({"websites": websites_json}, function () {
-                console.log("Background || Saved || Forced || Status: " + enabledOrNot + " || " + JSON.stringify(websites_json));
+                //console.log("Background || Saved || Forced || Status: " + enabledOrNot + " || " + JSON.stringify(websites_json));
+                //console.log("Background || Saved || Forced || Status: " + enabledOrNot + "");
             });
         }
     }
@@ -118,7 +100,7 @@ function tabUpdated(tabId, changeInfo, tabInfo) {
     oldUrl = currentUrl;
     currentUrl = getShortUrl(tabInfo.url);
     fullUrl = tabInfo.url;
-    setUIFromData(tabInfo.url);
+    getSavedData(tabInfo.url);
 }
 
 function setUrl(url, formatted = false) {
@@ -133,10 +115,8 @@ function getShortUrl(url) {
         urlParts = url.split(":");
         urlToReturn = urlParts[1];
         if (isUrlSupported(url)) {
-            disableSwitch(false);
         } else {
-            switchToOff("toggle-thumb");
-            disableSwitch(true);
+            switchToOff();
             return "This is URL is not supported";
         }
     }
@@ -168,9 +148,6 @@ function saveUrlToData(enabled, time = 0) {
     timeSpentToday += time;
     timeSpentAlways += time;
 
-    //document.getElementById("today-time").innerHTML = getTimeConverted(timeSpentToday);
-    //document.getElementById("always-time").innerHTML = getTimeConverted(timeSpentAlways);
-
     let value = {};
     if (websites_json[urlToUse] != undefined) value = websites_json[urlToUse];
     value["enabled"] = enabled;
@@ -179,21 +156,18 @@ function saveUrlToData(enabled, time = 0) {
     websites_json[urlToUse] = value;
 
     if (isUrlSupported(fullUrl)) {
-        if (globalCounter == 0) {
+        if (!changedEdits) {
             browser.storage.local.set({"websites": websites_json}, function () {
-                console.log("Background || Saved || Status: " + enabledOrNot + " || " + JSON.stringify(websites_json));
+                //console.log("Background || Saved || Status: " + enabledOrNot + " || " + JSON.stringify(websites_json));
+                //console.log("Background || Saved || Status: " + enabledOrNot + "");
             });
         }
     }
 }
 
-function setUIFromData(url) {
+function getSavedData(url) {
     let urlToUse = currentUrl;
-    clearInterval(timer);
-    timer = null;
 
-    //disableSwitch(true);//todo remove as comment
-    //disableSwitch(false);//this is just for testing
     if (isUrlSupported(url)) {
         browser.storage.local.get("websites", function (value) {
                 timeSpentToday = 0;
@@ -203,7 +177,7 @@ function setUIFromData(url) {
                     if (websites_json[urlToUse] != undefined) {
                         let enabled = false;
                         if (websites_json[urlToUse]["enabled"] != undefined) enabled = websites_json[urlToUse]["enabled"];
-                        switchToOnOrOff("toggle-thumb", true, enabled);
+                        switchToOnOrOff(true, enabled);
                         if (websites_json[urlToUse][getToday()] != undefined) {
                             timeSpentToday = websites_json[urlToUse][getToday()];
                         } else {
@@ -214,98 +188,33 @@ function setUIFromData(url) {
                         } else {
                             timeSpentAlways = 0;
                         }
-
-                        /*document.getElementById("today-time").innerHTML = getTimeConverted(timeSpentToday);
-                        document.getElementById("always-time").innerHTML = getTimeConverted(timeSpentAlways);*/
                     } else {
-                        switchToOnOrOff("toggle-thumb", true, true);
                         saveUrlToData(true, 0);
                     }
                 } else {
-                    switchToOnOrOff("toggle-thumb", true, true);
                     saveUrlToData(true, 0);
                 }
-                disableSwitch(false);
             }
         )
     } else {
-        disableSwitch(true);
-        switchToOff("toggle-thumb");
+        switchToOff();
     }
 }
 
-function switchToOnOrOff(toggleId, forced = false, value = false) {
-    if (!forced && document.getElementById(toggleId).style.left == "0px" || forced && value) {
-        switchToOn(toggleId);
+function switchToOnOrOff(forced = false, value = false) {
+    if (forced && value) {
+        switchToOn();
     } else {
-        switchToOff(toggleId);
+        switchToOff();
     }
 }
 
-function switchToOn(toggleId) {
-    /*document.getElementById(toggleId).style.left = "auto";
-    document.getElementById(toggleId).style.right = "0px";
-    document.getElementById(toggleId).style.backgroundImage = "url('../img/yes.png')";
-
-    document.getElementById("details-section").style.display = "block";*/
-
-    console.log("Background || Switch to on");
-
+function switchToOn() {
     enabledOrNot = true;
-    /*if (timer == null) {
-        timer = setInterval(function () {
-            increaseTime(currentUrl);
-        }, 1000);
-    }*/
 }
 
-function switchToOff(toggleId) {
-    /*document.getElementById(toggleId).style.left = "0px";
-    document.getElementById(toggleId).style.right = "auto";
-    document.getElementById(toggleId).style.backgroundImage = "url('../img/no.png')";
-
-    document.getElementById("details-section").style.display = "none";*/
-
-    console.log("Background || Switch to off");
-
-    browser.storage.local.get("websites", function (value) {
-        if (value["websites"] != undefined) {
-            websites_json = value["websites"];
-            if (websites_json[currentUrl] != undefined) {
-                websites_json[currentUrl]["enabled"] = false;
-                browser.storage.local.set({"websites": websites_json}, function () {
-                });
-            } else {
-                websites_json[currentUrl]["enabled"] = false;
-                websites_json[currentUrl]["today"] = 0;
-                websites_json[currentUrl]["always"] = 0;
-                browser.storage.local.set({"websites": websites_json}, function () {
-                });
-            }
-        } else {
-            websites_json[currentUrl]["enabled"] = false;
-            websites_json[currentUrl]["today"] = 0;
-            websites_json[currentUrl]["always"] = 0;
-            browser.storage.local.set({"websites": websites_json}, function () {
-            });
-        }
-    });
+function switchToOff() {
     enabledOrNot = false;
-    clearInterval(timer);
-    timer = null;
-}
-
-function disableSwitch(value) {
-    /*let toggleContainer = document.getElementById("toggle-container");
-    toggleContainer.style.top = (document.getElementById("switch-toggle-section").offsetHeight - toggleContainer.offsetHeight) / 2;
-    if (value) {
-        toggleContainer.onclick = function () {
-        }
-    } else {
-        toggleContainer.onclick = function () {
-            switchToOnOrOff("toggle-thumb");
-        }
-    }*/
 }
 
 function isUrlSupported(url) {
@@ -319,15 +228,14 @@ function isUrlSupported(url) {
 
         default:
             //this disable all unsupported website
-            valueToReturn = false;//todo remove this comment
-        //valueToReturn = true;//this is just for testing
+            valueToReturn = true;//todo | true->for testing, false->stable release
     }
     return valueToReturn;
 }
 
 function checkEverySecond(url) {
     reload();
-    //console.log("Checking... || enabled: " + enabledOrNot);
+    //console.log("Checking... || Enabled: " + enabledOrNot + " || Changed: " + changedEdits);
 }
 
 function increaseTime(url) {
@@ -354,10 +262,6 @@ function getToday() {
     else today = today + "" + day;
 
     return today;
-}
-
-function getTimeConverted(time) {
-    return time;
 }
 
 function isInteger(value) {
