@@ -11,16 +11,19 @@ var checkTimer = null;
 
 var changedEdits = false;
 
+var activeTabId;
+
 const linkReview = ["https://addons.mozilla.org/firefox/addon/limite/"]; //{firefox add-ons}
 const linkDonate = ["https://www.paypal.com/pools/c/8yl6auiU6e", "https://ko-fi.com/saveriomorelli", "https://liberapay.com/Sav22999/donate"]; //{paypal, ko-fi}
+const icons = ["icon.svg", "icon_disabled.svg", "icon_yellow.svg", "icon_orange.svg", "icon_red.svg"];
 
 function loaded() {
     browser.tabs.query({active: true, currentWindow: true}, function (tabs) {
         // since only one tab should be active and in the current window at once
         // the return variable should only have one entry
         var activeTab = tabs[0];
-        var activeTabId = activeTab.id; // or do whatever you need
-        var activeTabUrl = activeTab.url; // or do whatever you
+        activeTabId = activeTab.id;
+        var activeTabUrl = activeTab.url;
 
         setUrl(getShortUrl(activeTabUrl), true);
 
@@ -37,6 +40,7 @@ function loaded() {
         }
     });
 
+    //catch changing of tab
     browser.tabs.onUpdated.addListener(tabUpdated);
 }
 
@@ -45,7 +49,7 @@ function reload() {
         // since only one tab should be active and in the current window at once
         // the return variable should only have one entry
         let activeTab = tabs[0];
-        let activeTabId = activeTab.id; // or do whatever you need
+        activeTabId = activeTab.id; // or do whatever you need
         let activeTabUrl = activeTab.url; // or do whatever you
 
         setUrl(getShortUrl(activeTabUrl), true);
@@ -55,7 +59,7 @@ function reload() {
         fullUrl = activeTabUrl;
 
         browser.storage.local.get("edits", function (value) {
-            if (value["edits"]["counter"]) {
+            if (value["edits"] != undefined && value["edits"]["counter"]) {
                 enabledOrNot = value["edits"]["enabled"];
                 //console.log("Updated || Enabled: " + enabledOrNot);
                 let editsToPush = {};
@@ -92,6 +96,7 @@ function checkStatusEnabled(enabled, force = false) {
             });
         }
     }
+    if (!enabled) changeIcon(1);
 }
 
 function tabUpdated(tabId, changeInfo, tabInfo) {
@@ -211,10 +216,12 @@ function switchToOnOrOff(forced = false, value = false) {
 
 function switchToOn() {
     enabledOrNot = true;
+    changeIcon(0);
 }
 
 function switchToOff() {
     enabledOrNot = false;
+    changeIcon(1);
 }
 
 function isUrlSupported(url) {
@@ -241,12 +248,28 @@ function checkEverySecond(url) {
 function increaseTime(url) {
     if (enabledOrNot) {
         if (!isInteger(timeSpentToday)) timeSpentToday = 0;
-        timeSpentToday++;
+        timeSpentToday += 1;
         if (!isInteger(timeSpentAlways)) timeSpentAlways = 0;
-        timeSpentAlways++;
+        timeSpentAlways += 1;
         if (url == currentUrl) {
             saveUrlToData(true, 0);
         }
+
+        if (timeSpentToday >= 0 && timeSpentToday < 60 * 30) {
+            //30 minutes || OK
+            changeIcon(0);
+        } else if (timeSpentToday >= 60 * 30 && timeSpentToday < 60 * 60) {
+            //60 minutes (1 hour) || Yellow
+            changeIcon(2);
+        } else if (timeSpentToday >= 60 * 60 && timeSpentToday < 60 * 60 * 3) {
+            //3 hours || Orange
+            changeIcon(3);
+        } else if (timeSpentToday >= 60 * 60 * 3) {
+            //+3 hours || Red
+            changeIcon(4);
+        }
+
+        //console.log("All websites: " + JSON.stringify(websites_json));
     }
 }
 
@@ -271,6 +294,10 @@ function isInteger(value) {
         }
     }
     return false;
+}
+
+function changeIcon(index) {
+    browser.browserAction.setIcon({path: "../img/" + icons[index], tabId: activeTabId});
 }
 
 loaded();

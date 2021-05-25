@@ -17,7 +17,7 @@ var changedEdits = false;
 const linkReview = ["https://addons.mozilla.org/firefox/addon/limite/"]; //{firefox add-ons}
 const linkDonate = ["https://www.paypal.com/pools/c/8yl6auiU6e", "https://ko-fi.com/saveriomorelli", "https://liberapay.com/Sav22999/donate"]; //{paypal, ko-fi}
 
-function loaded() {
+function loaded(permissionDesc) {
     browser.tabs.query({active: true, currentWindow: true}, function (tabs) {
         // since only one tab should be active and in the current window at once
         // the return variable should only have one entry
