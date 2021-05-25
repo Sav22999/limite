@@ -117,7 +117,7 @@ function getShortUrl(url) {
         if (isUrlSupported(url)) {
         } else {
             switchToOff();
-            return "This is URL is not supported";
+            return "This URL is not supported";
         }
     }
 
@@ -228,7 +228,7 @@ function isUrlSupported(url) {
 
         default:
             //this disable all unsupported website
-            valueToReturn = true;//todo | true->for testing, false->stable release
+            valueToReturn = false;//todo | true->for testing, false->stable release
     }
     return valueToReturn;
 }

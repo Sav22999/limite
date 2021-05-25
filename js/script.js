@@ -70,7 +70,7 @@ function loadUI() {
 
         let urlToUse = currentUrl;
 
-        disableSwitch(true);//todo remove as comment
+        disableSwitch(true);
         if (isUrlSupported(fullUrl)) {
             browser.storage.local.get("websites", function (value) {
                     timeSpentToday = 0;
@@ -116,6 +116,7 @@ function tabUpdated(tabId, changeInfo, tabInfo) {
 
     oldUrl = currentUrl;
     currentUrl = getShortUrl(tabInfo.url);
+    firstTime = true;
     loadUI();
 }
 
@@ -145,7 +146,7 @@ function getShortUrl(url) {
         } else {
             switchToOff("toggle-thumb");
             disableSwitch(true);
-            return "This is URL is not supported";
+            return "This URL is not supported";
         }
     }
 
@@ -268,7 +269,7 @@ function isUrlSupported(url) {
 
         default:
             //this disable all unsupported website
-            valueToReturn = true;//todo | true->for testing, false->stable release
+            valueToReturn = false;//todo | true->for testing, false->stable release
     }
     return valueToReturn;
 }
@@ -288,16 +289,72 @@ function getToday() {
 }
 
 function getTimeConverted(time) {
+    let timeToUse = time;
     let timeToReturn = "";
-    if (time >= 60) {
-        if (time / 60 >= 60) {
-            timeToReturn = time + " h";
+    if (timeToUse >= 60) {
+        //check minutes
+        if (timeToUse / 60 >= 60) {
+            //check hours
+            if (timeToUse / (60 * 60) >= 24) {
+                //check days
+                if (timeToUse / (60 * 60 * 24) >= 365) {
+                    //check year(s)
+                    if (getDayOrDays((timeToUse % (60 * 60 * 24 * 365))) != "") {
+                        timeToReturn = getYearOrYears(timeToUse) + " and " + getDayOrDays((timeToUse % (60 * 60 * 24 * 365)));
+                    } else {
+                        timeToReturn = getYearOrYears(timeToUse);
+                    }
+                } else {
+                    //check day(s)
+                    timeToReturn = getDayOrDays(timeToUse);
+                }
+            } else {
+                //hours
+                timeToReturn = getHourOrHours(timeToUse);
+            }
         } else {
-            timeToReturn = ((time - (time % 60)) / 60) + " min";
+            //minutes
+            timeToReturn = getMinuteOrMinutes(timeToUse);
         }
     } else {
-        timeToReturn = time + " sec";
+        //seconds
+        timeToReturn = getSecondOrSeconds(timeToUse);
     }
+    return timeToReturn;
+}
+
+function getSecondOrSeconds(timeToUse) {
+    let timeToReturn = "";
+    if (timeToUse == 1) timeToReturn = timeToUse + " second";
+    else if (timeToUse > 1) timeToReturn = timeToUse + " seconds";
+    return timeToReturn;
+}
+
+function getMinuteOrMinutes(timeToUse) {
+    let timeToReturn = "";
+    if (timeToUse / 60 && timeToUse < 60 * 2) timeToReturn = ((timeToUse - (timeToUse % 60)) / 60) + " minute";
+    else if (timeToUse > 60 * 2) timeToReturn = ((timeToUse - (timeToUse % 60)) / 60) + " minutes";
+    return timeToReturn;
+}
+
+function getHourOrHours(timeToUse) {
+    let timeToReturn = "";
+    if (timeToUse / (60) >= 60 && timeToUse / (60) < 60 * 2) timeToReturn = ((timeToUse - (timeToUse % (60 * 60))) / (60 * 60)) + " hour";
+    else if (timeToUse / (60) > 60 * 2) timeToReturn = ((timeToUse - (timeToUse % (60 * 60))) / (60 * 60)) + " hours";
+    return timeToReturn;
+}
+
+function getDayOrDays(timeToUse) {
+    let timeToReturn = "";
+    if (timeToUse / (60 * 60) >= 24 && timeToUse / (60 * 60) < 24 * 2) timeToReturn = ((timeToUse - (timeToUse % (60 * 60 * 24))) / (60 * 60 * 24)) + " day";
+    else if (timeToUse / (60 * 60) > 24 * 2) timeToReturn = ((timeToUse - (timeToUse % (60 * 60 * 24))) / (60 * 60 * 24)) + " days";
+    return timeToReturn;
+}
+
+function getYearOrYears(timeToUse) {
+    let timeToReturn = "";
+    if (timeToUse / (60 * 60 * 24) >= 365 && timeToUse / (60 * 60 * 24) < 365 * 2) timeToReturn = ((timeToUse - (timeToUse % (60 * 60 * 24 * 365))) / (60 * 60 * 24 * 365)) + " year";
+    else timeToReturn = ((timeToUse - (timeToUse % (60 * 60 * 24 * 365))) / (60 * 60 * 24 * 365)) + " years";
     return timeToReturn;
 }
 
