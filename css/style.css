@@ -89,7 +89,7 @@ body {
     grid-template-areas: 'text text text switch';
     grid-gap: 0px;
 
-    background-size: 30px auto;
+    background-size: 20px auto;
     background-repeat: no-repeat;
     background-position: 5px center;
 }
