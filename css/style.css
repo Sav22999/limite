@@ -27,8 +27,9 @@ body {
     /*It's set in js script*/
     height: auto;
     overflow: hidden;
-    font-family: twemoji, sans-serif;
+    font-family: open-sans, sans-serif;
     margin: 0px;
+    padding: 0px;
 }
 
 #popup-content {
@@ -40,6 +41,7 @@ body {
     padding: 0px;
     border: 0px solid transparent;
     position: relative;
+    background-color: #0080ff;
 }
 
 #website-section, #buy-me-a-coffee-section {
@@ -52,6 +54,7 @@ body {
     font-size: 16px;
     color: #ffffff;
     text-align: center;
+    border: 0px solid transparent;
 }
 
 #buy-me-a-coffee-section {

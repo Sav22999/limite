@@ -10,6 +10,7 @@ var websites_json = {}
 var checkTimer = null;
 
 var changedEdits = false;
+var changedTab = false;
 
 var activeTabId;
 
@@ -45,36 +46,38 @@ function loaded() {
 }
 
 function reload() {
-    browser.tabs.query({active: true, currentWindow: true}, function (tabs) {
-        // since only one tab should be active and in the current window at once
-        // the return variable should only have one entry
-        let activeTab = tabs[0];
-        activeTabId = activeTab.id; // or do whatever you need
-        let activeTabUrl = activeTab.url; // or do whatever you
+    if (!changedTab) {
+        browser.tabs.query({active: true, currentWindow: true}, function (tabs) {
+            // since only one tab should be active and in the current window at once
+            // the return variable should only have one entry
+            let activeTab = tabs[0];
+            activeTabId = activeTab.id; // or do whatever you need
+            let activeTabUrl = activeTab.url; // or do whatever you
 
-        setUrl(getShortUrl(activeTabUrl), true);
+            setUrl(getShortUrl(activeTabUrl), true);
 
-        oldUrl = currentUrl;
-        currentUrl = getShortUrl(activeTabUrl);
-        fullUrl = activeTabUrl;
+            oldUrl = currentUrl;
+            currentUrl = getShortUrl(activeTabUrl);
+            fullUrl = activeTabUrl;
 
-        browser.storage.local.get("edits", function (value) {
-            if (value["edits"] != undefined && value["edits"]["counter"]) {
-                enabledOrNot = value["edits"]["enabled"];
-                //console.log("Updated || Enabled: " + enabledOrNot);
-                let editsToPush = {};
-                editsToPush["counter"] = false;
-                editsToPush["enabled"] = enabledOrNot;
-                browser.storage.local.set({"edits": editsToPush}, function () {
-                    //console.log("Background || Reset edits = " + JSON.stringify(editsToPush));
-                    checkStatusEnabled(enabledOrNot, true);
-                    changedEdits = false;
-                });
-            } else {
-                checkStatusEnabled(enabledOrNot);
-            }
+            browser.storage.local.get("edits", function (value) {
+                if (value["edits"] != undefined && value["edits"]["counter"]) {
+                    enabledOrNot = value["edits"]["enabled"];
+                    //console.log("Updated || Enabled: " + enabledOrNot);
+                    let editsToPush = {};
+                    editsToPush["counter"] = false;
+                    editsToPush["enabled"] = enabledOrNot;
+                    browser.storage.local.set({"edits": editsToPush}, function () {
+                        //console.log("Background || Reset edits = " + JSON.stringify(editsToPush));
+                        checkStatusEnabled(enabledOrNot, true);
+                        changedEdits = false;
+                    });
+                } else {
+                    checkStatusEnabled(enabledOrNot);
+                }
+            });
         });
-    });
+    }
 }
 
 function checkStatusEnabled(enabled, force = false) {
@@ -105,6 +108,7 @@ function tabUpdated(tabId, changeInfo, tabInfo) {
     oldUrl = currentUrl;
     currentUrl = getShortUrl(tabInfo.url);
     fullUrl = tabInfo.url;
+    changedTab = true;
     getSavedData(tabInfo.url);
 }
 
@@ -199,10 +203,12 @@ function getSavedData(url) {
                 } else {
                     saveUrlToData(true, 0);
                 }
+                changedTab = false;
             }
         )
     } else {
         switchToOff();
+        changedTab = false;
     }
 }
 
@@ -261,16 +267,29 @@ function increaseTime(url) {
         } else if (timeSpentToday >= 60 * 30 && timeSpentToday < 60 * 60) {
             //60 minutes (1 hour) || Yellow
             changeIcon(2);
+            //createNotification("30 minutes", "You have already spent 30 minutes on this site today");
         } else if (timeSpentToday >= 60 * 60 && timeSpentToday < 60 * 60 * 3) {
             //3 hours || Orange
             changeIcon(3);
+            //createNotification("1 hour", "You have already spent 1 hour on this site today");
         } else if (timeSpentToday >= 60 * 60 * 3) {
             //+3 hours || Red
             changeIcon(4);
+            //createNotification("3 hours", "You have already spent 1 hours on this site today");
         }
 
         //console.log("All websites: " + JSON.stringify(websites_json));
     }
+}
+
+function createNotification(title, content) {
+    //send a notification
+    browser.notifications.create({
+        "type": "basic",
+        "iconUrl": "./img/icon-96.png",
+        "title": title,
+        "message": content
+    });
 }
 
 function getToday() {

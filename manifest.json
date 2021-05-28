@@ -1,7 +1,7 @@
 {
   "manifest_version": 2,
   "name": "Limite",
-  "version": "1.0",
+  "version": "1.0.1",
   "description": "Check how much time you spend on each website every day.\nOptimise your productivity, your time and your life as well.\nDon't lose precious time!",
   "icons": {
     "16": "./img/icon-16.png",
@@ -62,6 +62,7 @@
   "permissions": [
     "storage",
     "tabs",
-    "unlimitedStorage"
+    "unlimitedStorage",
+    "notifications"
   ]
 }
