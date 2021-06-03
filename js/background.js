@@ -1,5 +1,5 @@
 var timeSpentToday = 0;
-var timeSpentAlways = 0;
+//var timeSpentAlways = 0;
 
 var currentUrl = "";
 var oldUrl = "";
@@ -84,20 +84,7 @@ function checkStatusEnabled(enabled, force = false) {
     if (!force) {
         if (enabled) increaseTime(currentUrl);
     } else {
-        let urlToUse = currentUrl;
-        let value = {};
-        if (websites_json[urlToUse] != undefined) value = websites_json[urlToUse];
-        value["enabled"] = enabled;
-        value["always"] = timeSpentAlways;
-        value[getToday()] = timeSpentToday;
-        websites_json[urlToUse] = value;
-
-        if (!changedEdits) {
-            browser.storage.local.set({"websites": websites_json}, function () {
-                //console.log("Background || Saved || Forced || Status: " + enabledOrNot + " || " + JSON.stringify(websites_json));
-                //console.log("Background || Saved || Forced || Status: " + enabledOrNot + "");
-            });
-        }
+        saveUrlToData(enabled, 0);
     }
     if (!enabled) changeIcon(1);
 }
@@ -154,24 +141,42 @@ function getTheProtocol(url) {
 function saveUrlToData(enabled, time = 0) {
     let urlToUse = currentUrl;
 
-    timeSpentToday += time;
-    timeSpentAlways += time;
-
-    let value = {};
-    if (websites_json[urlToUse] != undefined) value = websites_json[urlToUse];
-    value["enabled"] = enabled;
-    value["always"] = timeSpentAlways;
-    value[getToday()] = timeSpentToday;
-    websites_json[urlToUse] = value;
-
-    if (isUrlSupported(fullUrl)) {
-        if (!changedEdits) {
-            browser.storage.local.set({"websites": websites_json}, function () {
-                //console.log("Background || Saved || Status: " + enabledOrNot + " || " + JSON.stringify(websites_json));
-                //console.log("Background || Saved || Status: " + enabledOrNot + "");
-            });
+    let valueToUse = {};
+    browser.storage.local.get("websites", function (value) {
+        if (value["websites"] != undefined) {
+            websites_json = value["websites"];
         }
-    }
+        changedTab = false;
+        timeSpentToday = 0;
+        //timeSpentAlways = 0;
+        if (websites_json[urlToUse] != undefined) {
+            valueToUse = websites_json[urlToUse];
+            if (websites_json[urlToUse][getToday()] != undefined) {
+                timeSpentToday = websites_json[urlToUse][getToday()];
+            }
+            /*if (websites_json[urlToUse]["always"] != undefined) {
+                timeSpentAlways = websites_json[urlToUse]["always"];
+            }*/
+        }
+
+        timeSpentToday += time;
+        //timeSpentAlways += time;
+
+        valueToUse["enabled"] = enabled;
+        valueToUse[getToday()] = timeSpentToday;
+        //valueToUse["always"] = timeSpentAlways;
+        websites_json[urlToUse] = valueToUse;
+
+        if (isUrlSupported(fullUrl)) {
+            if (!changedEdits) {
+                browser.storage.local.set({"websites": websites_json}, function () {
+                    //console.log("Background || Saved || Status: " + enabledOrNot + " || " + JSON.stringify(websites_json));
+                    //console.log("Background || Saved || Status: " + enabledOrNot + "");
+                    //console.log("Background || Saved || " + JSON.stringify(websites_json[currentUrl]));
+                });
+            }
+        }
+    })
 }
 
 function getSavedData(url) {
@@ -180,23 +185,23 @@ function getSavedData(url) {
     if (isUrlSupported(url)) {
         browser.storage.local.get("websites", function (value) {
                 timeSpentToday = 0;
-                timeSpentAlways = 0;
+                //timeSpentAlways = 0;
                 if (value["websites"] != undefined) {
                     websites_json = value["websites"];
                     if (websites_json[urlToUse] != undefined) {
                         let enabled = false;
                         if (websites_json[urlToUse]["enabled"] != undefined) enabled = websites_json[urlToUse]["enabled"];
                         switchToOnOrOff(true, enabled);
+                        timeSpentToday=0;
                         if (websites_json[urlToUse][getToday()] != undefined) {
                             timeSpentToday = websites_json[urlToUse][getToday()];
-                        } else {
-                            timeSpentToday = 0;
                         }
+                        /*
                         if (websites_json[urlToUse]["always"] != undefined) {
                             timeSpentAlways = websites_json[urlToUse]["always"];
                         } else {
                             timeSpentAlways = 0;
-                        }
+                        }*/
                     } else {
                         saveUrlToData(true, 0);
                     }
@@ -253,12 +258,8 @@ function checkEverySecond(url) {
 
 function increaseTime(url) {
     if (enabledOrNot) {
-        if (!isInteger(timeSpentToday)) timeSpentToday = 0;
-        timeSpentToday += 1;
-        if (!isInteger(timeSpentAlways)) timeSpentAlways = 0;
-        timeSpentAlways += 1;
         if (url == currentUrl) {
-            saveUrlToData(true, 0);
+            saveUrlToData(true, 1);
         }
 
         if (timeSpentToday >= 0 && timeSpentToday < 60 * 30) {

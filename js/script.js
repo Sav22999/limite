@@ -17,7 +17,7 @@ var changedEdits = false;
 const linkReview = ["https://addons.mozilla.org/firefox/addon/limite/"]; //{firefox add-ons}
 const linkDonate = ["https://www.paypal.com/pools/c/8yl6auiU6e", "https://ko-fi.com/saveriomorelli", "https://liberapay.com/Sav22999/donate"]; //{paypal, ko-fi}
 
-function loaded(permissionDesc) {
+function loaded() {
     browser.tabs.query({active: true, currentWindow: true}, function (tabs) {
         // since only one tab should be active and in the current window at once
         // the return variable should only have one entry
@@ -73,36 +73,36 @@ function loadUI() {
         disableSwitch(true);
         if (isUrlSupported(fullUrl)) {
             browser.storage.local.get("websites", function (value) {
-                    timeSpentToday = 0;
-                    timeSpentAlways = 0;
-                    if (value["websites"] != undefined) {
-                        websites_json = value["websites"];
-                        if (websites_json[urlToUse] != undefined) {
-                            if (firstTime == true) {
-                                let enabled = false;
-                                if (websites_json[urlToUse]["enabled"] != undefined) enabled = websites_json[urlToUse]["enabled"];
-                                switchToOnOrOff(false, "toggle-thumb", true, enabled);
-                                firstTime = false;
+                timeSpentToday = 0;
+                timeSpentAlways = 0;
+                if (value["websites"] != undefined) {
+                    websites_json = value["websites"];
+                    if (websites_json[urlToUse] != undefined) {
+                        if (firstTime == true) {
+                            let enabled = false;
+                            if (websites_json[urlToUse]["enabled"] != undefined) enabled = websites_json[urlToUse]["enabled"];
+                            switchToOnOrOff(false, "toggle-thumb", true, enabled);
+                            firstTime = false;
+                        }
+                        timeSpentToday = 0;
+                        if (websites_json[urlToUse][getToday()] != undefined) {
+                            timeSpentToday = websites_json[urlToUse][getToday()];
+                        }
+                        timeSpentAlways = 0;
+                        for (var key in websites_json[currentUrl]) {
+                            if (key != "always" && key != "enabled") {
+                                //console.log(k + " : " + websites_json[currentUrl][k])
+                                timeSpentAlways += websites_json[currentUrl][key];
                             }
-                            if (websites_json[urlToUse][getToday()] != undefined) {
-                                timeSpentToday = websites_json[urlToUse][getToday()];
-                            } else {
-                                timeSpentToday = 0;
-                            }
-                            if (websites_json[urlToUse]["always"] != undefined) {
-                                timeSpentAlways = websites_json[urlToUse]["always"];
-                            } else {
-                                timeSpentAlways = 0;
-                            }
-                        } else {
                         }
                     } else {
                     }
-                    disableSwitch(false);
-                    document.getElementById("today-time").innerHTML = getTimeConverted(timeSpentToday);
-                    document.getElementById("always-time").innerHTML = getTimeConverted(timeSpentAlways);
+                } else {
                 }
-            )
+                disableSwitch(false);
+                document.getElementById("today-time").innerHTML = getTimeConverted(timeSpentToday);
+                document.getElementById("always-time").innerHTML = getTimeConverted(timeSpentAlways);
+            })
         } else {
             disableSwitch(true);
             switchToOff("toggle-thumb");
@@ -326,7 +326,7 @@ function getTimeConverted(time) {
 function getSecondOrSeconds(timeToUse) {
     let timeToReturn = "";
     if (timeToUse == 1) timeToReturn = timeToUse + " second";
-    else if (timeToUse > 1) timeToReturn = timeToUse + " seconds";
+    else if (timeToUse == 0 || timeToUse > 1) timeToReturn = timeToUse + " seconds";
     return timeToReturn;
 }
 
