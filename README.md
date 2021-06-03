@@ -5,10 +5,10 @@
 </h1>
 Official repo of https://addons.mozilla.org/it/firefox/addon/limite/.
 
-[![GitHub release](https://img.shields.io/github/release/Sav22999/limite.svg)](https://github.com/Sav22999/limite/releases/) [![GitHub license](https://img.shields.io/github/license/Sav22999/emoji.svg)](https://github.com/Sav22999/emoji/blob/master/LICENSE) ![Maintenance](https://img.shields.io/badge/Maintained%3F-yes-green.svg)
+[![GitHub release](https://img.shields.io/github/release/Sav22999/limite.svg)](https://github.com/Sav22999/limite/releases/) [![GitHub license](https://img.shields.io/github/license/Sav22999/limite.svg)](https://github.com/Sav22999/limite/blob/master/LICENSE) ![Maintenance](https://img.shields.io/badge/Maintained%3F-yes-green.svg)
 [![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2FSav22999%2Flimite.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2FSav22999%2Flimite?ref=badge_shield)
 
-[<img src="img/firefoxAddons.png" height="50px">](https://addons.mozilla.org/it/firefox/addon/emoji-sav/) 
+[<img src="img/firefoxAddons.png" height="50px">](https://addons.mozilla.org/it/firefox/addon/limite/) 
 
 To support me, you can do a donation :smile: with **PayPal**, **LiberaPay** or **Ko-Fi**:
 
