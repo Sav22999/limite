@@ -1,5 +1,6 @@
 var timeSpentToday = 0;
-//var timeSpentAlways = 0;
+var lastNotification = {};
+var lastNotificationDate = 0;
 
 var currentUrl = "";
 var oldUrl = "";
@@ -16,7 +17,7 @@ var activeTabId;
 
 const linkReview = ["https://addons.mozilla.org/firefox/addon/limite/"]; //{firefox add-ons}
 const linkDonate = ["https://www.paypal.com/pools/c/8yl6auiU6e", "https://ko-fi.com/saveriomorelli", "https://liberapay.com/Sav22999/donate"]; //{paypal, ko-fi}
-const icons = ["icon.svg", "icon_disabled.svg", "icon_yellow.svg", "icon_orange.svg", "icon_red.svg"];
+const icons = ["icon.png", "icon_disabled.png", "icon_yellow.png", "icon_orange.png", "icon_red.png"];
 
 function loaded() {
     browser.tabs.query({active: true, currentWindow: true}, function (tabs) {
@@ -86,7 +87,10 @@ function checkStatusEnabled(enabled, force = false) {
     } else {
         saveUrlToData(enabled, 0);
     }
-    if (!enabled) changeIcon(1);
+    if (!enabled) {
+        changeIcon(1);
+        setBadgeText("");
+    }
 }
 
 function tabUpdated(tabId, changeInfo, tabInfo) {
@@ -192,7 +196,7 @@ function getSavedData(url) {
                         let enabled = false;
                         if (websites_json[urlToUse]["enabled"] != undefined) enabled = websites_json[urlToUse]["enabled"];
                         switchToOnOrOff(true, enabled);
-                        timeSpentToday=0;
+                        timeSpentToday = 0;
                         if (websites_json[urlToUse][getToday()] != undefined) {
                             timeSpentToday = websites_json[urlToUse][getToday()];
                         }
@@ -265,32 +269,44 @@ function increaseTime(url) {
         if (timeSpentToday >= 0 && timeSpentToday < 60 * 30) {
             //30 minutes || OK
             changeIcon(0);
+            setBadgeText(((timeSpentToday - (timeSpentToday % 60)) / 60).toString() + "m");
         } else if (timeSpentToday >= 60 * 30 && timeSpentToday < 60 * 60) {
             //60 minutes (1 hour) || Yellow
             changeIcon(2);
-            //createNotification("30 minutes", "You have already spent 30 minutes on this site today");
+            createNotification(2, currentUrl, "30 minutes", "You have already spent 30 minutes on this site today");
+            setBadgeText(((timeSpentToday - (timeSpentToday % 60)) / 60).toString() + "m", "#FFD400", "#000000");
         } else if (timeSpentToday >= 60 * 60 && timeSpentToday < 60 * 60 * 3) {
             //3 hours || Orange
             changeIcon(3);
-            //createNotification("1 hour", "You have already spent 1 hour on this site today");
+            createNotification(3, currentUrl, "1 hour", "You have already spent 1 hour on this site today");
+            setBadgeText(((timeSpentToday - (timeSpentToday % (60 * 60))) / (60 * 60)).toString() + "h", "#FF7C00", "#000000");
         } else if (timeSpentToday >= 60 * 60 * 3) {
-            //+3 hours || Red
+            //>3 hours || Red
             changeIcon(4);
-            //createNotification("3 hours", "You have already spent 1 hours on this site today");
+            createNotification(4, currentUrl, "3 hours", "You have already spent 1 hours on this site today");
+            setBadgeText(">3h", "#FF0000");
         }
 
         //console.log("All websites: " + JSON.stringify(websites_json));
     }
 }
 
-function createNotification(title, content) {
+function createNotification(type, url, title, content) {
     //send a notification
-    browser.notifications.create({
-        "type": "basic",
-        "iconUrl": "./img/icon-96.png",
-        "title": title,
-        "message": content
-    });
+    if (getToday() != lastNotificationDate || lastNotification[url] != type) {
+        lastNotificationDate = getToday();
+        lastNotification[url] = type;
+        browser.notifications.create({
+            "type": "basic",
+            "iconUrl": "./img/icon-48.png",
+            "title": title,
+            "message": content
+        });
+    } else {
+        //already sent
+    }
+
+    console.log(JSON.stringify(lastNotification));
 }
 
 function getToday() {
@@ -318,6 +334,12 @@ function isInteger(value) {
 
 function changeIcon(index) {
     browser.browserAction.setIcon({path: "../img/" + icons[index], tabId: activeTabId});
+}
+
+function setBadgeText(text, background_color = "#0080FF", text_color = "#FFFFFF") {
+    browser.browserAction.setBadgeText({text: text});
+    browser.browserAction.setBadgeTextColor({color: text_color});
+    browser.browserAction.setBadgeBackgroundColor({color: background_color});
 }
 
 loaded();
