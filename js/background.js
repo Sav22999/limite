@@ -306,7 +306,7 @@ function createNotification(type, url, title, content) {
         //already sent
     }
 
-    console.log(JSON.stringify(lastNotification));
+    //console.log(JSON.stringify(lastNotification));
 }
 
 function getToday() {
