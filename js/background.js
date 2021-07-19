@@ -180,6 +180,27 @@ function saveUrlToData(enabled, time = 0) {
                 });
             }
         }
+
+        if (timeSpentToday >= 0 && timeSpentToday < 60 * 30) {
+            //30 minutes || OK
+            changeIcon(0);
+            setBadgeText(((timeSpentToday - (timeSpentToday % 60)) / 60).toString() + "m");
+        } else if (timeSpentToday >= 60 * 30 && timeSpentToday < 60 * 60) {
+            //60 minutes (1 hour) || Yellow
+            changeIcon(2);
+            createNotification(2, currentUrl, "30 minutes", "You have already spent 30 minutes on this site today");
+            setBadgeText(((timeSpentToday - (timeSpentToday % 60)) / 60).toString() + "m", "#FFD400", "#000000");
+        } else if (timeSpentToday >= 60 * 60 && timeSpentToday < 60 * 60 * 3) {
+            //3 hours || Orange
+            changeIcon(3);
+            createNotification(3, currentUrl, "1 hour", "You have already spent 1 hour on this site today");
+            setBadgeText(((timeSpentToday - (timeSpentToday % (60 * 60))) / (60 * 60)).toString() + "h", "#FF7C00", "#000000");
+        } else if (timeSpentToday >= 60 * 60 * 3) {
+            //>3 hours || Red
+            changeIcon(4);
+            createNotification(4, currentUrl, "3 hours", "You have already spent 3 hours on this site today");
+            setBadgeText(">3h", "#FF0000");
+        }
     })
 }
 
@@ -265,29 +286,6 @@ function increaseTime(url) {
         if (url == currentUrl) {
             saveUrlToData(true, 1);
         }
-
-        if (timeSpentToday >= 0 && timeSpentToday < 60 * 30) {
-            //30 minutes || OK
-            changeIcon(0);
-            setBadgeText(((timeSpentToday - (timeSpentToday % 60)) / 60).toString() + "m");
-        } else if (timeSpentToday >= 60 * 30 && timeSpentToday < 60 * 60) {
-            //60 minutes (1 hour) || Yellow
-            changeIcon(2);
-            createNotification(2, currentUrl, "30 minutes", "You have already spent 30 minutes on this site today");
-            setBadgeText(((timeSpentToday - (timeSpentToday % 60)) / 60).toString() + "m", "#FFD400", "#000000");
-        } else if (timeSpentToday >= 60 * 60 && timeSpentToday < 60 * 60 * 3) {
-            //3 hours || Orange
-            changeIcon(3);
-            createNotification(3, currentUrl, "1 hour", "You have already spent 1 hour on this site today");
-            setBadgeText(((timeSpentToday - (timeSpentToday % (60 * 60))) / (60 * 60)).toString() + "h", "#FF7C00", "#000000");
-        } else if (timeSpentToday >= 60 * 60 * 3) {
-            //>3 hours || Red
-            changeIcon(4);
-            createNotification(4, currentUrl, "3 hours", "You have already spent 1 hours on this site today");
-            setBadgeText(">3h", "#FF0000");
-        }
-
-        //console.log("All websites: " + JSON.stringify(websites_json));
     }
 }
 
