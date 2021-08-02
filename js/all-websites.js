@@ -129,6 +129,7 @@ function exportData() {
             document.getElementById("json-export").select();
             document.execCommand("copy");
         }
+        loadDataFromBrowser(true);
     });
 }
 
