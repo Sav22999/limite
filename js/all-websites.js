@@ -165,6 +165,7 @@ function loadAllWebsites() {
         }
 
         all_dates = getAllDates(smallest_date, getToday());
+        all_dates.reverse();
 
         let section = document.createElement("div");
         section.classList.add("section", "overflow-auto", "no-padding");
