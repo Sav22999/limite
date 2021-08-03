@@ -47,15 +47,15 @@ function loadDataFromBrowser(generate_section = true) {
 }
 
 function deleteAllData() {
-    let confirmationClearAllNotes = confirm("Are you sure you want to clear all notes?\nYou can cancel this process once started.");
-    if (confirmationClearAllNotes) {
+    let confirmation = confirm("Are you sure you want to clear all data?\nYou can cancel this process once started.");
+    if (confirmation) {
         let clearStorage = browser.storage.local.clear();
         clearStorage.then(onCleared, onError);
     }
 }
 
 function deleteAWebsite(url) {
-    let confirmation = confirm("Are you sure you want to clear the selected notes?\nYou can cancel this process once started.");
+    let confirmation = confirm("Are you sure you want to clear the selected website (https://" + url + ") and the time spent on it?\nYou can cancel this process once started.");
     if (confirmation) {
         //delete the selected page
         delete websites_json[url];
@@ -67,7 +67,7 @@ function deleteAWebsite(url) {
 }
 
 function onCleared() {
-    //all notes clear || successful
+    //all websites clear || successful
     loadDataFromBrowser(true);
 }
 
@@ -211,8 +211,17 @@ function loadAllWebsites() {
                 browser.tabs.create({url: "https://" + current_website});
             }
 
+            let buttonDelete = document.createElement("input");
+            buttonDelete.type = "button";
+            buttonDelete.value = "Delete";
+            buttonDelete.classList.add("button", "button-delete", "very-small-button", "float-left", "margin-left-minus-50-px", "margin-top-5-px", "text-align-center");
+            buttonDelete.onclick = function () {
+                deleteAWebsite(current_website);
+            }
+
             let tableDataElement = document.createElement("td");
-            tableDataElement.append(currentWebsiteElement);
+            tableDataElement.classList.add("padding-left-55-px");
+            tableDataElement.append(buttonDelete, currentWebsiteElement);
             tableRowElement.append(tableDataElement);
 
             let status_to_show = true;
