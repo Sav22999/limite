@@ -433,6 +433,7 @@ h2, th {
     padding-left: 10px;
     font-family: open-sans;
     height: 35px;
+    white-space: nowrap;
 }
 
 th {

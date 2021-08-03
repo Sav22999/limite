@@ -169,9 +169,11 @@ function loadAllWebsites() {
 
         let section = document.createElement("div");
         section.classList.add("section", "overflow-auto", "no-padding");
+        section.id = "table-section";
 
         let tableElement = document.createElement("table");
 
+        let tableTHeadElement = document.createElement("thead");
         let tableRowElement = document.createElement("tr");
 
         let tableHeaderElement = document.createElement("th");
@@ -193,8 +195,10 @@ function loadAllWebsites() {
             tableRowElement.append(tableHeaderElement);
         }
 
-        tableElement.append(tableRowElement);
+        tableTHeadElement.append(tableRowElement);
+        tableElement.append(tableTHeadElement);
 
+        let tableTBodyElement = document.createElement("tbody");
         for (let index in websites_json_by_domain) {
             tableRowElement = document.createElement("tr");
 
@@ -266,8 +270,9 @@ function loadAllWebsites() {
                 tableRowElement.append(tableDataElement);
             }
 
-            tableElement.append(tableRowElement);
+            tableTBodyElement.append(tableRowElement);
         }
+        tableElement.append(tableTBodyElement);
 
         section.append(tableElement);
         document.getElementById("all-websites-sections").append(section);
