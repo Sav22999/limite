@@ -48,6 +48,10 @@ function loaded() {
         browser.tabs.create({url: linkDonate[0]});
         window.close();
     }
+    document.getElementById("open-all-websites").onclick = function () {
+        browser.tabs.create({url: "../all-websites/index.html"});
+        window.close();
+    }
 }
 
 function loadUI() {
@@ -272,90 +276,6 @@ function isUrlSupported(url) {
             valueToReturn = false;//todo | true->for testing, false->stable release
     }
     return valueToReturn;
-}
-
-function getToday() {
-    let todayDate = new Date();
-    let today = "";
-    today = todayDate.getFullYear() + "-";
-    let month = todayDate.getMonth() + 1;
-    if (month < 10) today = today + "0" + month + "-";
-    else today = today + "" + month + "-";
-    let day = todayDate.getDate();
-    if (day < 10) today = today + "0" + day;
-    else today = today + "" + day;
-
-    return today;
-}
-
-function getTimeConverted(time) {
-    let timeToUse = time;
-    let timeToReturn = "";
-    if (timeToUse >= 60) {
-        //check minutes
-        if (timeToUse / 60 >= 60) {
-            //check hours
-            if (timeToUse / (60 * 60) >= 24) {
-                //check days
-                if (timeToUse / (60 * 60 * 24) >= 365) {
-                    //check year(s)
-                    if (getDayOrDays((timeToUse % (60 * 60 * 24 * 365))) != "") {
-                        timeToReturn = getYearOrYears(timeToUse) + " and " + getDayOrDays((timeToUse % (60 * 60 * 24 * 365)));
-                    } else {
-                        timeToReturn = getYearOrYears(timeToUse);
-                    }
-                } else {
-                    //check day(s)
-                    timeToReturn = getDayOrDays(timeToUse);
-                }
-            } else {
-                //hours
-                timeToReturn = getHourOrHours(timeToUse);
-            }
-        } else {
-            //minutes
-            timeToReturn = getMinuteOrMinutes(timeToUse);
-        }
-    } else {
-        //seconds
-        timeToReturn = getSecondOrSeconds(timeToUse);
-    }
-    return timeToReturn;
-}
-
-function getSecondOrSeconds(timeToUse) {
-    let timeToReturn = "";
-    if (timeToUse == 1) timeToReturn = timeToUse + " second";
-    else if (timeToUse == 0 || timeToUse > 1) timeToReturn = timeToUse + " seconds";
-    return timeToReturn;
-}
-
-function getMinuteOrMinutes(timeToUse) {
-    let timeToReturn = "";
-    if (timeToUse / 60 && timeToUse < 60 * 2) timeToReturn = ((timeToUse - (timeToUse % 60)) / 60) + " minute";
-    else if (timeToUse > 60 * 2) timeToReturn = ((timeToUse - (timeToUse % 60)) / 60) + " minutes";
-    return timeToReturn;
-}
-
-function getHourOrHours(timeToUse) {
-    let timeToReturn = "";
-    if (timeToUse / (60) >= 60 && timeToUse / (60) < 60 * 2) timeToReturn = ((timeToUse - (timeToUse % (60 * 60))) / (60 * 60)) + " hour";
-    else if (timeToUse / (60) > 60 * 2) timeToReturn = ((timeToUse - (timeToUse % (60 * 60))) / (60 * 60)) + " hours";
-    return timeToReturn;
-}
-
-function getDayOrDays(timeToUse) {
-    let timeToReturn = "";
-    if (timeToUse / (60 * 60) >= 24 && timeToUse / (60 * 60) < 24 * 2) timeToReturn = ((timeToUse - (timeToUse % (60 * 60 * 24))) / (60 * 60 * 24)) + " day";
-    else if (timeToUse / (60 * 60) > 24 * 2) timeToReturn = ((timeToUse - (timeToUse % (60 * 60 * 24))) / (60 * 60 * 24)) + " days";
-    return timeToReturn;
-}
-
-function getYearOrYears(timeToUse) {
-    let timeToReturn = "";
-    if (timeToUse / (60 * 60 * 24) >= 365 && timeToUse / (60 * 60 * 24) < 365 * 2) timeToReturn = ((timeToUse - (timeToUse % (60 * 60 * 24 * 365))) / (60 * 60 * 24 * 365)) + " year";
-    else timeToReturn = ((timeToUse - (timeToUse % (60 * 60 * 24 * 365))) / (60 * 60 * 24 * 365)) + " years";
-    return timeToReturn;
 }
 
 function isInteger(value) {

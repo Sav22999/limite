@@ -10,8 +10,8 @@ Created by Saverio Morelli - saveriomorelli.com
 
 <body>
 <div id="popup-content">
-    <div id="website-section"></div>
-    <div id="toggle-section">
+    <div id="website-section" class="section-popup background-primary"></div>
+    <div id="toggle-section" class="section-popup">
         <div id="text-toggle-section">
             Enable <span class="limite-text font-size-24px">Limite</span> on this domain
         </div>
@@ -22,7 +22,7 @@ Created by Saverio Morelli - saveriomorelli.com
             </div>
         </div>
     </div>
-    <div id="details-section">
+    <div id="details-section" class="section-popup">
         <div id="details-container">
             <div class="grid-item grid-item-time-spent">Time spent on this website</div>
             <div class="grid-item grid-item-text1">Today</div>
@@ -31,10 +31,15 @@ Created by Saverio Morelli - saveriomorelli.com
             <div class="grid-item grid-item-value2" id="always-time"></div>
         </div>
     </div>
-    <div id="buy-me-a-coffee-section">
+    <div id="open-all-websites"
+         class="section-popup no-border-radius background-primary section-link section-boder-bottom">
+        See more details
+    </div>
+    <div id="buy-me-a-coffee-section" class="section-popup border-radius-bottom background-primary section-link">
         ☕ Buy me a coffee on PayPal
     </div>
 </div>
+<script src="../js/definitions.js"></script>
 <script src="./js/script.js"></script>
 </body>
 

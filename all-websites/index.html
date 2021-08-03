@@ -1,0 +1,62 @@
+<!---
+Created by Saverio Morelli - saveriomorelli.com
+--->
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="../css/style.css"/>
+</head>
+
+<body>
+<div id="all-websites-dedication-section">
+    <h1>All spent time</h1>
+    <div class="section text-align-right sticky-section" id="actions">
+        <input type="button" value="Export data…" id="export-data-button" class="button"/>
+        <input type="button" value="Import data…" id="import-data-button" class="button"/>
+        <input type="button" value="Refresh data" id="refresh-data-button" class="button"/>
+        <input type="button" value="Delete all data" id="delete-all-data-button" class="button"/>
+    </div>
+    <span id="all-websites-sections"></span>
+    <div id="background-opacity"></div>
+    <div id="import-section">
+        <div class="section" id="import-sub-sections">
+            <div class="sub-section">
+                <div id="text-import">
+                    Paste here the JSON (or text) file content you exported previously, then click the <span
+                        class="button-code">Import now</span>
+                    button. The page will be automatically reloaded if data are successfully imported.
+                </div>
+            </div>
+            <div class="sub-section">
+                <textarea id="json-import"></textarea>
+            </div>
+            <div class="sub-section text-align-right">
+                <input type="button" value="Cancel" id="cancel-import-data-button" class="button"/>
+                <input type="button" value="Import now" id="import-now-data-button" class="button"/>
+            </div>
+        </div>
+    </div>
+    <div id="export-section">
+        <div class="section" id="export-sub-sections">
+            <div class="sub-section">
+                <div id="text-export">
+                    Create a new JSON (or text) file and paste the code below <strong>without modifying
+                    it</strong> (you can click the <span class="button-code">Copy now</span> button to copy the code).
+                </div>
+            </div>
+            <div class="sub-section">
+                <textarea id="json-export" readonly></textarea>
+            </div>
+            <div class="sub-section text-align-right">
+                <input type="button" value="Cancel" id="cancel-export-data-button" class="button"/>
+                <input type="button" value="Copy now" id="copy-now-data-button" class="button"/>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="../js/definitions.js"></script>
+<script src="../js/all-websites.js"></script>
+</body>
+
+</html>

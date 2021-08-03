@@ -145,11 +145,17 @@ function getTheProtocol(url) {
 function saveUrlToData(enabled, time = 0) {
     let urlToUse = currentUrl;
 
+    //console.log(JSON.stringify(websites_json));
+
     let valueToUse = {};
     browser.storage.local.get("websites", function (value) {
+        websites_json = {};
         if (value["websites"] != undefined) {
             websites_json = value["websites"];
+        } else {
+            enabledOrNot = true;
         }
+        //console.log(JSON.stringify(websites_json));
         changedTab = false;
         timeSpentToday = 0;
         //timeSpentAlways = 0;
@@ -161,6 +167,8 @@ function saveUrlToData(enabled, time = 0) {
             /*if (websites_json[urlToUse]["always"] != undefined) {
                 timeSpentAlways = websites_json[urlToUse]["always"];
             }*/
+        } else {
+            websites_json[urlToUse] = {};
         }
 
         timeSpentToday += time;
