@@ -47,7 +47,7 @@ function loadDataFromBrowser(generate_section = true) {
 }
 
 function deleteAllData() {
-    let confirmation = confirm("Are you sure you want to clear all data?\nYou can cancel this process once started.");
+    let confirmation = confirm("Are you sure you want to clear all data?\nYou can't cancel this process once started.");
     if (confirmation) {
         let clearStorage = browser.storage.local.clear();
         clearStorage.then(onCleared, onError);
@@ -55,7 +55,7 @@ function deleteAllData() {
 }
 
 function deleteAWebsite(url) {
-    let confirmation = confirm("Are you sure you want to clear the selected website (https://" + url + ") and the time spent on it?\nYou can cancel this process once started.");
+    let confirmation = confirm("Are you sure you want to clear the selected website (https://" + url + ") and the time spent on it?\nYou can't cancel this process once started.");
     if (confirmation) {
         //delete the selected page
         delete websites_json[url];
