@@ -363,6 +363,37 @@ tr:hover {
     border-radius: 0px;
 }
 
+.button-delete, .button-copy, .button-import, .button-export, .button-refresh {
+    padding-left: 30px;
+    padding-right: 10px;
+    background-image: url("../img/delete.svg");
+    background-size: auto 50%;
+    background-repeat: no-repeat;
+    background-position: 10px center;
+}
+
+#button-delete-single {
+    width: auto;
+    padding-left: 25px;
+    padding-right: 10px;
+}
+
+.button-copy {
+    background-image: url("../img/copy.svg");
+}
+
+.button-import {
+    background-image: url("../img/import.svg");
+}
+
+.button-export {
+    background-image: url("../img/export.svg");
+}
+
+.button-refresh {
+    background-image: url("../img/refresh.svg");
+}
+
 #background-opacity {
     background-color: rgba(0, 0, 0, 0.6);
     position: fixed;
@@ -407,11 +438,6 @@ tr:hover {
     padding-bottom: 3px;
     font-size: 13px;
 }
-
-.button-delete {
-    min-width: 50px;
-}
-
 
 .padding-left-55-px {
     padding-left: 55px;

@@ -34,7 +34,7 @@ function loaded() {
 function loadDataFromBrowser(generate_section = true) {
     browser.storage.local.get("websites", function (value) {
         websites_json = {};
-        if (value["websites"] != undefined) {
+        if (value["websites"] !== undefined) {
             websites_json = value["websites"];
         }
         if (generate_section) {
@@ -87,7 +87,7 @@ function importData() {
     }
     document.getElementById("import-now-data-button").onclick = function () {
         let value = jsonImportElement.value;
-        if (value.replaceAll(" ", "") != "") {
+        if (value.replaceAll(" ", "") !== "") {
             try {
                 websites_json = JSON.parse(value);
                 document.getElementById("import-section").style.display = "none";
@@ -112,7 +112,7 @@ function exportData() {
     showBackgroundOpacity();
     browser.storage.local.get("websites", function (value) {
         websites_json = {};
-        if (value["websites"] != undefined) {
+        if (value["websites"] !== undefined) {
             websites_json = value["websites"];
         }
         document.getElementById("export-section").style.display = "block";
@@ -156,7 +156,7 @@ function loadAllWebsites() {
 
         for (let index in websites_json_by_domain) {
             for (let date in websites_json[websites_json_by_domain[index]]) {
-                if (date != "enabled") {
+                if (date !== "enabled") {
                     if (date < smallest_date) {
                         smallest_date = date;
                     }
@@ -166,6 +166,15 @@ function loadAllWebsites() {
 
         all_dates = getAllDates(smallest_date, getToday());
         all_dates.reverse();
+
+        let last_seven_days = [];
+        let counter = 0;
+        while (counter < 7) {
+            if (all_dates.length >= (counter + 1)) {
+                last_seven_days.push(all_dates[counter]);
+            }
+            counter++;
+        }
 
         let section = document.createElement("div");
         section.classList.add("section", "overflow-auto", "no-padding");
@@ -188,8 +197,8 @@ function loadAllWebsites() {
         tableHeaderElement.textContent = "Since install";
         tableRowElement.append(tableHeaderElement);
 
-        for (let date in all_dates) {
-            let date_to_show = all_dates[date];
+        for (let date in last_seven_days) {
+            let date_to_show = last_seven_days[date];
             tableHeaderElement = document.createElement("th");
             tableHeaderElement.textContent = date_to_show;
             tableRowElement.append(tableHeaderElement);
@@ -213,8 +222,9 @@ function loadAllWebsites() {
 
             let buttonDelete = document.createElement("input");
             buttonDelete.type = "button";
-            buttonDelete.value = "Delete";
+            //buttonDelete.value = "Delete";
             buttonDelete.classList.add("button", "button-delete", "very-small-button", "float-left", "margin-left-minus-50-px", "margin-top-5-px", "text-align-center");
+            buttonDelete.id = "button-delete-single";
             buttonDelete.onclick = function () {
                 deleteAWebsite(current_website);
             }
@@ -225,7 +235,7 @@ function loadAllWebsites() {
             tableRowElement.append(tableDataElement);
 
             let status_to_show = true;
-            if (websites_json[current_website]["enabled"] != undefined) {
+            if (websites_json[current_website]["enabled"] !== undefined) {
                 status_to_show = websites_json[current_website]["enabled"];
             }
             tableDataElement = document.createElement("td");
@@ -238,10 +248,12 @@ function loadAllWebsites() {
             }
             tableRowElement.append(tableDataElement);
 
+            let number_of_days = 7;
+
             let sum_since_install = 0;
             for (let date in all_dates) {
                 let date_to_show = all_dates[date];
-                if (websites_json[current_website][date_to_show] != undefined) {
+                if (websites_json[current_website][date_to_show] !== undefined) {
                     sum_since_install += parseInt(websites_json[current_website][date_to_show].toString());
                 }
             }
@@ -249,24 +261,24 @@ function loadAllWebsites() {
             tableDataElement = document.createElement("td");
             tableDataElement.textContent = since_install;
             tableDataElement.classList.add("since-install-time");
-            if (sum_since_install >= 60 * 30 && sum_since_install < 60 * 60) {
+            if (sum_since_install >= (60 * 30) * number_of_days && sum_since_install < (60 * 60) * number_of_days) {
                 tableDataElement.classList.add("yellow");
-            } else if (sum_since_install >= 60 * 60 && sum_since_install < 60 * 60 * 3) {
+            } else if (sum_since_install >= (60 * 60) * number_of_days && sum_since_install < (60 * 60 * 3) * number_of_days) {
                 tableDataElement.classList.add("orange");
-            } else if (sum_since_install >= 60 * 60 * 3) {
+            } else if (sum_since_install >= (60 * 60 * 3) * number_of_days) {
                 tableDataElement.classList.add("red");
             }
             tableRowElement.append(tableDataElement);
 
-            for (let date in all_dates) {
-                let date_to_show = all_dates[date];
+            for (let date in last_seven_days) {
+                let date_to_show = last_seven_days[date];
                 let time_to_show = getTimeConverted(0);
                 let time = 0;
-                if (websites_json[current_website][date_to_show] != undefined) {
+                if (websites_json[current_website][date_to_show] !== undefined) {
                     time = websites_json[current_website][date_to_show];
                     time_to_show = getTimeConverted(time);
                 }
-                if (time_to_show == "") time_to_show = getTimeConverted(0);
+                if (time_to_show === "") time_to_show = getTimeConverted(0);
                 tableDataElement = document.createElement("td");
                 tableDataElement.textContent = time_to_show;
                 if (time >= 60 * 30 && time < 60 * 60) {
