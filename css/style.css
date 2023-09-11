@@ -91,6 +91,8 @@ body {
     padding: 0px;
     position: relative;
     overflow: visible;
+    width: 45px;
+    margin: auto;
 }
 
 #toggle-section {
@@ -583,4 +585,8 @@ h3 {
 
 .no-padding {
     padding: 0px;
+}
+
+.width-100-perc {
+    width: 100%;
 }

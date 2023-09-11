@@ -79,22 +79,22 @@ function loadUI() {
             browser.storage.local.get("websites", function (value) {
                 timeSpentToday = 0;
                 timeSpentAlways = 0;
-                if (value["websites"] != undefined) {
+                if (value["websites"] !== undefined) {
                     websites_json = value["websites"];
                     if (websites_json[urlToUse] != undefined) {
-                        if (firstTime == true) {
+                        if (firstTime === true) {
                             let enabled = false;
-                            if (websites_json[urlToUse]["enabled"] != undefined) enabled = websites_json[urlToUse]["enabled"];
+                            if (websites_json[urlToUse]["enabled"] !== undefined) enabled = websites_json[urlToUse]["enabled"];
                             switchToOnOrOff(false, "toggle-thumb", true, enabled);
                             firstTime = false;
                         }
                         timeSpentToday = 0;
-                        if (websites_json[urlToUse][getToday()] != undefined) {
+                        if (websites_json[urlToUse][getToday()] !== undefined) {
                             timeSpentToday = websites_json[urlToUse][getToday()];
                         }
                         timeSpentAlways = 0;
                         for (var key in websites_json[currentUrl]) {
-                            if (key != "always" && key != "enabled") {
+                            if (key !== "always" && key !== "enabled") {
                                 //console.log(k + " : " + websites_json[currentUrl][k])
                                 timeSpentAlways += websites_json[currentUrl][key];
                             }

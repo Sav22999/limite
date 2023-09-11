@@ -240,15 +240,38 @@ function loadAllWebsites() {
             if (websites_json[current_website]["enabled"] !== undefined) {
                 status_to_show = websites_json[current_website]["enabled"];
             }
-            tableDataElement = document.createElement("td");
-            if (status_to_show) {
-                tableDataElement.textContent = "enabled";
-                tableDataElement.classList.add("status-enabled");
-            } else {
-                tableDataElement.textContent = "disabled";
-                tableDataElement.classList.add("status-disabled");
+            let tableDataElementStatus = document.createElement("td");
+            tableDataElementStatus.classList.add("status-website");
+            let switchToggleSection = document.createElement("div");
+            switchToggleSection.id = "switch-toggle-section";
+            let toggleContainer = document.createElement("div");
+            toggleContainer.id = "toggle-container";
+            let toggleBackground = document.createElement("div");
+            toggleBackground.id = "toggle-background";
+            let toggleThumb = document.createElement("div");
+            toggleThumb.id = "toggle-thumb";
+            toggleContainer.append(toggleBackground);
+            toggleContainer.append(toggleThumb);
+            toggleContainer.onclick = function () {
+                switchToggleOnOff(toggleThumb, current_website, tableDataElementStatus);
             }
-            tableRowElement.append(tableDataElement);
+            switchToggleSection.append(toggleContainer);
+            if (status_to_show) {
+                //enabled
+                toggleThumb.style.left = "auto";
+                toggleThumb.style.right = "0px";
+                toggleThumb.style.backgroundImage = "url('../img/yes.png')";
+                tableDataElementStatus.append(switchToggleSection);
+                tableDataElementStatus.classList.add("status-enabled");
+            } else {
+                //disabled
+                toggleThumb.style.left = "0px";
+                toggleThumb.style.right = "auto";
+                toggleThumb.style.backgroundImage = "url('../img/no.png')";
+                tableDataElementStatus.append(switchToggleSection);
+                tableDataElementStatus.classList.add("status-disabled");
+            }
+            tableRowElement.append(tableDataElementStatus);
 
             let number_of_days = 7;
 
@@ -308,6 +331,40 @@ function loadAllWebsites() {
 
         document.getElementById("all-websites-sections").append(section);
     }
+}
+
+function switchToggleOnOff(toggleThumb, current_website, tableDataElement) {
+    if (websites_json[current_website]["enabled"] === undefined) websites_json[current_website]["enabled"] = true;
+
+    if (!websites_json[current_website]["enabled"]) {
+        //enable
+        toggleThumb.style.left = "auto";
+        toggleThumb.style.right = "0px";
+        toggleThumb.style.backgroundImage = "url('../img/yes.png')";
+        websites_json[current_website]["enabled"] = true;
+        if (tableDataElement.classList.contains("status-disabled")) tableDataElement.classList.remove("status-disabled");
+        tableDataElement.classList.add("status-enabled");
+    } else {
+        //disable
+        toggleThumb.style.left = "0px";
+        toggleThumb.style.right = "auto";
+        toggleThumb.style.backgroundImage = "url('../img/no.png')";
+        websites_json[current_website]["enabled"] = false;
+        if (tableDataElement.classList.contains("status-enabled")) tableDataElement.classList.remove("status-enabled");
+        tableDataElement.classList.add("status-disabled");
+    }
+
+    let websites_status_temp = {};
+    browser.storage.local.get("websites", function (value) {
+        if (value["websites"] !== undefined) {
+            websites_status_temp = value["websites"];
+            websites_status_temp[current_website]["enabled"] = websites_json[current_website]["enabled"];
+            browser.storage.local.set({"websites": websites_json}, function () {
+            }).then(() => {
+                websites_json = websites_status_temp;
+            })
+        }
+    });
 }
 
 function isEmpty(obj) {
