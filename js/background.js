@@ -20,29 +20,8 @@ const linkDonate = ["https://www.paypal.me/saveriomorelli", "https://ko-fi.com/s
 const icons = ["icon.png", "icon_disabled.png", "icon_yellow.png", "icon_orange.png", "icon_red.png"];
 
 function loaded() {
-    browser.tabs.query({active: true, currentWindow: true}, function (tabs) {
-        // since only one tab should be active and in the current window at once
-        // the return variable should only have one entry
-        var activeTab = tabs[0];
-        activeTabId = activeTab.id;
-        var activeTabUrl = activeTab.url;
-
-        setUrl(getShortUrl(activeTabUrl), true);
-
-        oldUrl = currentUrl;
-        currentUrl = getShortUrl(activeTabUrl);
-        getSavedData(activeTabUrl);
-
-        changedEdits = false;
-
-        if (checkTimer == null) {
-            checkTimer = setInterval(function () {
-                checkEverySecond(currentUrl);
-            }, 1000);
-        }
-    });
-
     //catch changing of tab
+    browser.tabs.onActivated.addListener(tabUpdated);
     browser.tabs.onUpdated.addListener(tabUpdated);
 }
 
@@ -93,14 +72,28 @@ function checkStatusEnabled(enabled, force = false) {
     }
 }
 
-function tabUpdated(tabId, changeInfo, tabInfo) {
-    setUrl(getShortUrl(tabInfo.url), true);
+function tabUpdated() {
+    browser.tabs.query({active: true, currentWindow: true}, function (tabs) {
+        // since only one tab should be active and in the current window at once
+        // the return variable should only have one entry
+        var activeTab = tabs[0];
+        activeTabId = activeTab.id;
+        var activeTabUrl = activeTab.url;
 
-    oldUrl = currentUrl;
-    currentUrl = getShortUrl(tabInfo.url);
-    fullUrl = tabInfo.url;
-    changedTab = true;
-    getSavedData(tabInfo.url);
+        setUrl(getShortUrl(activeTabUrl), true);
+
+        oldUrl = currentUrl;
+        currentUrl = getShortUrl(activeTabUrl);
+        getSavedData(activeTabUrl);
+
+        changedEdits = false;
+
+        if (checkTimer === null) {
+            checkTimer = setInterval(function () {
+                checkEverySecond(currentUrl);
+            }, 1000);
+        }
+    });
 }
 
 function setUrl(url, formatted = false) {
@@ -123,14 +116,14 @@ function getShortUrl(url) {
 
     if (urlToReturn.includes("/")) {
         urlPartsTemp = urlToReturn.split("/");
-        if (urlPartsTemp[0] == "" && urlPartsTemp[1] == "") {
+        if (urlPartsTemp[0] === "" && urlPartsTemp[1] === "") {
             urlToReturn = urlPartsTemp[2];
         }
     }
 
     if (urlToReturn.includes(".")) {
         urlPartsTemp = urlToReturn.split(".");
-        if (urlPartsTemp[0] == "www") {
+        if (urlPartsTemp[0] === "www") {
             urlToReturn = urlToReturn.substr(4);
         }
     }

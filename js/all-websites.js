@@ -167,9 +167,10 @@ function loadAllWebsites() {
         all_dates = getAllDates(smallest_date, getToday());
         all_dates.reverse();
 
+        const days_to_show = 7;
         let last_seven_days = [];
-        let counter = 0;
-        while (counter < 7) {
+        let counter = 0; //from index 0
+        while (counter < days_to_show) {
             if (all_dates.length >= (counter + 1)) {
                 last_seven_days.push(all_dates[counter]);
             }
@@ -219,18 +220,19 @@ function loadAllWebsites() {
             currentWebsiteElement.onclick = function () {
                 browser.tabs.create({url: "https://" + current_website});
             }
+            currentWebsiteElement.title = currentWebsiteElement.textContent;
 
             let buttonDelete = document.createElement("input");
             buttonDelete.type = "button";
             //buttonDelete.value = "Delete";
-            buttonDelete.classList.add("button", "button-delete", "very-small-button", "float-left", "margin-left-minus-50-px", "margin-top-5-px", "text-align-center");
+            buttonDelete.classList.add("button", "button-delete", "very-small-button", "float-left", "margin-left-minus-20-px", "margin-top-5-px", "text-align-center");
             buttonDelete.id = "button-delete-single";
             buttonDelete.onclick = function () {
                 deleteAWebsite(current_website);
             }
 
             let tableDataElement = document.createElement("td");
-            tableDataElement.classList.add("padding-left-55-px");
+            tableDataElement.classList.add("padding-left-30-px");
             tableDataElement.append(buttonDelete, currentWebsiteElement);
             tableRowElement.append(tableDataElement);
 
