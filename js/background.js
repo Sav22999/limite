@@ -4,6 +4,7 @@ var lastNotificationDate = 0;
 
 var currentUrl = "";
 var oldUrl = "";
+var fullUrl = "";
 var enabledOrNot = true;
 
 var websites_json = {}
@@ -12,6 +13,8 @@ var checkTimer = null;
 
 var changedEdits = false;
 var changedTab = false;
+
+let all_categories = ["social", "entertainment", "news", "travel", "health", "education", "games", "adults", "shopping", "reference", "messaging", "other"];
 
 var activeTabId;
 
@@ -73,6 +76,7 @@ function checkStatusEnabled(enabled, force = false) {
 }
 
 function tabUpdated() {
+    //console.log("updated");
     browser.tabs.query({active: true, currentWindow: true}, function (tabs) {
         // since only one tab should be active and in the current window at once
         // the return variable should only have one entry
@@ -84,6 +88,7 @@ function tabUpdated() {
 
         oldUrl = currentUrl;
         currentUrl = getShortUrl(activeTabUrl);
+        fullUrl = activeTabUrl;
         getSavedData(activeTabUrl);
 
         changedEdits = false;
@@ -143,7 +148,7 @@ function saveUrlToData(enabled, time = 0) {
     let valueToUse = {};
     browser.storage.local.get("websites", function (value) {
         websites_json = {};
-        if (value["websites"] != undefined) {
+        if (value["websites"] !== undefined) {
             websites_json = value["websites"];
         } else {
             enabledOrNot = true;
@@ -152,17 +157,20 @@ function saveUrlToData(enabled, time = 0) {
         changedTab = false;
         timeSpentToday = 0;
         //timeSpentAlways = 0;
-        if (websites_json[urlToUse] != undefined) {
+        if (websites_json[urlToUse] !== undefined) {
             valueToUse = websites_json[urlToUse];
             if (websites_json[urlToUse][getToday()] != undefined) {
                 timeSpentToday = websites_json[urlToUse][getToday()];
             }
+
             /*if (websites_json[urlToUse]["always"] != undefined) {
                 timeSpentAlways = websites_json[urlToUse]["always"];
             }*/
         } else {
             websites_json[urlToUse] = {};
         }
+
+        if (valueToUse["category"] === undefined) valueToUse["category"] = getCategory(urlToUse);
 
         timeSpentToday += time;
         //timeSpentAlways += time;
@@ -339,6 +347,44 @@ function setBadgeText(text, background_color = "#0080FF", text_color = "#FFFFFF"
     browser.browserAction.setBadgeText({text: text});
     browser.browserAction.setBadgeTextColor({color: text_color});
     browser.browserAction.setBadgeBackgroundColor({color: background_color});
+}
+
+let categories = {
+    "social": ["facebook.com", "twitter.com", "instagram.com", "chat.openai.com"],
+    "travel": ["booking.com", "expedia.com", "airbnb.com", "hotels.com", "trivago.it"],
+    "news": ["bbc.com", "bbc.co.uk", "cnn.com", "rainews.it", "corriere.it", "repubblica.it"],
+    "education": ["classroom.google.com", "edu.google.com"],
+    "shopping": ["amazon.com", "amazon.it", "amazon.fr", "amazon.de", "ebay.com", "eprice.it", "lafeltrinelli.it", "ibs.it", "mediaworld.it", "euronics.it", "trony.it", "unieuro.it"],
+    "search": ["google.com", "google.it", "google.co.uk", "google.fr", "google.de", "bing.com", "duckduckgo.com", "qwant.com", "baidu.com", "yandex.com"],
+    "reference": ["wikipedia.org", "wordreference.com", "dictionary.cambridge.org", "treccani.it", "oxfordlearnersdictionaries.com", "emojipedia.org"],
+    "entertainment": ["youtube.com", "netflix.com", "primevideo.com", "spotify.com", "deezer.com", "disneyplus.com", "imdb.com", "hulu.com"],
+    "adults": ["youporn.com", "pornhub.com", "xnxx.com", "xvideos.com", "xhamster.com"],
+    "sav22999": ["saveriomorelli.com", "emojiaddon.com", "savpdfviewer.com"],
+    "develop": ["github.com", "gitlab.com", "addons.firefox.com", "thunderbird.net", "addons.thunderbird.com", "stackoverflow.com", "w3.org", "w3schools.com", "developer.mozilla.org"],
+    "messaging": ["whatsapp.com", "web.whatsapp.com", "telegram.org", "web.telegram.org", "t.me"],
+    "games": [],
+    "health": []
+};
+
+function getCategory(website) {
+    let valueToReturn = "";
+    if (website in categories["social"]) valueToReturn = "social";
+    else if (categories["travel"].includes(website)) valueToReturn = "travel";
+    else if (categories["news"].includes(website)) valueToReturn = "news";
+    else if (categories["education"].includes(website)) valueToReturn = "education";
+    else if (categories["shopping"].includes(website)) valueToReturn = "shopping";
+    else if (categories["search"].includes(website)) valueToReturn = "search";
+    else if (categories["reference"].includes(website)) valueToReturn = "reference";
+    else if (categories["entertainment"].includes(website)) valueToReturn = "entertainment";
+    else if (categories["adults"].includes(website)) valueToReturn = "adults";
+    else if (categories["sav22999"].includes(website)) valueToReturn = "sav22999";
+    else if (categories["develop"].includes(website)) valueToReturn = "develop";
+    else if (categories["messaging"].includes(website)) valueToReturn = "messaging";
+    else if (categories["games"].includes(website)) valueToReturn = "games";
+    else if (categories["health"].includes(website)) valueToReturn = "health";
+    else valueToReturn = "other";
+    //console.log(website + " : " + valueToReturn);//TODO: use for testing websites filter
+    return valueToReturn;
 }
 
 loaded();

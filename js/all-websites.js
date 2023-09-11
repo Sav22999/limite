@@ -89,7 +89,9 @@ function importData() {
         let value = jsonImportElement.value;
         if (value.replaceAll(" ", "") !== "") {
             try {
-                websites_json = JSON.parse(value);
+                let websites_temp = value;
+                if (value["websites"] !== undefined && value["limite"] !== undefined) websites_temp = value["websites"];
+                websites_json = JSON.parse(websites_temp);
                 document.getElementById("import-section").style.display = "none";
                 browser.storage.local.set({"websites": websites_json}, function () {
                     loadDataFromBrowser(true);
@@ -115,8 +117,14 @@ function exportData() {
         if (value["websites"] !== undefined) {
             websites_json = value["websites"];
         }
+        let limite_json = {
+            "version": browser.runtime.getManifest().version,
+            "author": browser.runtime.getManifest().author,
+            "manifest_version": browser.runtime.getManifest().manifest_version
+        };
+        let export_json = {"limite": limite_json, "websites": websites_json};
         document.getElementById("export-section").style.display = "block";
-        document.getElementById("json-export").value = JSON.stringify(websites_json);
+        document.getElementById("json-export").value = JSON.stringify(export_json);
 
         document.getElementById("cancel-export-data-button").onclick = function () {
             hideBackgroundOpacity();
@@ -192,6 +200,10 @@ function loadAllWebsites() {
 
         tableHeaderElement = document.createElement("th");
         tableHeaderElement.textContent = "Status";
+        tableRowElement.append(tableHeaderElement);
+
+        tableHeaderElement = document.createElement("th");
+        tableHeaderElement.textContent = "Category";
         tableRowElement.append(tableHeaderElement);
 
         tableHeaderElement = document.createElement("th");
@@ -273,7 +285,11 @@ function loadAllWebsites() {
             }
             tableRowElement.append(tableDataElementStatus);
 
-            let number_of_days = 7;
+            tableDataElement = document.createElement("td");
+            tableDataElement.textContent = checkCategory(current_website);
+            tableRowElement.append(tableDataElement);
+
+            let number_of_days = all_dates.length;
 
             let sum_since_install = 0;
             for (let date in all_dates) {
@@ -360,9 +376,8 @@ function switchToggleOnOff(toggleThumb, current_website, tableDataElement) {
             websites_status_temp = value["websites"];
             websites_status_temp[current_website]["enabled"] = websites_json[current_website]["enabled"];
             browser.storage.local.set({"websites": websites_json}, function () {
-            }).then(() => {
                 websites_json = websites_status_temp;
-            })
+            });
         }
     });
 }
@@ -379,6 +394,50 @@ function getAllDates(startDate, stopDate) {
         currentDate.setDate(currentDate.getDate() + 1);
     }
     return dateArray;
+}
+
+function checkCategory(current_website) {
+    let valueToReturn = websites_json[current_website]["category"];
+    if (valueToReturn === undefined) valueToReturn = getCategory(current_website);
+    return valueToReturn;
+}
+
+let categories = {
+    "social": ["facebook.com", "twitter.com", "instagram.com", "chat.openai.com"],
+    "travel": ["booking.com", "expedia.com", "airbnb.com", "hotels.com", "trivago.it"],
+    "news": ["bbc.com", "bbc.co.uk", "cnn.com", "rainews.it", "corriere.it", "repubblica.it"],
+    "education": ["classroom.google.com", "edu.google.com"],
+    "shopping": ["amazon.com", "amazon.it", "amazon.fr", "amazon.de", "ebay.com", "eprice.it", "lafeltrinelli.it", "ibs.it", "mediaworld.it", "euronics.it", "trony.it", "unieuro.it"],
+    "search": ["google.com", "google.it", "google.co.uk", "google.fr", "google.de", "bing.com", "duckduckgo.com", "qwant.com", "baidu.com", "yandex.com"],
+    "reference": ["wikipedia.org", "wordreference.com", "dictionary.cambridge.org", "treccani.it", "oxfordlearnersdictionaries.com", "emojipedia.org"],
+    "entertainment": ["youtube.com", "netflix.com", "primevideo.com", "spotify.com", "deezer.com", "disneyplus.com", "imdb.com", "hulu.com"],
+    "adults": ["youporn.com", "pornhub.com", "xnxx.com", "xvideos.com", "xhamster.com"],
+    "sav22999": ["saveriomorelli.com", "emojiaddon.com", "savpdfviewer.com"],
+    "develop": ["github.com", "gitlab.com", "addons.firefox.com", "thunderbird.net", "addons.thunderbird.com", "stackoverflow.com", "w3.org", "w3schools.com", "developer.mozilla.org"],
+    "messaging": ["whatsapp.com", "web.whatsapp.com", "telegram.org", "web.telegram.org", "t.me"],
+    "games": [],
+    "health": []
+};
+
+function getCategory(website) {
+    let valueToReturn = "";
+    if (website in categories["social"]) valueToReturn = "social";
+    else if (categories["travel"].includes(website)) valueToReturn = "travel";
+    else if (categories["news"].includes(website)) valueToReturn = "news";
+    else if (categories["education"].includes(website)) valueToReturn = "education";
+    else if (categories["shopping"].includes(website)) valueToReturn = "shopping";
+    else if (categories["search"].includes(website)) valueToReturn = "search";
+    else if (categories["reference"].includes(website)) valueToReturn = "reference";
+    else if (categories["entertainment"].includes(website)) valueToReturn = "entertainment";
+    else if (categories["adults"].includes(website)) valueToReturn = "adults";
+    else if (categories["sav22999"].includes(website)) valueToReturn = "sav22999";
+    else if (categories["develop"].includes(website)) valueToReturn = "develop";
+    else if (categories["messaging"].includes(website)) valueToReturn = "messaging";
+    else if (categories["games"].includes(website)) valueToReturn = "games";
+    else if (categories["health"].includes(website)) valueToReturn = "health";
+    else valueToReturn = "other";
+    //console.log(website + " : " + valueToReturn);//TODO: use for testing websites filter
+    return valueToReturn;
 }
 
 loaded();

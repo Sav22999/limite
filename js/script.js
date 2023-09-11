@@ -94,7 +94,7 @@ function loadUI() {
                         }
                         timeSpentAlways = 0;
                         for (var key in websites_json[currentUrl]) {
-                            if (key !== "always" && key !== "enabled") {
+                            if (key !== "always" && key !== "enabled" && key !== "category") {
                                 //console.log(k + " : " + websites_json[currentUrl][k])
                                 timeSpentAlways += websites_json[currentUrl][key];
                             }
