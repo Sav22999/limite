@@ -3,6 +3,9 @@ let websites_json_by_domain = [];
 let smallest_date = "";
 let all_dates = [];
 
+let start_date = null;
+let days_to_show = 7; //number of days to show
+
 function loaded() {
     document.getElementById("refresh-data-button").onclick = function () {
         //location.reload();
@@ -17,6 +20,18 @@ function loaded() {
     document.getElementById("export-data-button").onclick = function () {
         exportData();
     }
+    document.getElementById("go-today-button").onclick = function () {
+        goToday();
+    }
+    document.getElementById("go-last-button").onclick = function () {
+        goLast();
+    }
+    document.getElementById("go-newer-button").onclick = function () {
+        goNewer();
+    }
+    document.getElementById("go-older-button").onclick = function () {
+        goOlder();
+    }
 
     loadDataFromBrowser(true);
 
@@ -28,13 +43,49 @@ function loaded() {
                 document.getElementById("actions").classList.remove("section-selected");
             }
         }
+        if (document.getElementById("all-websites-dedication-section").scrollTop > 53) {
+            document.getElementById("navigator-days").classList.add("nav-days-fixed");
+        } else {
+            if (document.getElementById("navigator-days").classList.contains("nav-days-fixed")) {
+                document.getElementById("navigator-days").classList.remove("nav-days-fixed");
+            }
+        }
     }
+}
+
+function goToday() {
+    loadDataFromBrowser(true);
+    start_date = 0;
+}
+
+function goLast() {
+    loadDataFromBrowser(true);
+    start_date = 0;
+    if (all_dates.length > days_to_show) start_date = all_dates.length - days_to_show;
+}
+
+function goNewer() {
+    loadDataFromBrowser(true);
+    //-7
+    if (start_date > days_to_show) start_date -= days_to_show;
+    else start_date = 0;
+}
+
+function goOlder() {
+    loadDataFromBrowser(true);
+    //+7
+    if ((start_date + days_to_show) < all_dates.length) start_date += days_to_show;
+    //else start_date = all_dates.length - days_to_show;
+}
+
+function setDateInterval(from, to) {
+    document.getElementById("from-to-date-label").textContent = "Days: " + from + " – " + to;
 }
 
 function loadDataFromBrowser(generate_section = true) {
     browser.storage.local.get("websites", function (value) {
         websites_json = {};
-        if (value["websites"] != undefined) {
+        if (value["websites"] !== undefined) {
             websites_json = value["websites"];
         }
         if (generate_section) {
@@ -87,16 +138,18 @@ function importData() {
     }
     document.getElementById("import-now-data-button").onclick = function () {
         let value = jsonImportElement.value;
-        if (value.replaceAll(" ", "") != "") {
+        if (value.replaceAll(" ", "") !== "") {
             try {
-                websites_json = JSON.parse(value);
+                let websites_temp = value;
+                if (value["websites"] !== undefined && value["limite"] !== undefined) websites_temp = value["websites"];
+                websites_json = JSON.parse(websites_temp);
                 document.getElementById("import-section").style.display = "none";
                 browser.storage.local.set({"websites": websites_json}, function () {
                     loadDataFromBrowser(true);
-                    hideBackgroundOpacity()
+                    hideBackgroundOpacity();
                 });
             } catch (e) {
-                //console.log("Error: " + e.toString());
+                console.error("Error: " + e.toString());
                 let errorSubSection = document.createElement("div");
                 errorSubSection.classList.add("sub-section", "background-light-red");
                 errorSubSection.textContent = "Error: " + e.toString();
@@ -112,11 +165,17 @@ function exportData() {
     showBackgroundOpacity();
     browser.storage.local.get("websites", function (value) {
         websites_json = {};
-        if (value["websites"] != undefined) {
+        if (value["websites"] !== undefined) {
             websites_json = value["websites"];
         }
+        let limite_json = {
+            "version": browser.runtime.getManifest().version,
+            "author": browser.runtime.getManifest().author,
+            "manifest_version": browser.runtime.getManifest().manifest_version
+        };
+        let export_json = {"limite": limite_json, "websites": websites_json};
         document.getElementById("export-section").style.display = "block";
-        document.getElementById("json-export").value = JSON.stringify(websites_json);
+        document.getElementById("json-export").value = JSON.stringify(export_json);
 
         document.getElementById("cancel-export-data-button").onclick = function () {
             hideBackgroundOpacity();
@@ -156,7 +215,7 @@ function loadAllWebsites() {
 
         for (let index in websites_json_by_domain) {
             for (let date in websites_json[websites_json_by_domain[index]]) {
-                if (date != "enabled") {
+                if (date !== "enabled" && date !== "category") {
                     if (date < smallest_date) {
                         smallest_date = date;
                     }
@@ -167,11 +226,23 @@ function loadAllWebsites() {
         all_dates = getAllDates(smallest_date, getToday());
         all_dates.reverse();
 
+        if (start_date === null) start_date = 0;
+
+        let last_seven_days = [];
+        let counter = start_date; //from index 0
+        while (counter < (days_to_show + start_date)) {
+            if (all_dates.length >= (counter + 1)) {
+                last_seven_days.push(all_dates[counter]);
+            }
+            counter++;
+        }
+
         let section = document.createElement("div");
         section.classList.add("section", "overflow-auto", "no-padding");
         section.id = "table-section";
 
         let tableElement = document.createElement("table");
+        tableElement.classList.add("table-days");
 
         let tableTHeadElement = document.createElement("thead");
         let tableRowElement = document.createElement("tr");
@@ -185,15 +256,20 @@ function loadAllWebsites() {
         tableRowElement.append(tableHeaderElement);
 
         tableHeaderElement = document.createElement("th");
+        tableHeaderElement.textContent = "Category";
+        tableRowElement.append(tableHeaderElement);
+
+        tableHeaderElement = document.createElement("th");
         tableHeaderElement.textContent = "Since install";
         tableRowElement.append(tableHeaderElement);
 
-        for (let date in all_dates) {
-            let date_to_show = all_dates[date];
+        for (let date in last_seven_days) {
+            let date_to_show = last_seven_days[date];
             tableHeaderElement = document.createElement("th");
             tableHeaderElement.textContent = date_to_show;
             tableRowElement.append(tableHeaderElement);
         }
+        setDateInterval(last_seven_days[0], last_seven_days[last_seven_days.length - 1]);
 
         tableTHeadElement.append(tableRowElement);
         tableElement.append(tableTHeadElement);
@@ -202,6 +278,7 @@ function loadAllWebsites() {
         for (let index in websites_json_by_domain) {
             tableRowElement = document.createElement("tr");
 
+            //website
             let current_website = websites_json_by_domain[index];
 
             let currentWebsiteElement = document.createElement("h2");
@@ -210,63 +287,100 @@ function loadAllWebsites() {
             currentWebsiteElement.onclick = function () {
                 browser.tabs.create({url: "https://" + current_website});
             }
+            currentWebsiteElement.title = currentWebsiteElement.textContent;
 
             let buttonDelete = document.createElement("input");
             buttonDelete.type = "button";
-            buttonDelete.value = "Delete";
-            buttonDelete.classList.add("button", "button-delete", "very-small-button", "float-left", "margin-left-minus-50-px", "margin-top-5-px", "text-align-center");
+            buttonDelete.alt = "Delete";
+            buttonDelete.classList.add("button", "button-delete", "very-small-button", "float-left", "margin-left-minus-20-px", "margin-top-5-px", "text-align-center");
+            buttonDelete.id = "button-delete-single";
             buttonDelete.onclick = function () {
                 deleteAWebsite(current_website);
             }
 
+
             let tableDataElement = document.createElement("td");
-            tableDataElement.classList.add("padding-left-55-px");
+            tableDataElement.classList.add("padding-left-30-px");
             tableDataElement.append(buttonDelete, currentWebsiteElement);
             tableRowElement.append(tableDataElement);
 
+            //status
             let status_to_show = true;
-            if (websites_json[current_website]["enabled"] != undefined) {
+            if (websites_json[current_website]["enabled"] !== undefined) {
                 status_to_show = websites_json[current_website]["enabled"];
             }
-            tableDataElement = document.createElement("td");
-            if (status_to_show) {
-                tableDataElement.textContent = "enabled";
-                tableDataElement.classList.add("status-enabled");
-            } else {
-                tableDataElement.textContent = "disabled";
-                tableDataElement.classList.add("status-disabled");
+            let tableDataElementStatus = document.createElement("td");
+            tableDataElementStatus.classList.add("status-website");
+            let switchToggleSection = document.createElement("div");
+            switchToggleSection.id = "switch-toggle-section";
+            let toggleContainer = document.createElement("div");
+            toggleContainer.id = "toggle-container";
+            let toggleBackground = document.createElement("div");
+            toggleBackground.id = "toggle-background";
+            let toggleThumb = document.createElement("div");
+            toggleThumb.id = "toggle-thumb";
+            toggleContainer.append(toggleBackground);
+            toggleContainer.append(toggleThumb);
+            toggleContainer.onclick = function () {
+                switchToggleOnOff(toggleThumb, current_website, tableDataElementStatus);
             }
-            tableRowElement.append(tableDataElement);
+            switchToggleSection.append(toggleContainer);
+            if (status_to_show) {
+                //enabled
+                toggleThumb.style.left = "auto";
+                toggleThumb.style.right = "0px";
+                toggleThumb.style.backgroundImage = "url('../img/yes.png')";
+                tableDataElementStatus.append(switchToggleSection);
+                tableDataElementStatus.classList.add("status-enabled");
+            } else {
+                //disabled
+                toggleThumb.style.left = "0px";
+                toggleThumb.style.right = "auto";
+                toggleThumb.style.backgroundImage = "url('../img/no.png')";
+                tableDataElementStatus.append(switchToggleSection);
+                tableDataElementStatus.classList.add("status-disabled");
+            }
+            tableRowElement.append(tableDataElementStatus);
+
+            //category
+            let tableDataElementCategory = document.createElement("td");
+            tableDataElementCategory.append(generateCategories(checkCategory(current_website), current_website, tableDataElementCategory));
+            tableRowElement.append(tableDataElementCategory);
+
+
+            //since install
+            let number_of_days = all_dates.length;
 
             let sum_since_install = 0;
-            for (let date in all_dates) {
-                let date_to_show = all_dates[date];
-                if (websites_json[current_website][date_to_show] != undefined) {
-                    sum_since_install += parseInt(websites_json[current_website][date_to_show].toString());
+            for (let date in websites_json[current_website]) {
+                if (date !== "always" && date !== "enabled" && date !== "category") {
+                    sum_since_install += websites_json[current_website][date];
                 }
             }
             let since_install = getTimeConverted(sum_since_install);
             tableDataElement = document.createElement("td");
             tableDataElement.textContent = since_install;
             tableDataElement.classList.add("since-install-time");
-            if (sum_since_install >= 60 * 30 && sum_since_install < 60 * 60) {
+            if (sum_since_install >= (60 * 30) * number_of_days && sum_since_install < (60 * 60) * number_of_days) {
                 tableDataElement.classList.add("yellow");
-            } else if (sum_since_install >= 60 * 60 && sum_since_install < 60 * 60 * 3) {
+            } else if (sum_since_install >= (60 * 60) * number_of_days && sum_since_install < (60 * 60 * 3) * number_of_days) {
                 tableDataElement.classList.add("orange");
-            } else if (sum_since_install >= 60 * 60 * 3) {
+            } else if (sum_since_install >= (60 * 60 * 3) * number_of_days) {
                 tableDataElement.classList.add("red");
             }
             tableRowElement.append(tableDataElement);
 
-            for (let date in all_dates) {
-                let date_to_show = all_dates[date];
+
+            //days
+            for (let date in last_seven_days) {
+                let date_to_show = last_seven_days[date];
                 let time_to_show = getTimeConverted(0);
                 let time = 0;
-                if (websites_json[current_website][date_to_show] != undefined) {
+                if (websites_json[current_website][date_to_show] !== undefined) {
                     time = websites_json[current_website][date_to_show];
                     time_to_show = getTimeConverted(time);
                 }
-                if (time_to_show == "") time_to_show = getTimeConverted(0);
+                if (time_to_show === "") time_to_show = getTimeConverted(0);
                 tableDataElement = document.createElement("td");
                 tableDataElement.textContent = time_to_show;
                 if (time >= 60 * 30 && time < 60 * 60) {
@@ -296,6 +410,39 @@ function loadAllWebsites() {
     }
 }
 
+function switchToggleOnOff(toggleThumb, current_website, tableDataElement) {
+    if (websites_json[current_website]["enabled"] === undefined) websites_json[current_website]["enabled"] = true;
+
+    if (!websites_json[current_website]["enabled"]) {
+        //enable
+        toggleThumb.style.left = "auto";
+        toggleThumb.style.right = "0px";
+        toggleThumb.style.backgroundImage = "url('../img/yes.png')";
+        websites_json[current_website]["enabled"] = true;
+        if (tableDataElement.classList.contains("status-disabled")) tableDataElement.classList.remove("status-disabled");
+        tableDataElement.classList.add("status-enabled");
+    } else {
+        //disable
+        toggleThumb.style.left = "0px";
+        toggleThumb.style.right = "auto";
+        toggleThumb.style.backgroundImage = "url('../img/no.png')";
+        websites_json[current_website]["enabled"] = false;
+        if (tableDataElement.classList.contains("status-enabled")) tableDataElement.classList.remove("status-enabled");
+        tableDataElement.classList.add("status-disabled");
+    }
+
+    let websites_status_temp = {};
+    browser.storage.local.get("websites", function (value) {
+        if (value["websites"] !== undefined) {
+            websites_status_temp = value["websites"];
+            websites_status_temp[current_website]["enabled"] = websites_json[current_website]["enabled"];
+            browser.storage.local.set({"websites": websites_status_temp}, function () {
+                websites_json = websites_status_temp;
+            });
+        }
+    });
+}
+
 function isEmpty(obj) {
     return Object.keys(obj).length === 0
 }
@@ -307,7 +454,72 @@ function getAllDates(startDate, stopDate) {
         dateArray.push(getFormattedDate(new Date(currentDate)));
         currentDate.setDate(currentDate.getDate() + 1);
     }
+    if (!dateArray.includes(getToday())) dateArray.push(getFormattedDate(getToday()));
     return dateArray;
+}
+
+function checkCategory(current_website) {
+    let valueToReturn = websites_json[current_website]["category"];
+    if (valueToReturn === undefined) valueToReturn = getCategory(current_website);
+    return valueToReturn;
+}
+
+let categories = {
+    "social": ["facebook.com", "twitter.com", "instagram.com", "chat.openai.com"],
+    "travel": ["booking.com", "expedia.com", "airbnb.com", "hotels.com", "trivago.it"],
+    "news": ["bbc.com", "bbc.co.uk", "cnn.com", "rainews.it", "corriere.it", "repubblica.it", "msn.com", "news.yahoo.com", "aol.com", "ladige.it", "ildolomiti.it"],
+    "education": ["classroom.google.com", "edu.google.com"],
+    "shopping": ["amazon.com", "amazon.it", "amazon.fr", "amazon.de", "ebay.com", "eprice.it", "lafeltrinelli.it", "ibs.it", "mediaworld.it", "euronics.it", "trony.it", "unieuro.it", "justeat.it", "glovoapp.com", "deliveroo.co.uk", "deliveroo.it", "deliveroo.com", "tesco.com", "asda.com", "sainsburys.co.uk", "ah.nl"],
+    "search": ["google.com", "google.it", "google.co.uk", "google.fr", "google.de", "bing.com", "duckduckgo.com", "qwant.com", "baidu.com", "yandex.com", "search.yahoo.com"],
+    "reference": ["wikipedia.org", "wordreference.com", "dictionary.cambridge.org", "treccani.it", "oxfordlearnersdictionaries.com", "emojipedia.org", "affinity.help"],
+    "entertainment": ["youtube.com", "netflix.com", "primevideo.com", "spotify.com", "deezer.com", "disneyplus.com", "imdb.com", "hulu.com"],
+    "adults": ["youporn.com", "pornhub.com", "xnxx.com", "xvideos.com", "xhamster.com"],
+    "sav22999": ["saveriomorelli.com", "emojiaddon.com", "savpdfviewer.com"],
+    "develop": ["github.com", "gitlab.com", "addons.mozilla.org", "thunderbird.net", "addons.thunderbird.net", "stackoverflow.com", "w3.org", "w3schools.com", "developer.mozilla.org", "w3docs.com"],
+    "messaging": ["whatsapp.com", "web.whatsapp.com", "telegram.org", "web.telegram.org", "t.me"],
+    "games": [],
+    "health": ["apss.tn.it"],
+    "other": [] //must remain empty here
+};
+
+function getCategory(website) {
+    let valueToReturn = "other";
+    for (item in categories) {
+        if (categories[item].includes(website)) valueToReturn = item;
+    }
+    //console.log(website + " : " + valueToReturn);//TODO: use for testing websites filter
+    return valueToReturn;
+}
+
+function generateCategories(selectedItem = "other", current_website, tableDataElementCategory) {
+    let selectElement = document.createElement("select");
+    selectElement.classList.add("select-category");
+    for (item in categories) {
+        let optionElement = document.createElement("option");
+        if (item === selectedItem) optionElement.selected = true;
+        optionElement.value = item;
+        optionElement.textContent = item;
+        selectElement.append(optionElement);
+    }
+    selectElement.onchange = function () {
+        saveCategory(current_website, selectElement.value);
+        tableDataElementCategory.classList = [selectElement.value + "-category"];
+    }
+    tableDataElementCategory.classList = [selectedItem + "-category"];
+    return selectElement;
+}
+
+function saveCategory(current_website, selected_item) {
+    let websites_status_temp = {};
+    browser.storage.local.get("websites", function (value) {
+        if (value["websites"] !== undefined) {
+            websites_status_temp = value["websites"];
+            websites_status_temp[current_website]["category"] = selected_item;
+            browser.storage.local.set({"websites": websites_status_temp}, function () {
+                websites_json = websites_status_temp;
+            });
+        }
+    });
 }
 
 loaded();

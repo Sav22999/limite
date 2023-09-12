@@ -1,19 +1,14 @@
 {
   "manifest_version": 2,
   "name": "Limite",
-  "version": "1.2.1.2",
+  "version": "2.0.0.1",
+  "author": "Saverio Morelli (Sav22999)",
   "description": "Check how much time you spend on each website every day.\nOptimise your productivity, your time and your life as well.\nDon't lose precious time!",
   "icons": {
     "16": "./img/icon-16.png",
     "24": "./img/icon-24.png",
     "48": "./img/icon-48.png",
     "96": "./img/icon-96.png"
-  },
-  "browser_specific_settings": {
-    "gecko": {
-      "id": "limite@saveriomorelli.com",
-      "strict_min_version": "42.0"
-    }
   },
   "applications": {
     "gecko": {
@@ -63,6 +58,8 @@
     "storage",
     "tabs",
     "unlimitedStorage",
-    "notifications"
+    "notifications",
+    "activeTab",
+    "<all_urls>"
   ]
 }

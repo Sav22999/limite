@@ -10,12 +10,19 @@ Created by Saverio Morelli - saveriomorelli.com
 
 <body>
 <div id="all-websites-dedication-section">
-    <h1>All spent time</h1>
+    <h1>All time spent</h1>
     <div class="section text-align-right sticky-section" id="actions">
-        <input type="button" value="Export data…" id="export-data-button" class="button"/>
-        <input type="button" value="Import data…" id="import-data-button" class="button"/>
-        <input type="button" value="Refresh data" id="refresh-data-button" class="button"/>
-        <input type="button" value="Delete all data" id="delete-all-data-button" class="button"/>
+        <input type="button" value="Export data…" id="export-data-button" class="button button-export"/>
+        <input type="button" value="Import data…" id="import-data-button" class="button button-import"/>
+        <input type="button" value="Refresh data" id="refresh-data-button" class="button button-refresh"/>
+        <input type="button" value="Delete all data" id="delete-all-data-button" class="button button-delete"/>
+    </div>
+    <div id="navigator-days">
+        <label id="from-to-date-label"></label>
+        <input type="button" value="Today" id="go-today-button" class="button button-invert-colors button-go-today"/>
+        <input type="button" value="Newer" id="go-newer-button" class="button button-invert-colors button-newer"/>
+        <input type="button" value="Older" id="go-older-button" class="button button-invert-colors button-older"/>
+        <input type="button" value="Last" id="go-last-button" class="button button-invert-colors button-go-last-day"/>
     </div>
     <span id="all-websites-sections"></span>
     <div id="background-opacity"></div>
@@ -33,7 +40,7 @@ Created by Saverio Morelli - saveriomorelli.com
             </div>
             <div class="sub-section text-align-right">
                 <input type="button" value="Cancel" id="cancel-import-data-button" class="button"/>
-                <input type="button" value="Import now" id="import-now-data-button" class="button"/>
+                <input type="button" value="Import now" id="import-now-data-button" class="button button-import"/>
             </div>
         </div>
     </div>
@@ -50,7 +57,7 @@ Created by Saverio Morelli - saveriomorelli.com
             </div>
             <div class="sub-section text-align-right">
                 <input type="button" value="Cancel" id="cancel-export-data-button" class="button"/>
-                <input type="button" value="Copy now" id="copy-now-data-button" class="button"/>
+                <input type="button" value="Copy now" id="copy-now-data-button" class="button button-copy"/>
             </div>
         </div>
     </div>

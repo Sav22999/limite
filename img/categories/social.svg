@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg width="100%" height="100%" viewBox="0 0 800 800" version="1.1" xmlns="http://www.w3.org/2000/svg"
+     xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/"
+     style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;">
+    <rect x="0" y="0" width="800" height="800" style="fill:none;fill-rule:nonzero;"/>
+    <g id="Shopicon">
+        <path d="M564.05,448.567L400,600L235.95,448.567C144.567,507.017 83.333,612.483 83.333,733.333L716.667,733.333C716.667,612.483 655.433,507.017 564.05,448.567Z"
+              style="fill:rgb(0,128,255);fill-opacity:0.15;fill-rule:nonzero;"/>
+        <path d="M400,466.667C459.167,466.667 512.15,440.833 548.767,400C580.517,364.6 600,317.967 600,266.667C600,156.217 510.45,66.667 400,66.667C289.55,66.667 200,156.217 200,266.667C200,317.967 219.483,364.6 251.233,400C287.85,440.833 340.833,466.667 400,466.667Z"
+              style="fill:rgb(0,128,255);fill-opacity:0.15;fill-rule:nonzero;"/>
+    </g>
+</svg>
