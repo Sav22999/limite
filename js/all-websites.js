@@ -79,7 +79,7 @@ function goOlder() {
 }
 
 function setDateInterval(from, to) {
-    document.getElementById("from-to-date-label").textContent = "Weeks: " + from + " – " + to;
+    document.getElementById("from-to-date-label").textContent = "Days: " + from + " – " + to;
 }
 
 function loadDataFromBrowser(generate_section = true) {
