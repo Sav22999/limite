@@ -4,6 +4,7 @@ let smallest_date = "";
 let all_dates = [];
 
 let start_date = null;
+let days_to_show = 7; //number of days to show
 
 function loaded() {
     document.getElementById("refresh-data-button").onclick = function () {
@@ -60,21 +61,21 @@ function goToday() {
 function goLast() {
     loadDataFromBrowser(true);
     start_date = 0;
-    if (all_dates.length > 7) start_date = all_dates.length - 7;
+    if (all_dates.length > days_to_show) start_date = all_dates.length - days_to_show;
 }
 
 function goNewer() {
     loadDataFromBrowser(true);
     //-7
-    if (start_date > 7) start_date -= 7;
+    if (start_date > days_to_show) start_date -= days_to_show;
     else start_date = 0;
 }
 
 function goOlder() {
     loadDataFromBrowser(true);
     //+7
-    if ((start_date + 7) < all_dates.length) start_date += 7;
-    //else start_date = all_dates.length - 7;
+    if ((start_date + days_to_show) < all_dates.length) start_date += days_to_show;
+    //else start_date = all_dates.length - days_to_show;
 }
 
 function setDateInterval(from, to) {
@@ -227,7 +228,6 @@ function loadAllWebsites() {
 
         if (start_date === null) start_date = 0;
 
-        const days_to_show = 7;
         let last_seven_days = [];
         let counter = start_date; //from index 0
         while (counter < (days_to_show + start_date)) {
@@ -475,7 +475,7 @@ let categories = {
     "entertainment": ["youtube.com", "netflix.com", "primevideo.com", "spotify.com", "deezer.com", "disneyplus.com", "imdb.com", "hulu.com"],
     "adults": ["youporn.com", "pornhub.com", "xnxx.com", "xvideos.com", "xhamster.com"],
     "sav22999": ["saveriomorelli.com", "emojiaddon.com", "savpdfviewer.com"],
-    "develop": ["github.com", "gitlab.com", "addons.firefox.com", "thunderbird.net", "addons.thunderbird.com", "stackoverflow.com", "w3.org", "w3schools.com", "developer.mozilla.org", "w3docs.com"],
+    "develop": ["github.com", "gitlab.com", "addons.mozilla.org", "thunderbird.net", "addons.thunderbird.net", "stackoverflow.com", "w3.org", "w3schools.com", "developer.mozilla.org", "w3docs.com"],
     "messaging": ["whatsapp.com", "web.whatsapp.com", "telegram.org", "web.telegram.org", "t.me"],
     "games": [],
     "health": ["apss.tn.it"],

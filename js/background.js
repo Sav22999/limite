@@ -358,7 +358,7 @@ let categories = {
     "entertainment": ["youtube.com", "netflix.com", "primevideo.com", "spotify.com", "deezer.com", "disneyplus.com", "imdb.com", "hulu.com"],
     "adults": ["youporn.com", "pornhub.com", "xnxx.com", "xvideos.com", "xhamster.com"],
     "sav22999": ["saveriomorelli.com", "emojiaddon.com", "savpdfviewer.com"],
-    "develop": ["github.com", "gitlab.com", "addons.firefox.com", "thunderbird.net", "addons.thunderbird.com", "stackoverflow.com", "w3.org", "w3schools.com", "developer.mozilla.org", "w3docs.com"],
+    "develop": ["github.com", "gitlab.com", "addons.mozilla.org", "thunderbird.net", "addons.thunderbird.net", "stackoverflow.com", "w3.org", "w3schools.com", "developer.mozilla.org", "w3docs.com"],
     "messaging": ["whatsapp.com", "web.whatsapp.com", "telegram.org", "web.telegram.org", "t.me"],
     "games": [],
     "health": ["apss.tn.it"],
