@@ -28,6 +28,13 @@ function loaded() {
                 document.getElementById("actions").classList.remove("section-selected");
             }
         }
+        if (document.getElementById("all-websites-dedication-section").scrollTop > 53) {
+            document.getElementById("navigator-days").classList.add("nav-days-fixed");
+        } else {
+            if (document.getElementById("navigator-days").classList.contains("nav-days-fixed")) {
+                document.getElementById("navigator-days").classList.remove("nav-days-fixed");
+            }
+        }
     }
 }
 
@@ -190,6 +197,7 @@ function loadAllWebsites() {
         section.id = "table-section";
 
         let tableElement = document.createElement("table");
+        tableElement.classList.add("table-days");
 
         let tableTHeadElement = document.createElement("thead");
         let tableRowElement = document.createElement("tr");

@@ -318,10 +318,44 @@ textarea {
     z-index: 4;
 }
 
+#navigator-days {
+    background-color: #0080ff;
+    margin: 5px;
+    margin-bottom: -5px;
+    position: sticky;
+    top: 40px;
+    z-index: 4;
+    border-radius: 5px;
+    border-bottom-left-radius: 0px;
+    border-bottom-right-radius: 0px;
+    width: auto;
+    height: 40px;
+}
+
+.nav-days-fixed {
+    background-color: #0080ffaa !important;
+    border-radius: 5px !important;
+}
+
+.nav-days-fixed:active, .nav-days-fixed:hover {
+    background-color: #0080ff !important;
+    border-radius: 5px !important;
+}
+
 table {
     border-collapse: collapse;
     padding: 5px;
     width: 100%;
+}
+
+.table-days, #all-websites-sections, #table-section {
+    border-radius: 5px;
+    border-top-left-radius: 0px;
+    border-top-right-radius: 0px;
+}
+
+.table-days * {
+    border-radius: 0px;
 }
 
 .sub-section {
