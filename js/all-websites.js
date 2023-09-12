@@ -22,6 +22,9 @@ function loaded() {
     document.getElementById("go-today-button").onclick = function () {
         goToday();
     }
+    document.getElementById("go-last-button").onclick = function () {
+        goLast();
+    }
     document.getElementById("go-newer-button").onclick = function () {
         goNewer();
     }
@@ -52,6 +55,12 @@ function loaded() {
 function goToday() {
     loadDataFromBrowser(true);
     start_date = 0;
+}
+
+function goLast() {
+    loadDataFromBrowser(true);
+    start_date = 0;
+    if (all_dates.length > 7) start_date = all_dates.length - 7;
 }
 
 function goNewer() {

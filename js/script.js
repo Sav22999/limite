@@ -15,7 +15,7 @@ var firstTime = true;
 var changedEdits = false;
 
 const linkReview = ["https://addons.mozilla.org/firefox/addon/limite/"]; //{firefox add-ons}
-const linkDonate = ["https://www.paypal.me/saveriomorelli", "https://ko-fi.com/saveriomorelli", "https://liberapay.com/Sav22999/donate"]; //{paypal, ko-fi}
+const linkDonate = ["https://www.paypal.me/saveriomorelli", "https://liberapay.com/Sav22999/donate"]; //{paypal, liberapay}
 
 function loaded() {
     browser.tabs.query({active: true, currentWindow: true}, function (tabs) {
@@ -79,9 +79,10 @@ function loadUI() {
             browser.storage.local.get("websites", function (value) {
                 timeSpentToday = 0;
                 timeSpentAlways = 0;
+                let category = "other";
                 if (value["websites"] !== undefined) {
                     websites_json = value["websites"];
-                    if (websites_json[urlToUse] != undefined) {
+                    if (websites_json[urlToUse] !== undefined) {
                         if (firstTime === true) {
                             let enabled = false;
                             if (websites_json[urlToUse]["enabled"] !== undefined) enabled = websites_json[urlToUse]["enabled"];
@@ -99,6 +100,7 @@ function loadUI() {
                                 timeSpentAlways += websites_json[currentUrl][key];
                             }
                         }
+                        if (websites_json[currentUrl]["category"] !== undefined) category = websites_json[currentUrl]["category"];
                     } else {
                     }
                 } else {
@@ -106,6 +108,7 @@ function loadUI() {
                 disableSwitch(false);
                 document.getElementById("today-time").innerHTML = getTimeConverted(timeSpentToday);
                 document.getElementById("always-time").innerHTML = getTimeConverted(timeSpentAlways);
+                document.getElementById("details-container").classList = [category + "-category"];
             })
         } else {
             disableSwitch(true);
@@ -156,14 +159,14 @@ function getShortUrl(url) {
 
     if (urlToReturn.includes("/")) {
         urlPartsTemp = urlToReturn.split("/");
-        if (urlPartsTemp[0] == "" && urlPartsTemp[1] == "") {
+        if (urlPartsTemp[0] === "" && urlPartsTemp[1] === "") {
             urlToReturn = urlPartsTemp[2];
         }
     }
 
     if (urlToReturn.includes(".")) {
         urlPartsTemp = urlToReturn.split(".");
-        if (urlPartsTemp[0] == "www") {
+        if (urlPartsTemp[0] === "www") {
             urlToReturn = urlToReturn.substr(4);
         }
     }
@@ -176,14 +179,14 @@ function getUrlFormatted(url) {
     let i = 0;
     let urlToReturn = "";
     while (i < urlParts.length) {
-        if (i == urlParts.length - 2) {
+        if (i === urlParts.length - 2) {
             urlToReturn += "<span class='bold'>";
         }
         urlToReturn += urlParts[i] + "";
-        if (i != (urlParts.length - 1)) {
+        if (i !== (urlParts.length - 1)) {
             urlToReturn += "."
         }
-        if (i == (urlParts.length - 1)) {
+        if (i === (urlParts.length - 1)) {
             urlToReturn += "</span>";
         }
         i++;
@@ -196,7 +199,7 @@ function getTheProtocol(url) {
 }
 
 function switchToOnOrOff(changeVariable = false, toggleId, forced = false, value = false) {
-    if (!forced && document.getElementById(toggleId).style.left == "0px" || forced && value) {
+    if (!forced && document.getElementById(toggleId).style.left === "0px" || forced && value) {
         switchToOn(toggleId, changeVariable);
     } else {
         switchToOff(toggleId, changeVariable);
@@ -279,7 +282,7 @@ function isUrlSupported(url) {
 }
 
 function isInteger(value) {
-    if (Number.isNaN(value) == false) {
+    if (Number.isNaN(value) === false) {
         if (Number.isInteger(value)) {
             return true;
         }

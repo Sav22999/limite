@@ -290,7 +290,7 @@ function checkEverySecond(url) {
 
 function increaseTime(url) {
     if (enabledOrNot) {
-        if (url == currentUrl) {
+        if (url === currentUrl) {
             saveUrlToData(true, 1);
         }
     }

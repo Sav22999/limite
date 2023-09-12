@@ -97,7 +97,7 @@ body {
 
 #toggle-section {
     position: relative;
-    width: 350px;
+    width: auto; /*350px*/
     height: auto;
     padding: 0px 20px;
     margin: 0px;
@@ -173,11 +173,12 @@ body {
 
 #details-section {
     padding: 0px;
+    width: auto;
 }
 
 #details-container {
     position: relative;
-    width: 350px;
+    width: auto; /*350px*/
     height: auto;
     padding: 5px 20px;
     margin: 0px;
@@ -193,6 +194,10 @@ body {
             'text2 text2 value2';
     grid-gap: 5px;
     border-radius: 0px;
+
+    background-repeat: no-repeat;
+    background-size: auto 110%;
+    background-position: bottom -15px right -10px;
 }
 
 .grid-item {
@@ -425,7 +430,7 @@ tr:hover {
     border-radius: 0px;
 }
 
-.button-delete, .button-copy, .button-import, .button-export, .button-refresh, .button-newer, .button-older, .button-go-today {
+.button-delete, .button-copy, .button-import, .button-export, .button-refresh, .button-newer, .button-older, .button-go-today, .button-go-last-day {
     padding-left: 30px;
     padding-right: 10px;
     background-image: url("../img/delete.svg");
@@ -466,7 +471,11 @@ tr:hover {
 }
 
 .button-go-today {
-    background-image: url("../img/go-back-to-today.svg");
+    background-image: url("../img/today.svg");
+}
+
+.button-go-last-day {
+    background-image: url("../img/last.svg");
 }
 
 #background-opacity {
