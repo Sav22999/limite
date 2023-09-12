@@ -352,10 +352,9 @@ function loadAllWebsites() {
             let number_of_days = all_dates.length;
 
             let sum_since_install = 0;
-            for (let date in all_dates) {
-                let date_to_show = all_dates[date];
-                if (websites_json[current_website][date_to_show] !== undefined) {
-                    sum_since_install += parseInt(websites_json[current_website][date_to_show].toString());
+            for (let date in websites_json[current_website]) {
+                if (date !== "always" && date !== "enabled" && date !== "category") {
+                    sum_since_install += websites_json[current_website][date];
                 }
             }
             let since_install = getTimeConverted(sum_since_install);
