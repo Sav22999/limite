@@ -145,10 +145,10 @@ function importData() {
                 document.getElementById("import-section").style.display = "none";
                 browser.storage.local.set({"websites": websites_json}, function () {
                     loadDataFromBrowser(true);
-                    hideBackgroundOpacity()
+                    hideBackgroundOpacity();
                 });
             } catch (e) {
-                //console.log("Error: " + e.toString());
+                console.error("Error: " + e.toString());
                 let errorSubSection = document.createElement("div");
                 errorSubSection.classList.add("sub-section", "background-light-red");
                 errorSubSection.textContent = "Error: " + e.toString();
@@ -214,7 +214,7 @@ function loadAllWebsites() {
 
         for (let index in websites_json_by_domain) {
             for (let date in websites_json[websites_json_by_domain[index]]) {
-                if (date !== "enabled") {
+                if (date !== "enabled" && date !== "category") {
                     if (date < smallest_date) {
                         smallest_date = date;
                     }
@@ -454,6 +454,7 @@ function getAllDates(startDate, stopDate) {
         dateArray.push(getFormattedDate(new Date(currentDate)));
         currentDate.setDate(currentDate.getDate() + 1);
     }
+    if (!dateArray.includes(getToday())) dateArray.push(getFormattedDate(getToday()));
     return dateArray;
 }
 
@@ -466,18 +467,18 @@ function checkCategory(current_website) {
 let categories = {
     "social": ["facebook.com", "twitter.com", "instagram.com", "chat.openai.com"],
     "travel": ["booking.com", "expedia.com", "airbnb.com", "hotels.com", "trivago.it"],
-    "news": ["bbc.com", "bbc.co.uk", "cnn.com", "rainews.it", "corriere.it", "repubblica.it"],
+    "news": ["bbc.com", "bbc.co.uk", "cnn.com", "rainews.it", "corriere.it", "repubblica.it", "msn.com", "news.yahoo.com", "aol.com", "ladige.it", "ildolomiti.it"],
     "education": ["classroom.google.com", "edu.google.com"],
-    "shopping": ["amazon.com", "amazon.it", "amazon.fr", "amazon.de", "ebay.com", "eprice.it", "lafeltrinelli.it", "ibs.it", "mediaworld.it", "euronics.it", "trony.it", "unieuro.it"],
-    "search": ["google.com", "google.it", "google.co.uk", "google.fr", "google.de", "bing.com", "duckduckgo.com", "qwant.com", "baidu.com", "yandex.com"],
-    "reference": ["wikipedia.org", "wordreference.com", "dictionary.cambridge.org", "treccani.it", "oxfordlearnersdictionaries.com", "emojipedia.org"],
+    "shopping": ["amazon.com", "amazon.it", "amazon.fr", "amazon.de", "ebay.com", "eprice.it", "lafeltrinelli.it", "ibs.it", "mediaworld.it", "euronics.it", "trony.it", "unieuro.it", "justeat.it", "glovoapp.com", "deliveroo.co.uk", "deliveroo.it", "deliveroo.com", "tesco.com", "asda.com", "sainsburys.co.uk", "ah.nl"],
+    "search": ["google.com", "google.it", "google.co.uk", "google.fr", "google.de", "bing.com", "duckduckgo.com", "qwant.com", "baidu.com", "yandex.com", "search.yahoo.com"],
+    "reference": ["wikipedia.org", "wordreference.com", "dictionary.cambridge.org", "treccani.it", "oxfordlearnersdictionaries.com", "emojipedia.org", "affinity.help"],
     "entertainment": ["youtube.com", "netflix.com", "primevideo.com", "spotify.com", "deezer.com", "disneyplus.com", "imdb.com", "hulu.com"],
     "adults": ["youporn.com", "pornhub.com", "xnxx.com", "xvideos.com", "xhamster.com"],
     "sav22999": ["saveriomorelli.com", "emojiaddon.com", "savpdfviewer.com"],
-    "develop": ["github.com", "gitlab.com", "addons.firefox.com", "thunderbird.net", "addons.thunderbird.com", "stackoverflow.com", "w3.org", "w3schools.com", "developer.mozilla.org"],
+    "develop": ["github.com", "gitlab.com", "addons.firefox.com", "thunderbird.net", "addons.thunderbird.com", "stackoverflow.com", "w3.org", "w3schools.com", "developer.mozilla.org", "w3docs.com"],
     "messaging": ["whatsapp.com", "web.whatsapp.com", "telegram.org", "web.telegram.org", "t.me"],
     "games": [],
-    "health": [],
+    "health": ["apss.tn.it"],
     "other": [] //must remain empty here
 };
 
