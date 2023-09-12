@@ -3,6 +3,8 @@ let websites_json_by_domain = [];
 let smallest_date = "";
 let all_dates = [];
 
+let start_date = null;
+
 function loaded() {
     document.getElementById("refresh-data-button").onclick = function () {
         //location.reload();
@@ -16,6 +18,15 @@ function loaded() {
     }
     document.getElementById("export-data-button").onclick = function () {
         exportData();
+    }
+    document.getElementById("go-today-button").onclick = function () {
+        goToday();
+    }
+    document.getElementById("go-newer-button").onclick = function () {
+        goNewer();
+    }
+    document.getElementById("go-older-button").onclick = function () {
+        goOlder();
     }
 
     loadDataFromBrowser(true);
@@ -36,6 +47,29 @@ function loaded() {
             }
         }
     }
+}
+
+function goToday() {
+    loadDataFromBrowser(true);
+    start_date = 0;
+}
+
+function goNewer() {
+    loadDataFromBrowser(true);
+    //-7
+    if (start_date > 7) start_date -= 7;
+    else start_date = 0;
+}
+
+function goOlder() {
+    loadDataFromBrowser(true);
+    //+7
+    if ((start_date + 7) < all_dates.length) start_date += 7;
+    //else start_date = all_dates.length - 7;
+}
+
+function setDateInterval(from, to) {
+    document.getElementById("from-to-date-label").textContent = "Weeks: " + from + " – " + to;
 }
 
 function loadDataFromBrowser(generate_section = true) {
@@ -182,10 +216,12 @@ function loadAllWebsites() {
         all_dates = getAllDates(smallest_date, getToday());
         all_dates.reverse();
 
+        if (start_date === null) start_date = 0;
+
         const days_to_show = 7;
         let last_seven_days = [];
-        let counter = 0; //from index 0
-        while (counter < days_to_show) {
+        let counter = start_date; //from index 0
+        while (counter < (days_to_show + start_date)) {
             if (all_dates.length >= (counter + 1)) {
                 last_seven_days.push(all_dates[counter]);
             }
@@ -224,6 +260,7 @@ function loadAllWebsites() {
             tableHeaderElement.textContent = date_to_show;
             tableRowElement.append(tableHeaderElement);
         }
+        setDateInterval(last_seven_days[0], last_seven_days[last_seven_days.length - 1]);
 
         tableTHeadElement.append(tableRowElement);
         tableElement.append(tableTHeadElement);
@@ -245,7 +282,7 @@ function loadAllWebsites() {
 
             let buttonDelete = document.createElement("input");
             buttonDelete.type = "button";
-            //buttonDelete.value = "Delete";
+            buttonDelete.alt = "Delete";
             buttonDelete.classList.add("button", "button-delete", "very-small-button", "float-left", "margin-left-minus-20-px", "margin-top-5-px", "text-align-center");
             buttonDelete.id = "button-delete-single";
             buttonDelete.onclick = function () {

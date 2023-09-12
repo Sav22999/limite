@@ -257,6 +257,11 @@ body {
     display: inline-block;
 }
 
+.button-invert-colors {
+    background-color: #ffffff;
+    color: #0080ff;
+}
+
 .section-link {
     width: auto;
     background-color: #0080ff;
@@ -268,10 +273,18 @@ body {
     background-color: #2c96ff;
 }
 
+.button-invert-colors:hover {
+    background-color: #dddddd;
+}
+
 .button:active, .button:focus, textarea:focus, textarea:active, .select-category:active, .select-category:focus {
     box-shadow: 0px 0px 0px 2px #0080ff66, 0px 0px 0px 5px #84c0ff66;
     border-radius: 5px;
     z-index: 2;
+}
+
+.button-invert-colors:active, .button-invert-colors:focus {
+    box-shadow: 0px 0px 0px 2px #dddddd66, 0px 0px 0px 5px #ffffff66;
 }
 
 textarea {
@@ -329,7 +342,9 @@ textarea {
     border-bottom-left-radius: 0px;
     border-bottom-right-radius: 0px;
     width: auto;
-    height: 40px;
+    height: auto;
+    padding: 5px;
+    text-align: right;
 }
 
 .nav-days-fixed {
@@ -354,8 +369,10 @@ table {
     border-top-right-radius: 0px;
 }
 
-.table-days * {
-    border-radius: 0px;
+#from-to-date-label {
+    color: #ffffff;
+    font-weight: bold;
+    padding: 10px 20px;
 }
 
 .sub-section {
@@ -408,7 +425,7 @@ tr:hover {
     border-radius: 0px;
 }
 
-.button-delete, .button-copy, .button-import, .button-export, .button-refresh {
+.button-delete, .button-copy, .button-import, .button-export, .button-refresh, .button-newer, .button-older, .button-go-today {
     padding-left: 30px;
     padding-right: 10px;
     background-image: url("../img/delete.svg");
@@ -438,6 +455,18 @@ tr:hover {
 
 .button-refresh {
     background-image: url("../img/refresh.svg");
+}
+
+.button-newer {
+    background-image: url("../img/newer.svg");
+}
+
+.button-older {
+    background-image: url("../img/older.svg");
+}
+
+.button-go-today {
+    background-image: url("../img/go-back-to-today.svg");
 }
 
 #background-opacity {

@@ -42,7 +42,7 @@ function reload() {
             fullUrl = activeTabUrl;
 
             browser.storage.local.get("edits", function (value) {
-                if (value["edits"] != undefined && value["edits"]["counter"]) {
+                if (value["edits"] !== undefined && value["edits"]["counter"]) {
                     enabledOrNot = value["edits"]["enabled"];
                     //console.log("Updated || Enabled: " + enabledOrNot);
                     let editsToPush = {};
@@ -157,11 +157,11 @@ function saveUrlToData(enabled, time = 0) {
         //timeSpentAlways = 0;
         if (websites_json[urlToUse] !== undefined) {
             valueToUse = websites_json[urlToUse];
-            if (websites_json[urlToUse][getToday()] != undefined) {
+            if (websites_json[urlToUse][getToday()] !== undefined) {
                 timeSpentToday = websites_json[urlToUse][getToday()];
             }
 
-            /*if (websites_json[urlToUse]["always"] != undefined) {
+            /*if (websites_json[urlToUse]["always"] !== undefined) {
                 timeSpentAlways = websites_json[urlToUse]["always"];
             }*/
         } else {
@@ -218,18 +218,18 @@ function getSavedData(url) {
         browser.storage.local.get("websites", function (value) {
                 timeSpentToday = 0;
                 //timeSpentAlways = 0;
-                if (value["websites"] != undefined) {
+                if (value["websites"] !== undefined) {
                     websites_json = value["websites"];
-                    if (websites_json[urlToUse] != undefined) {
+                    if (websites_json[urlToUse] !== undefined) {
                         let enabled = false;
-                        if (websites_json[urlToUse]["enabled"] != undefined) enabled = websites_json[urlToUse]["enabled"];
+                        if (websites_json[urlToUse]["enabled"] !== undefined) enabled = websites_json[urlToUse]["enabled"];
                         switchToOnOrOff(true, enabled);
                         timeSpentToday = 0;
-                        if (websites_json[urlToUse][getToday()] != undefined) {
+                        if (websites_json[urlToUse][getToday()] !== undefined) {
                             timeSpentToday = websites_json[urlToUse][getToday()];
                         }
                         /*
-                        if (websites_json[urlToUse]["always"] != undefined) {
+                        if (websites_json[urlToUse]["always"] !== undefined) {
                             timeSpentAlways = websites_json[urlToUse]["always"];
                         } else {
                             timeSpentAlways = 0;
@@ -298,7 +298,7 @@ function increaseTime(url) {
 
 function createNotification(type, url, title, content) {
     //send a notification
-    if (getToday() != lastNotificationDate || lastNotification[url] != type) {
+    if (getToday() !== lastNotificationDate || lastNotification[url] !== type) {
         lastNotificationDate = getToday();
         lastNotification[url] = type;
         browser.notifications.create({
@@ -329,7 +329,7 @@ function getToday() {
 }
 
 function isInteger(value) {
-    if (Number.isNaN(value) == false) {
+    if (Number.isNaN(value) === false) {
         if (Number.isInteger(value)) {
             return true;
         }
