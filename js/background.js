@@ -14,8 +14,6 @@ var checkTimer = null;
 var changedEdits = false;
 var changedTab = false;
 
-let all_categories = ["social", "entertainment", "news", "travel", "health", "education", "games", "adults", "shopping", "reference", "messaging", "other"];
-
 var activeTabId;
 
 const linkReview = ["https://addons.mozilla.org/firefox/addon/limite/"]; //{firefox add-ons}

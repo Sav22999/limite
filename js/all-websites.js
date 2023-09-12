@@ -224,6 +224,7 @@ function loadAllWebsites() {
         for (let index in websites_json_by_domain) {
             tableRowElement = document.createElement("tr");
 
+            //website
             let current_website = websites_json_by_domain[index];
 
             let currentWebsiteElement = document.createElement("h2");
@@ -243,11 +244,13 @@ function loadAllWebsites() {
                 deleteAWebsite(current_website);
             }
 
+
             let tableDataElement = document.createElement("td");
             tableDataElement.classList.add("padding-left-30-px");
             tableDataElement.append(buttonDelete, currentWebsiteElement);
             tableRowElement.append(tableDataElement);
 
+            //status
             let status_to_show = true;
             if (websites_json[current_website]["enabled"] !== undefined) {
                 status_to_show = websites_json[current_website]["enabled"];
@@ -285,10 +288,13 @@ function loadAllWebsites() {
             }
             tableRowElement.append(tableDataElementStatus);
 
-            tableDataElement = document.createElement("td");
-            tableDataElement.textContent = checkCategory(current_website);
-            tableRowElement.append(tableDataElement);
+            //category
+            let tableDataElementCategory = document.createElement("td");
+            tableDataElementCategory.append(generateCategories(checkCategory(current_website), current_website, tableDataElementCategory));
+            tableRowElement.append(tableDataElementCategory);
 
+
+            //since install
             let number_of_days = all_dates.length;
 
             let sum_since_install = 0;
@@ -311,6 +317,8 @@ function loadAllWebsites() {
             }
             tableRowElement.append(tableDataElement);
 
+
+            //days
             for (let date in last_seven_days) {
                 let date_to_show = last_seven_days[date];
                 let time_to_show = getTimeConverted(0);
@@ -375,7 +383,7 @@ function switchToggleOnOff(toggleThumb, current_website, tableDataElement) {
         if (value["websites"] !== undefined) {
             websites_status_temp = value["websites"];
             websites_status_temp[current_website]["enabled"] = websites_json[current_website]["enabled"];
-            browser.storage.local.set({"websites": websites_json}, function () {
+            browser.storage.local.set({"websites": websites_status_temp}, function () {
                 websites_json = websites_status_temp;
             });
         }
@@ -416,28 +424,48 @@ let categories = {
     "develop": ["github.com", "gitlab.com", "addons.firefox.com", "thunderbird.net", "addons.thunderbird.com", "stackoverflow.com", "w3.org", "w3schools.com", "developer.mozilla.org"],
     "messaging": ["whatsapp.com", "web.whatsapp.com", "telegram.org", "web.telegram.org", "t.me"],
     "games": [],
-    "health": []
+    "health": [],
+    "other": [] //must remain empty here
 };
 
 function getCategory(website) {
-    let valueToReturn = "";
-    if (website in categories["social"]) valueToReturn = "social";
-    else if (categories["travel"].includes(website)) valueToReturn = "travel";
-    else if (categories["news"].includes(website)) valueToReturn = "news";
-    else if (categories["education"].includes(website)) valueToReturn = "education";
-    else if (categories["shopping"].includes(website)) valueToReturn = "shopping";
-    else if (categories["search"].includes(website)) valueToReturn = "search";
-    else if (categories["reference"].includes(website)) valueToReturn = "reference";
-    else if (categories["entertainment"].includes(website)) valueToReturn = "entertainment";
-    else if (categories["adults"].includes(website)) valueToReturn = "adults";
-    else if (categories["sav22999"].includes(website)) valueToReturn = "sav22999";
-    else if (categories["develop"].includes(website)) valueToReturn = "develop";
-    else if (categories["messaging"].includes(website)) valueToReturn = "messaging";
-    else if (categories["games"].includes(website)) valueToReturn = "games";
-    else if (categories["health"].includes(website)) valueToReturn = "health";
-    else valueToReturn = "other";
+    let valueToReturn = "other";
+    for (item in categories) {
+        if (categories[item].includes(website)) valueToReturn = item;
+    }
     //console.log(website + " : " + valueToReturn);//TODO: use for testing websites filter
     return valueToReturn;
+}
+
+function generateCategories(selectedItem = "other", current_website, tableDataElementCategory) {
+    let selectElement = document.createElement("select");
+    selectElement.classList.add("select-category");
+    for (item in categories) {
+        let optionElement = document.createElement("option");
+        if (item === selectedItem) optionElement.selected = true;
+        optionElement.value = item;
+        optionElement.textContent = item;
+        selectElement.append(optionElement);
+    }
+    selectElement.onchange = function () {
+        saveCategory(current_website, selectElement.value);
+        tableDataElementCategory.classList = [selectElement.value + "-category"];
+    }
+    tableDataElementCategory.classList = [selectedItem + "-category"];
+    return selectElement;
+}
+
+function saveCategory(current_website, selected_item) {
+    let websites_status_temp = {};
+    browser.storage.local.get("websites", function (value) {
+        if (value["websites"] !== undefined) {
+            websites_status_temp = value["websites"];
+            websites_status_temp[current_website]["category"] = selected_item;
+            browser.storage.local.set({"websites": websites_status_temp}, function () {
+                websites_json = websites_status_temp;
+            });
+        }
+    });
 }
 
 loaded();

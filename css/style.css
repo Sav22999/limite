@@ -161,7 +161,7 @@ body {
     background-image: url("../img/yes.png");
 }
 
-#toggle-thumb:hover {
+#toggle-thumb:hover, .select-category:hover {
     box-shadow: 0px 0px 0px 2px #0080ff55;
     z-index: 2;
 }
@@ -225,6 +225,16 @@ body {
     grid-area: value2;
 }
 
+.select-category {
+    background-color: transparent;
+    color: #0088ff;
+    width: auto;
+    padding: 5px 10px;
+    border-radius: 5px;
+    border: 0px solid transparent;
+    margin: 3px !important;
+}
+
 .grey {
     color: #dddddd;
 }
@@ -258,8 +268,8 @@ body {
     background-color: #2c96ff;
 }
 
-.button:active, .button:focus, textarea:focus, textarea:active {
-    box-shadow: 0px 0px 0px 2px #0080ff, 0px 0px 0px 5px #84c0ff;
+.button:active, .button:focus, textarea:focus, textarea:active, .select-category:active, .select-category:focus {
+    box-shadow: 0px 0px 0px 2px #0080ff66, 0px 0px 0px 5px #84c0ff66;
     border-radius: 5px;
     z-index: 2;
 }
@@ -303,7 +313,6 @@ textarea {
 }
 
 .sticky-section {
-    position: -webkit-sticky;
     position: sticky;
     top: 0px;
     z-index: 4;
@@ -589,4 +598,75 @@ h3 {
 
 .width-100-perc {
     width: 100%;
+}
+
+/*categories*/
+.other-category, .social-category, .travel-category, .news-category, .education-category, .shopping-category, .search-category, .reference-category, .entertainment-category, .adults-category, .sav22999-category, .develop-category, .messaging-category, .games-category, .health-category {
+    background-color: transparent;
+    background-repeat: no-repeat;
+    background-size: auto 100%;
+    background-position: bottom -10px right -10px;
+}
+
+.other-category {
+    background-image: url("../img/categories/other.svg");
+}
+
+.social-category {
+    background-image: url("../img/categories/social.svg");
+}
+
+.travel-category {
+    background-image: url("../img/categories/travel.svg");
+}
+
+.news-category {
+    background-image: url("../img/categories/news.svg");
+    background-size: auto 110%;
+}
+
+.education-category {
+    background-image: url("../img/categories/education.svg");
+}
+
+.shopping-category {
+    background-image: url("../img/categories/shopping.svg");
+}
+
+.search-category {
+    background-image: url("../img/categories/search.svg");
+    background-position: bottom -5px right -10px;
+}
+
+.reference-category {
+    background-image: url("../img/categories/reference.svg");
+}
+
+.entertainment-category {
+    background-image: url("../img/categories/entertainment.svg");
+}
+
+.adults-category {
+    background-image: url("../img/categories/adults.svg");
+}
+
+.sav22999-category {
+    background-image: url("../img/categories/sav22999.svg");
+}
+
+.develop-category {
+    background-image: url("../img/categories/develop.svg");
+}
+
+.messaging-category {
+    background-image: url("../img/categories/messaging.svg");
+    background-size: auto 110%;
+}
+
+.games-category {
+    background-image: url("../img/categories/games.svg");
+}
+
+.health-category {
+    background-image: url("../img/categories/health.svg");
 }
