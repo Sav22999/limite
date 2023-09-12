@@ -14,6 +14,8 @@ var checkTimer = null;
 var changedEdits = false;
 var changedTab = false;
 
+var minimized = false;
+
 var activeTabId;
 
 const linkReview = ["https://addons.mozilla.org/firefox/addon/limite/"]; //{firefox add-ons}
@@ -24,6 +26,18 @@ function loaded() {
     //catch changing of tab
     browser.tabs.onActivated.addListener(tabUpdated);
     browser.tabs.onUpdated.addListener(tabUpdated);
+    browser.windows.onFocusChanged.addListener(checkLostFocus);
+}
+
+function checkLostFocus(windowId) {
+    if (windowId === browser.windows.WINDOW_ID_NONE) {
+        // The browser window is minimized or lost focus
+        minimized = true;
+    } else {
+        //browser has focus
+        minimized = false;
+    }
+    //console.log("Minimized: " + minimized);
 }
 
 function reload() {
@@ -289,7 +303,7 @@ function checkEverySecond(url) {
 }
 
 function increaseTime(url) {
-    if (enabledOrNot) {
+    if (enabledOrNot && !minimized) {
         if (url === currentUrl) {
             saveUrlToData(true, 1);
         }
