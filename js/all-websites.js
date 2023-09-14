@@ -5,6 +5,7 @@ let all_dates = [];
 
 let start_date = null;
 let days_to_show = 7; //number of days to show
+let categories = {};
 
 function loaded() {
     document.getElementById("refresh-data-button").onclick = function () {
@@ -33,7 +34,12 @@ function loaded() {
         goOlder();
     }
 
-    loadDataFromBrowser(true);
+    browser.runtime.sendMessage({from: "all-websites", ask: "categories"}, (response) => {
+        if (response !== undefined) {
+            categories = response.categories;
+            loadDataFromBrowser(true);
+        }
+    });
 
     document.getElementById("all-websites-dedication-section").onscroll = function () {
         if (document.getElementById("all-websites-dedication-section").scrollTop > 30) {
@@ -463,24 +469,6 @@ function checkCategory(current_website) {
     if (valueToReturn === undefined) valueToReturn = getCategory(current_website);
     return valueToReturn;
 }
-
-let categories = {
-    "social": ["facebook.com", "twitter.com", "instagram.com", "chat.openai.com"],
-    "travel": ["booking.com", "expedia.com", "airbnb.com", "hotels.com", "trivago.it"],
-    "news": ["bbc.com", "bbc.co.uk", "cnn.com", "rainews.it", "corriere.it", "repubblica.it", "msn.com", "news.yahoo.com", "aol.com", "ladige.it", "ildolomiti.it"],
-    "education": ["classroom.google.com", "edu.google.com"],
-    "shopping": ["amazon.com", "amazon.it", "amazon.fr", "amazon.de", "ebay.com", "eprice.it", "lafeltrinelli.it", "ibs.it", "mediaworld.it", "euronics.it", "trony.it", "unieuro.it", "justeat.it", "glovoapp.com", "deliveroo.co.uk", "deliveroo.it", "deliveroo.com", "tesco.com", "asda.com", "sainsburys.co.uk", "ah.nl"],
-    "search": ["google.com", "google.it", "google.co.uk", "google.fr", "google.de", "bing.com", "duckduckgo.com", "qwant.com", "baidu.com", "yandex.com", "search.yahoo.com"],
-    "reference": ["wikipedia.org", "wordreference.com", "dictionary.cambridge.org", "treccani.it", "oxfordlearnersdictionaries.com", "emojipedia.org", "affinity.help"],
-    "entertainment": ["youtube.com", "netflix.com", "primevideo.com", "spotify.com", "deezer.com", "disneyplus.com", "imdb.com", "hulu.com"],
-    "adults": ["youporn.com", "pornhub.com", "xnxx.com", "xvideos.com", "xhamster.com"],
-    "sav22999": ["saveriomorelli.com", "emojiaddon.com", "savpdfviewer.com"],
-    "develop": ["github.com", "gitlab.com", "addons.mozilla.org", "thunderbird.net", "addons.thunderbird.net", "stackoverflow.com", "w3.org", "w3schools.com", "developer.mozilla.org", "w3docs.com"],
-    "messaging": ["whatsapp.com", "web.whatsapp.com", "telegram.org", "web.telegram.org", "t.me"],
-    "games": [],
-    "health": ["apss.tn.it"],
-    "other": [] //must remain empty here
-};
 
 function getCategory(website) {
     let valueToReturn = "other";

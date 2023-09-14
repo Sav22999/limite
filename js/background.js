@@ -18,6 +18,24 @@ var minimized = false;
 
 var activeTabId;
 
+const categories = {
+    "social": ["facebook.com", "twitter.com", "instagram.com", "chat.openai.com"],
+    "travel": ["booking.com", "expedia.com", "airbnb.com", "hotels.com", "trivago.it"],
+    "news": ["bbc.com", "bbc.co.uk", "cnn.com", "rainews.it", "corriere.it", "repubblica.it", "msn.com", "news.yahoo.com", "aol.com", "ladige.it", "ildolomiti.it"],
+    "education": ["classroom.google.com", "edu.google.com"],
+    "shopping": ["amazon.com", "amazon.it", "amazon.fr", "amazon.de", "ebay.com", "eprice.it", "lafeltrinelli.it", "ibs.it", "mediaworld.it", "euronics.it", "trony.it", "unieuro.it", "justeat.it", "glovoapp.com", "deliveroo.co.uk", "deliveroo.it", "deliveroo.com", "tesco.com", "asda.com", "sainsburys.co.uk", "ah.nl"],
+    "search": ["google.com", "google.it", "google.co.uk", "google.fr", "google.de", "bing.com", "duckduckgo.com", "qwant.com", "baidu.com", "yandex.com", "search.yahoo.com"],
+    "reference": ["wikipedia.org", "wordreference.com", "dictionary.cambridge.org", "treccani.it", "oxfordlearnersdictionaries.com", "emojipedia.org", "affinity.help"],
+    "entertainment": ["youtube.com", "netflix.com", "primevideo.com", "spotify.com", "deezer.com", "disneyplus.com", "imdb.com", "hulu.com"],
+    "adults": ["youporn.com", "pornhub.com", "xnxx.com", "xvideos.com", "xhamster.com"],
+    "sav22999": ["saveriomorelli.com", "emojiaddon.com", "savpdfviewer.com"],
+    "develop": ["github.com", "gitlab.com", "addons.mozilla.org", "thunderbird.net", "addons.thunderbird.net", "stackoverflow.com", "w3.org", "w3schools.com", "developer.mozilla.org", "w3docs.com"],
+    "messaging": ["whatsapp.com", "web.whatsapp.com", "telegram.org", "web.telegram.org", "t.me"],
+    "games": [],
+    "health": ["apss.tn.it"],
+    "other": [] //must remain empty here
+};
+
 const linkReview = ["https://addons.mozilla.org/firefox/addon/limite/"]; //{firefox add-ons}
 const linkDonate = ["https://www.paypal.me/saveriomorelli", "https://ko-fi.com/saveriomorelli", "https://liberapay.com/Sav22999/donate"]; //{paypal, ko-fi}
 const icons = ["icon.png", "icon_disabled.png", "icon_yellow.png", "icon_orange.png", "icon_red.png"];
@@ -27,6 +45,11 @@ function loaded() {
     browser.tabs.onActivated.addListener(tabUpdated);
     browser.tabs.onUpdated.addListener(tabUpdated);
     browser.windows.onFocusChanged.addListener(checkLostFocus);
+
+    //send categories to "all-websites"
+    browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
+        if (message !== undefined && message["from"] === "all-websites" && message["ask"] === "categories") sendResponse({"categories": categories});
+    });
 }
 
 function checkLostFocus(windowId) {
@@ -360,24 +383,6 @@ function setBadgeText(text, background_color = "#0080FF", text_color = "#FFFFFF"
     browser.browserAction.setBadgeTextColor({color: text_color});
     browser.browserAction.setBadgeBackgroundColor({color: background_color});
 }
-
-let categories = {
-    "social": ["facebook.com", "twitter.com", "instagram.com", "chat.openai.com"],
-    "travel": ["booking.com", "expedia.com", "airbnb.com", "hotels.com", "trivago.it"],
-    "news": ["bbc.com", "bbc.co.uk", "cnn.com", "rainews.it", "corriere.it", "repubblica.it", "msn.com", "news.yahoo.com", "aol.com", "ladige.it", "ildolomiti.it"],
-    "education": ["classroom.google.com", "edu.google.com"],
-    "shopping": ["amazon.com", "amazon.it", "amazon.fr", "amazon.de", "ebay.com", "eprice.it", "lafeltrinelli.it", "ibs.it", "mediaworld.it", "euronics.it", "trony.it", "unieuro.it", "justeat.it", "glovoapp.com", "deliveroo.co.uk", "deliveroo.it", "deliveroo.com", "tesco.com", "asda.com", "sainsburys.co.uk", "ah.nl"],
-    "search": ["google.com", "google.it", "google.co.uk", "google.fr", "google.de", "bing.com", "duckduckgo.com", "qwant.com", "baidu.com", "yandex.com", "search.yahoo.com"],
-    "reference": ["wikipedia.org", "wordreference.com", "dictionary.cambridge.org", "treccani.it", "oxfordlearnersdictionaries.com", "emojipedia.org", "affinity.help"],
-    "entertainment": ["youtube.com", "netflix.com", "primevideo.com", "spotify.com", "deezer.com", "disneyplus.com", "imdb.com", "hulu.com"],
-    "adults": ["youporn.com", "pornhub.com", "xnxx.com", "xvideos.com", "xhamster.com"],
-    "sav22999": ["saveriomorelli.com", "emojiaddon.com", "savpdfviewer.com"],
-    "develop": ["github.com", "gitlab.com", "addons.mozilla.org", "thunderbird.net", "addons.thunderbird.net", "stackoverflow.com", "w3.org", "w3schools.com", "developer.mozilla.org", "w3docs.com"],
-    "messaging": ["whatsapp.com", "web.whatsapp.com", "telegram.org", "web.telegram.org", "t.me"],
-    "games": [],
-    "health": ["apss.tn.it"],
-    "other": [] //must remain empty here
-};
 
 function getCategory(website) {
     let valueToReturn = "";
