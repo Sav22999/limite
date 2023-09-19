@@ -32,6 +32,7 @@ const categories = {
     "develop": ["github.com", "gitlab.com", "addons.mozilla.org", "thunderbird.net", "addons.thunderbird.net", "stackoverflow.com", "w3.org", "w3schools.com", "developer.mozilla.org", "w3docs.com"],
     "messaging": ["whatsapp.com", "web.whatsapp.com", "telegram.org", "web.telegram.org", "t.me"],
     "games": [],
+    "cloud": ["drive.google.com", "onedrive.live.com", "mega.io", "mega.nz"],
     "health": ["apss.tn.it"],
     "other": [] //must remain empty here
 };
@@ -385,22 +386,10 @@ function setBadgeText(text, background_color = "#0080FF", text_color = "#FFFFFF"
 }
 
 function getCategory(website) {
-    let valueToReturn = "";
-    if (website in categories["social"]) valueToReturn = "social";
-    else if (categories["travel"].includes(website)) valueToReturn = "travel";
-    else if (categories["news"].includes(website)) valueToReturn = "news";
-    else if (categories["education"].includes(website)) valueToReturn = "education";
-    else if (categories["shopping"].includes(website)) valueToReturn = "shopping";
-    else if (categories["search"].includes(website)) valueToReturn = "search";
-    else if (categories["reference"].includes(website)) valueToReturn = "reference";
-    else if (categories["entertainment"].includes(website)) valueToReturn = "entertainment";
-    else if (categories["adults"].includes(website)) valueToReturn = "adults";
-    else if (categories["sav22999"].includes(website)) valueToReturn = "sav22999";
-    else if (categories["develop"].includes(website)) valueToReturn = "develop";
-    else if (categories["messaging"].includes(website)) valueToReturn = "messaging";
-    else if (categories["games"].includes(website)) valueToReturn = "games";
-    else if (categories["health"].includes(website)) valueToReturn = "health";
-    else valueToReturn = "other";
+    let valueToReturn = "other";
+    for (item in categories) {
+        if (categories[item].includes(website)) valueToReturn = item;
+    }
     //console.log(website + " : " + valueToReturn);//TODO: use for testing websites filter
     return valueToReturn;
 }

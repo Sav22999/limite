@@ -673,7 +673,7 @@ h3 {
 }
 
 /*categories*/
-.other-category, .social-category, .travel-category, .news-category, .education-category, .shopping-category, .search-category, .reference-category, .entertainment-category, .adults-category, .sav22999-category, .develop-category, .messaging-category, .games-category, .health-category {
+.other-category, .social-category, .travel-category, .news-category, .education-category, .shopping-category, .search-category, .reference-category, .entertainment-category, .adults-category, .sav22999-category, .develop-category, .messaging-category, .games-category, .health-category, .cloud-category {
     background-color: transparent;
     background-repeat: no-repeat;
     background-size: auto 100%;
@@ -737,6 +737,11 @@ h3 {
 
 .games-category {
     background-image: url("../img/categories/games.svg");
+}
+
+.cloud-category {
+    background-image: url("../img/categories/cloud.svg");
+    background-size: auto 110%;
 }
 
 .health-category {
