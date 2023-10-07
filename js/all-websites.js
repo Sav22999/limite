@@ -57,28 +57,32 @@ function loaded() {
             }
         }
     }
+
+    document.getElementById("search-all-websites-text").onkeyup = function () {
+        search(document.getElementById("search-all-websites-text").value);
+    }
 }
 
 function goToday() {
-    loadDataFromBrowser(true);
+    loadDataFromBrowser(true, false);
     start_date = 0;
 }
 
 function goLast() {
-    loadDataFromBrowser(true);
+    loadDataFromBrowser(true, false);
     start_date = 0;
     if (all_dates.length > days_to_show) start_date = all_dates.length - days_to_show;
 }
 
 function goNewer() {
-    loadDataFromBrowser(true);
+    loadDataFromBrowser(true, false);
     //-7
     if (start_date > days_to_show) start_date -= days_to_show;
     else start_date = 0;
 }
 
 function goOlder() {
-    loadDataFromBrowser(true);
+    loadDataFromBrowser(true, false);
     //+7
     if ((start_date + days_to_show) < all_dates.length) start_date += days_to_show;
     //else start_date = all_dates.length - days_to_show;
@@ -88,7 +92,7 @@ function setDateInterval(from, to) {
     document.getElementById("from-to-date-label").textContent = "Days: " + from + " – " + to;
 }
 
-function loadDataFromBrowser(generate_section = true) {
+function loadDataFromBrowser(generate_section = true, force_generation = true) {
     browser.storage.local.get("websites", function (value) {
         websites_json = {};
         if (value["websites"] !== undefined) {
@@ -96,11 +100,27 @@ function loadDataFromBrowser(generate_section = true) {
         }
         if (generate_section) {
             document.getElementById("all-websites-sections").textContent = "";
-            websites_json_by_domain = [];
-            loadAllWebsites();
+            //websites_json_by_domain = [];
+            loadAllWebsites(generate_section, force_generation);
         }
         //console.log(JSON.stringify(websites_json));
     });
+}
+
+function search(value = "") {
+    websites_json_by_domain = [];
+    document.getElementById("search-all-websites-text").value = value.toString();
+    let valueToUse = value.toLowerCase();
+    for (const website in websites_json) {
+        let current_website_json = websites_json[website];
+        let condition_category = true//TODO//
+        let condition_time = true//TODO//
+        let condition_enabled = true//TODO
+        if ((website.toLowerCase().includes(valueToUse)) && condition_category && condition_time && condition_enabled) {
+            websites_json_by_domain.push(website);
+        }
+    }
+    loadAllWebsites(true, false, false);
 }
 
 function deleteAllData() {
@@ -206,12 +226,18 @@ function hideBackgroundOpacity() {
     document.getElementById("background-opacity").style.display = "none";
 }
 
-function loadAllWebsites() {
+function loadAllWebsites(clear = true, load_all_websites = true, apply_filter = true) {
+    if (clear) {
+        document.getElementById("all-websites-sections").textContent = "";
+    }
     if (!isEmpty(websites_json)) {
         //there are websites saved
 
-        for (let url in websites_json) {
-            websites_json_by_domain.push(url);
+        if (load_all_websites) {
+            websites_json_by_domain = [];
+            for (let url in websites_json) {
+                websites_json_by_domain.push(url);
+            }
         }
         //console.log(JSON.stringify(websites_json_by_domain));
 
@@ -405,7 +431,9 @@ function loadAllWebsites() {
 
         section.append(tableElement);
         document.getElementById("all-websites-sections").append(section);
-
+        if (apply_filter) {
+            applyFilter();
+        }
     } else {
         //no websites
         let section = document.createElement("div");
@@ -413,6 +441,12 @@ function loadAllWebsites() {
         section.textContent = "No websites found";
 
         document.getElementById("all-websites-sections").append(section);
+    }
+}
+
+function applyFilter() {
+    if (document.getElementById("search-all-websites-text").value.replaceAll(" ", "") !== "") {
+        search(document.getElementById("search-all-websites-text").value);
     }
 }
 
