@@ -6,6 +6,7 @@ let all_dates = [];
 let start_date = null;
 let days_to_show = 7; //number of days to show
 let categories = {};
+let sorted_by = "website";
 
 function loaded() {
     document.getElementById("refresh-data-button").onclick = function () {
@@ -61,6 +62,13 @@ function loaded() {
     document.getElementById("search-all-websites-text").onkeyup = function () {
         search(document.getElementById("search-all-websites-text").value);
     }
+
+    let titleAllWebsites = document.getElementById("title-all-time-spent");
+    let versionNumber = document.createElement("div");
+    versionNumber.classList.add("float-right", "small-button");
+    versionNumber.textContent = browser.runtime.getManifest().version;
+    versionNumber.id = "version";
+    titleAllWebsites.append(versionNumber);
 }
 
 function goToday() {
@@ -226,6 +234,46 @@ function hideBackgroundOpacity() {
     document.getElementById("background-opacity").style.display = "none";
 }
 
+/**
+ *
+ * @param column it can be "website", "category", "status", "since-install", "date-N" (where N is 0, 1, 2, ...)
+ */
+function sortByColumn(column) {
+    if (column === sorted_by.replace("-asc", "").replace("-desc", "")) {
+        //the same column
+        if (sorted_by.includes("-asc")) {
+            sorted_by = sorted_by.replace("-asc", "-desc");
+            document.getElementById("th-" + column).classList.remove("sort-by-column-asc");
+            document.getElementById("th-" + column).classList.add("sort-by-column-desc");
+        } else if (sorted_by.includes("-desc") || !sorted_by.includes("-desc")) {
+            sorted_by = sorted_by.replace("-desc", "-asc");
+            if (!sorted_by.includes("-desc") && !sorted_by.includes("-asc")) sorted_by = sorted_by + "-asc";
+            if (document.getElementById("th-" + column).classList.contains("sort-by-column-desc")) {
+                document.getElementById("th-" + column).classList.remove("sort-by-column-desc");
+            }
+            document.getElementById("th-" + column).classList.add("sort-by-column-asc");
+        }
+        if (!document.getElementById("th-" + column).classList.contains("th-sort-by-column-sel")) {
+            document.getElementById("th-" + column).classList.add("th-sort-by-column-sel");
+        }
+    } else {
+        //another column
+        let oldColumn = sorted_by.replace("-asc", "").replace("-desc", "");
+        if (document.getElementById("th-" + oldColumn).classList.contains("sort-by-column-asc")) {
+            document.getElementById("th-" + oldColumn).classList.remove("sort-by-column-asc");
+        } else if (document.getElementById("th-" + oldColumn).classList.contains("sort-by-column-desc")) {
+            document.getElementById("th-" + oldColumn).classList.remove("sort-by-column-desc");
+        }
+        if (document.getElementById("th-" + oldColumn).classList.contains("th-sort-by-column-sel")) {
+            document.getElementById("th-" + oldColumn).classList.remove("th-sort-by-column-sel");
+        }
+
+        sorted_by = column + "-asc";
+        document.getElementById("th-" + column).classList.add("sort-by-column-asc");
+        document.getElementById("th-" + column).classList.add("th-sort-by-column-sel");
+    }
+}
+
 function loadAllWebsites(clear = true, load_all_websites = true, apply_filter = true) {
     if (clear) {
         document.getElementById("all-websites-sections").textContent = "";
@@ -269,11 +317,26 @@ function loadAllWebsites(clear = true, load_all_websites = true, apply_filter = 
             counter++;
         }
 
+        let websites_to_use = [];
+
+        for (let website in websites_json_by_domain) {
+            let new_website = {};
+            //console.log(websites_json[websites_json_by_domain[website]]);
+            new_website["website"] = websites_json_by_domain[website];
+            new_website["enabled"] = websites_json[websites_json_by_domain[website]]["enabled"];
+            new_website["category"] = websites_json[websites_json_by_domain[website]]["category"];
+            new_website["since-install"] = websites_json[websites_json_by_domain[website]]["category"];
+            websites_to_use.push(new_website);
+        }
+
+        //console.log(websites_to_use)
+
         let section = document.createElement("div");
         section.classList.add("section", "overflow-auto", "no-padding");
         section.id = "table-section";
 
         let tableElement = document.createElement("table");
+        tableElement.id = "table-all-websites";
         tableElement.classList.add("table-days");
 
         let tableTHeadElement = document.createElement("thead");
@@ -281,24 +344,49 @@ function loadAllWebsites(clear = true, load_all_websites = true, apply_filter = 
 
         let tableHeaderElement = document.createElement("th");
         tableHeaderElement.textContent = "Website";
+        tableHeaderElement.id = "th-website";
+        tableHeaderElement.classList.add("th-sort-by-column");
+        tableHeaderElement.onclick = function () {
+            sortByColumn("website");
+        }
         tableRowElement.append(tableHeaderElement);
 
         tableHeaderElement = document.createElement("th");
         tableHeaderElement.textContent = "Status";
+        tableHeaderElement.id = "th-status";
+        tableHeaderElement.classList.add("th-sort-by-column");
+        tableHeaderElement.onclick = function () {
+            sortByColumn("status");
+        }
         tableRowElement.append(tableHeaderElement);
 
         tableHeaderElement = document.createElement("th");
         tableHeaderElement.textContent = "Category";
+        tableHeaderElement.id = "th-category";
+        tableHeaderElement.classList.add("th-sort-by-column");
+        tableHeaderElement.onclick = function () {
+            sortByColumn("category");
+        }
         tableRowElement.append(tableHeaderElement);
 
         tableHeaderElement = document.createElement("th");
         tableHeaderElement.textContent = "Since install";
+        tableHeaderElement.id = "th-since-install";
+        tableHeaderElement.classList.add("th-sort-by-column");
+        tableHeaderElement.onclick = function () {
+            sortByColumn("since-install");
+        }
         tableRowElement.append(tableHeaderElement);
-
         for (let date in last_seven_days) {
+
             let date_to_show = last_seven_days[date];
             tableHeaderElement = document.createElement("th");
             tableHeaderElement.textContent = date_to_show;
+            tableHeaderElement.id = "th-date-" + date;
+            tableHeaderElement.classList.add("th-sort-by-column");
+            tableHeaderElement.onclick = function () {
+                sortByColumn("date-" + date);
+            }
             tableRowElement.append(tableHeaderElement);
         }
         setDateInterval(last_seven_days[0], last_seven_days[last_seven_days.length - 1]);
@@ -434,6 +522,7 @@ function loadAllWebsites(clear = true, load_all_websites = true, apply_filter = 
         if (apply_filter) {
             applyFilter();
         }
+        sortByColumn("website");
     } else {
         //no websites
         let section = document.createElement("div");

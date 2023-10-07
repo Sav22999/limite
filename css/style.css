@@ -336,18 +336,46 @@ textarea {
     z-index: 4;
 }
 
-.width-100-perc {
-    width: 100%;
+.th-sort-by-column {
+    cursor: pointer;
+    transition: 0s;
+}
+
+.th-sort-by-column:hover {
+    background-color: #2c96ff;
+}
+
+.th-sort-by-column-sel {
+    padding-right: 25px;
+    background-repeat: no-repeat;
+    background-position: right 5px center;
+    background-size: 20px auto;
+}
+
+.sort-by-column-asc {
+    background-image: url("/img/sort-asc.svg");
+}
+
+.sort-by-column-desc {
+    background-image: url("/img/sort-desc.svg");
 }
 
 #search-container {
     grid-area: search;
     text-align: left;
+    overflow: visible;
 }
 
 #nav-days-container {
     grid-area: days;
     text-align: right;
+    overflow: visible;
+}
+
+#filters-container {
+    grid-area: filters;
+    text-align: center;
+    overflow: visible;
 }
 
 #search-all-websites-text {
