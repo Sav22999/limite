@@ -230,7 +230,7 @@ function loadAllWebsites(clear = true, load_all_websites = true, apply_filter = 
     if (clear) {
         document.getElementById("all-websites-sections").textContent = "";
     }
-    if (!isEmpty(websites_json)) {
+    if (!isEmpty(websites_json) && load_all_websites || !isEmpty(websites_json_by_domain) && !load_all_websites) {
         //there are websites saved
 
         if (load_all_websites) {
