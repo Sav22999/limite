@@ -482,6 +482,17 @@ function getTHeadTable(websites, last_seven_days) {
     return tableTHeadElement;
 }
 
+function getWebsiteToShow(website) {
+    let website_to_return = website;
+
+    let length_to_check = website_to_return.length;
+    const length_to_short = 46;
+    if (length_to_check > length_to_short) {
+        website_to_return = website_to_return.substring(0, length_to_short / 2) + "…" + website_to_return.substring(length_to_check - length_to_short / 2, length_to_check);
+    }
+    return website_to_return;
+}
+
 function getTBodyTable(websites, last_seven_days) {
     let tableTBodyElement = document.createElement("tbody");
     tableTBodyElement.id = "tbody-table-all-websites";
@@ -491,12 +502,13 @@ function getTBodyTable(websites, last_seven_days) {
         //console.log(websites[website]);
 
         let currentWebsiteElement = document.createElement("h2");
-        currentWebsiteElement.textContent = "https://" + websites[website]["website"];
+        let current_full_url = "https://" + websites[website]["website"];
+        currentWebsiteElement.textContent = getWebsiteToShow(current_full_url);
         currentWebsiteElement.classList.add("link", "go-to-external");
         currentWebsiteElement.onclick = function () {
-            browser.tabs.create({url: "https://" + websites[website]["website"]});
+            browser.tabs.create({url: current_full_url});
         }
-        currentWebsiteElement.title = currentWebsiteElement.textContent;
+        currentWebsiteElement.title = current_full_url;
 
         let buttonDelete = document.createElement("input");
         buttonDelete.type = "button";
