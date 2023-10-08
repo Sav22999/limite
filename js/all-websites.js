@@ -366,7 +366,9 @@ function loadAllWebsites(clear = true, load_all_websites = true, apply_filter = 
         let websites_to_use = getWebsitesToUse(websites_json);
 
         //console.log(websites_to_use)
-        websites_to_use = sortByColumn("website", websites_to_use, false, false);
+        if (apply_filter) {
+            //websites_to_use = sortByColumn("website", websites_to_use, false, false);
+        }
         showWebsitesTable(websites_to_use, apply_filter);
 
     } else {
@@ -418,7 +420,11 @@ function getTHeadTable(websites, last_seven_days) {
     tableHeaderElement.textContent = "Website";
     tableHeaderElement.id = "th-website";
     tableHeaderElement.classList.add("th-sort-by-column");
-    if (sorted_by === "" || sorted_by === "website-asc") tableHeaderElement.classList.add("th-sort-by-column-sel", "sort-by-column-asc");
+    if (sorted_by === "" || sorted_by === "website-asc") {
+        tableHeaderElement.classList.add("th-sort-by-column-sel", "sort-by-column-asc");
+        sorted_by = "website-asc";
+    }
+    if (sorted_by === "website-desc") tableHeaderElement.classList.add("th-sort-by-column-sel", "sort-by-column-desc");
     tableHeaderElement.onclick = function () {
         websites = sortByColumn("website", websites);
     }
@@ -428,6 +434,8 @@ function getTHeadTable(websites, last_seven_days) {
     tableHeaderElement.textContent = "Status";
     tableHeaderElement.id = "th-status";
     tableHeaderElement.classList.add("th-sort-by-column");
+    if (sorted_by === "status-asc") tableHeaderElement.classList.add("th-sort-by-column-sel", "sort-by-column-asc");
+    if (sorted_by === "status-desc") tableHeaderElement.classList.add("th-sort-by-column-sel", "sort-by-column-desc");
     tableHeaderElement.onclick = function () {
         websites = sortByColumn("status", websites);
     }
@@ -437,6 +445,8 @@ function getTHeadTable(websites, last_seven_days) {
     tableHeaderElement.textContent = "Category";
     tableHeaderElement.id = "th-category";
     tableHeaderElement.classList.add("th-sort-by-column");
+    if (sorted_by === "category-asc") tableHeaderElement.classList.add("th-sort-by-column-sel", "sort-by-column-asc");
+    if (sorted_by === "category-desc") tableHeaderElement.classList.add("th-sort-by-column-sel", "sort-by-column-desc");
     tableHeaderElement.onclick = function () {
         websites = sortByColumn("category", websites);
     }
@@ -446,6 +456,8 @@ function getTHeadTable(websites, last_seven_days) {
     tableHeaderElement.textContent = "Since install";
     tableHeaderElement.id = "th-since-install";
     tableHeaderElement.classList.add("th-sort-by-column");
+    if (sorted_by === "since-install-asc") tableHeaderElement.classList.add("th-sort-by-column-sel", "sort-by-column-asc");
+    if (sorted_by === "since-install-desc") tableHeaderElement.classList.add("th-sort-by-column-sel", "sort-by-column-desc");
     tableHeaderElement.onclick = function () {
         websites = sortByColumn("since-install", websites);
     }
@@ -457,6 +469,8 @@ function getTHeadTable(websites, last_seven_days) {
         tableHeaderElement.textContent = date_to_show;
         tableHeaderElement.id = "th-date-" + date;
         tableHeaderElement.classList.add("th-sort-by-column");
+        if (sorted_by === "th-date-" + date + "-asc") tableHeaderElement.classList.add("th-sort-by-column-sel", "sort-by-column-asc");
+        if (sorted_by === "th-date-" + date + "-desc") tableHeaderElement.classList.add("th-sort-by-column-sel", "sort-by-column-desc");
         tableHeaderElement.onclick = function () {
             websites = sortByColumn("date-" + date, websites);
         }
@@ -592,6 +606,8 @@ function showWebsitesTable(websites, apply_filter = true) {
 
     let tableTHeadElement = getTHeadTable(websites, getLastSevenDays());
     tableElement.append(tableTHeadElement);
+
+    websites = sortByColumn(sorted_by.replace("-asc", "").replace("-desc", ""), websites, false, false);
 
     let tableTBodyElement = getTBodyTable(websites, getLastSevenDays());
     tableElement.append(tableTBodyElement);
