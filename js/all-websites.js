@@ -242,7 +242,7 @@ function hideBackgroundOpacity() {
 
 /**
  * Sort by column!
- * @param column it can be "website", "category", "status", "since-install", "date-N" (where N is 0, 1, 2, ...)
+ * @param column it can be "website", "category", "status", "since-install", "avg-time", "date-N" (where N is 0, 1, 2, ...)
  * @param websites the dictionary to sort
  * @param generate_ui true -> it "generates" also the UI, false -> otherwise it changes only the variable
  */
@@ -316,7 +316,7 @@ function getWebsitesToUse(websites_json) {
 
         new_website["website"] = current_website;
         new_website["status"] = websites_json[current_website]["enabled"];
-        new_website["category"] = websites_json[current_website]["category"];
+        new_website["category"] = checkCategory(current_website);
 
         //since install
         let number_of_days = all_dates.length;
@@ -329,6 +329,9 @@ function getWebsitesToUse(websites_json) {
         }
         new_website["since-install"] = sum_since_install;
 
+        let avg_time = 0;
+        if (number_of_days > 0) avg_time = sum_since_install / number_of_days;
+        new_website["avg-time"] = parseInt(avg_time.toString());
 
         //days
         for (let date in last_seven_days) {
@@ -462,6 +465,17 @@ function getTHeadTable(websites, last_seven_days) {
         websites = sortByColumn("since-install", websites);
     }
     tableRowElement.append(tableHeaderElement);
+
+    tableHeaderElement = document.createElement("th");
+    tableHeaderElement.textContent = "Average";
+    tableHeaderElement.id = "th-avg-time";
+    tableHeaderElement.classList.add("th-sort-by-column");
+    if (sorted_by === "avg-time-asc") tableHeaderElement.classList.add("th-sort-by-column-sel", "sort-by-column-asc");
+    if (sorted_by === "avg-time-desc") tableHeaderElement.classList.add("th-sort-by-column-sel", "sort-by-column-desc");
+    tableHeaderElement.onclick = function () {
+        websites = sortByColumn("avg-time", websites);
+    }
+    tableRowElement.append(tableHeaderElement);
     for (let date in last_seven_days) {
 
         let date_to_show = last_seven_days[date];
@@ -569,7 +583,7 @@ function getTBodyTable(websites, last_seven_days) {
         //since install
         let number_of_days = all_dates.length;
 
-        let sum_since_install = websites[website]["since-install"]
+        let sum_since_install = websites[website]["since-install"];
         let since_install = getTimeConverted(sum_since_install);
         tableDataElement = document.createElement("td");
         tableDataElement.textContent = since_install;
@@ -583,6 +597,19 @@ function getTBodyTable(websites, last_seven_days) {
         }
         tableRowElement.append(tableDataElement);
 
+        let avg_time = websites[website]["avg-time"];
+        let avg_time_to_show = getTimeConverted(avg_time);
+        tableDataElement = document.createElement("td");
+        tableDataElement.textContent = avg_time_to_show;
+        tableDataElement.classList.add("avg-time");
+        if (avg_time >= (60 * 30) * number_of_days && avg_time < (60 * 60) * number_of_days) {
+            tableDataElement.classList.add("yellow");
+        } else if (avg_time >= (60 * 60) * number_of_days && avg_time < (60 * 60 * 3) * number_of_days) {
+            tableDataElement.classList.add("orange");
+        } else if (avg_time >= (60 * 60 * 3) * number_of_days) {
+            tableDataElement.classList.add("red");
+        }
+        tableRowElement.append(tableDataElement);
 
         //days
         for (let date in last_seven_days) {
