@@ -475,6 +475,11 @@ tr:hover {
     border-radius: 0px;
 }
 
+.avg-time {
+    background-color: rgba(178, 178, 178, 0.27);
+    border-radius: 0px;
+}
+
 .yellow {
     background-color: #ffd40044;
     border-radius: 0px;
@@ -627,6 +632,7 @@ th {
     background-color: #0080ff;
     color: #ffffff;
     border-radius: 0px;
+    white-space: normal;
 }
 
 td {
