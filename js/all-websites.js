@@ -316,7 +316,7 @@ function getWebsitesToUse(websites_json) {
 
         new_website["website"] = current_website;
         new_website["status"] = websites_json[current_website]["enabled"];
-        new_website["category"] = websites_json[current_website]["category"];
+        new_website["category"] = checkCategory(current_website);
 
         //since install
         let number_of_days = all_dates.length;
