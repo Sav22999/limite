@@ -8,19 +8,18 @@ let days_to_show = 7; //number of days to show
 let categories = {};
 let sorted_by = "";
 
+let websites_to_render = [];
+let currentIndex = 0;
+const PAGE_SIZE = 20;
+
 function loaded() {
+    localizeUI();
     document.getElementById("refresh-data-button").onclick = function () {
         //location.reload();
         loadDataFromBrowser(true);
     }
-    document.getElementById("delete-all-data-button").onclick = function () {
-        deleteAllData();
-    }
-    document.getElementById("import-data-button").onclick = function () {
-        importData();
-    }
-    document.getElementById("export-data-button").onclick = function () {
-        exportData();
+    document.getElementById("open-settings-button").onclick = function () {
+        browser.tabs.create({url: browser.runtime.getURL("settings/index.html")});
     }
     document.getElementById("go-today-button").onclick = function () {
         goToday();
@@ -35,11 +34,20 @@ function loaded() {
         goOlder();
     }
 
-    browser.runtime.sendMessage({from: "all-websites", ask: "categories"}, (response) => {
-        if (response !== undefined) {
-            categories = response.categories;
-            loadDataFromBrowser(true);
-        }
+    loadDateFormat(function () {
+        browser.storage.local.get("limite_settings", function (val) {
+            let settings = val["limite_settings"] || {};
+            if (settings["default_sort_by"]) {
+                sorted_by = settings["default_sort_by"];
+            }
+
+            browser.runtime.sendMessage({from: "all-websites", ask: "categories"}, (response) => {
+                if (response !== undefined) {
+                    categories = response.categories;
+                    loadDataFromBrowser(true);
+                }
+            });
+        });
     });
 
     document.getElementById("all-websites-dedication-section").onscroll = function () {
@@ -56,6 +64,12 @@ function loaded() {
             if (document.getElementById("navigator-days").classList.contains("nav-days-fixed")) {
                 document.getElementById("navigator-days").classList.remove("nav-days-fixed");
             }
+        }
+
+        // Infinite scrolling
+        let section = document.getElementById("all-websites-dedication-section");
+        if (section.scrollTop + section.clientHeight >= section.scrollHeight - 100) {
+            renderNextPage();
         }
     }
 
@@ -97,7 +111,34 @@ function goOlder() {
 }
 
 function setDateInterval(from, to) {
-    document.getElementById("from-to-date-label").textContent = "Days: " + from + " – " + to;
+    document.getElementById("from-to-date-label").textContent = "Days: " + formatDateDisplay(from) + " – " + formatDateDisplay(to);
+}
+
+function formatDateDisplay(dateStr) {
+    return applyDateFormat(dateStr);
+}
+
+let _dateFormat = "YYYY-MM-DD";
+
+function loadDateFormat(callback) {
+    browser.storage.local.get("limite_settings", function (value) {
+        let settings = value["limite_settings"] || {};
+        _dateFormat = settings["date_format"] || "YYYY-MM-DD";
+        if (callback) callback();
+    });
+}
+
+function applyDateFormat(dateStr) {
+    if (!dateStr || dateStr.length !== 10) return dateStr;
+    let parts = dateStr.split("-"); // [YYYY, MM, DD]
+    let y = parts[0], m = parts[1], d = parts[2];
+    switch (_dateFormat) {
+        case "DD/MM/YYYY": return d + "/" + m + "/" + y;
+        case "MM/DD/YYYY": return m + "/" + d + "/" + y;
+        case "DD-MM-YYYY": return d + "-" + m + "-" + y;
+        case "DD.MM.YYYY": return d + "." + m + "." + y;
+        default:           return dateStr; // YYYY-MM-DD
+    }
 }
 
 function loadDataFromBrowser(generate_section = true, force_generation = true) {
@@ -165,80 +206,6 @@ function onCleared() {
 function onError(e) {
 }
 
-function importData() {
-    showBackgroundOpacity();
-    document.getElementById("import-section").style.display = "block";
-    let jsonImportElement = document.getElementById("json-import")
-    jsonImportElement.value = "";
-    jsonImportElement.focus();
-
-    document.getElementById("cancel-import-data-button").onclick = function () {
-        hideBackgroundOpacity();
-        document.getElementById("import-section").style.display = "none";
-    }
-    document.getElementById("import-now-data-button").onclick = function () {
-        let value = jsonImportElement.value;
-        if (value.replaceAll(" ", "") !== "") {
-            try {
-                let websites_temp = value;
-                if (value["websites"] !== undefined && value["limite"] !== undefined) websites_temp = value["websites"];
-                websites_json = JSON.parse(websites_temp);
-                document.getElementById("import-section").style.display = "none";
-                browser.storage.local.set({"websites": websites_json}, function () {
-                    loadDataFromBrowser(true);
-                    hideBackgroundOpacity();
-                });
-            } catch (e) {
-                console.error("Error: " + e.toString());
-                let errorSubSection = document.createElement("div");
-                errorSubSection.classList.add("sub-section", "background-light-red");
-                errorSubSection.textContent = "Error: " + e.toString();
-
-                let mainSection = document.getElementById("import-sub-sections");
-                mainSection.insertBefore(errorSubSection, mainSection.childNodes[0]);
-            }
-        }
-    }
-}
-
-function exportData() {
-    showBackgroundOpacity();
-    browser.storage.local.get("websites", function (value) {
-        websites_json = {};
-        if (value["websites"] !== undefined) {
-            websites_json = value["websites"];
-        }
-        let limite_json = {
-            "version": browser.runtime.getManifest().version,
-            "author": browser.runtime.getManifest().author,
-            "manifest_version": browser.runtime.getManifest().manifest_version
-        };
-        let export_json = {"limite": limite_json, "websites": websites_json};
-        document.getElementById("export-section").style.display = "block";
-        document.getElementById("json-export").value = JSON.stringify(export_json);
-
-        document.getElementById("cancel-export-data-button").onclick = function () {
-            hideBackgroundOpacity();
-            document.getElementById("export-section").style.display = "none";
-        }
-        document.getElementById("copy-now-data-button").onclick = function () {
-            document.getElementById("cancel-export-data-button").value = "Close";
-
-            document.getElementById("json-export").value = JSON.stringify(websites_json);
-            document.getElementById("json-export").select();
-            document.execCommand("copy");
-        }
-        loadDataFromBrowser(true);
-    });
-}
-
-function showBackgroundOpacity() {
-    document.getElementById("background-opacity").style.display = "block";
-}
-
-function hideBackgroundOpacity() {
-    document.getElementById("background-opacity").style.display = "none";
-}
 
 /**
  * Sort by column!
@@ -296,9 +263,15 @@ function sortByColumn(column, websites, generate_ui = true, toggle = true) {
             if (response["websites"] !== undefined) {
                 websites_json = response["websites"];
             }
-            document.getElementById("table-all-websites").removeChild(document.getElementById("tbody-table-all-websites"));
-            let tableTBodyElement = getTBodyTable(websites, getLastSevenDays());
+            // Re-sort and reset infinite scroll
+            websites_to_render = websites;
+            currentIndex = 0;
+            let oldTBody = document.getElementById("tbody-table-all-websites");
+            if (oldTBody) document.getElementById("table-all-websites").removeChild(oldTBody);
+            let tableTBodyElement = document.createElement("tbody");
+            tableTBodyElement.id = "tbody-table-all-websites";
             document.getElementById("table-all-websites").append(tableTBodyElement);
+            renderNextPage();
         });
     }
     return websites;
@@ -480,7 +453,7 @@ function getTHeadTable(websites, last_seven_days) {
 
         let date_to_show = last_seven_days[date];
         tableHeaderElement = document.createElement("th");
-        tableHeaderElement.textContent = date_to_show;
+        tableHeaderElement.textContent = applyDateFormat(date_to_show);
         tableHeaderElement.id = "th-date-" + date;
         tableHeaderElement.classList.add("th-sort-by-column");
         if (sorted_by === "th-date-" + date + "-asc") tableHeaderElement.classList.add("th-sort-by-column-sel", "sort-by-column-asc");
@@ -518,7 +491,7 @@ function getTBodyTable(websites, last_seven_days) {
         let currentWebsiteElement = document.createElement("h2");
         let current_full_url = "https://" + websites[website]["website"];
         currentWebsiteElement.textContent = getWebsiteToShow(current_full_url);
-        currentWebsiteElement.classList.add("link", "go-to-external");
+        currentWebsiteElement.classList.add("link", "go-to-external", "website-url-cell");
         currentWebsiteElement.onclick = function () {
             browser.tabs.create({url: current_full_url});
         }
@@ -648,14 +621,37 @@ function showWebsitesTable(websites, apply_filter = true) {
 
     websites = sortByColumn(sorted_by.replace("-asc", "").replace("-desc", ""), websites, false, false);
 
-    let tableTBodyElement = getTBodyTable(websites, getLastSevenDays());
+    // Infinite scroll: store sorted list and render first page
+    websites_to_render = websites;
+    currentIndex = 0;
+
+    let tableTBodyElement = document.createElement("tbody");
+    tableTBodyElement.id = "tbody-table-all-websites";
     tableElement.append(tableTBodyElement);
 
     section.append(tableElement);
     document.getElementById("all-websites-sections").append(section);
+
+    renderNextPage();
+
     if (apply_filter) {
         applyFilter();
     }
+}
+
+function renderNextPage() {
+    if (currentIndex >= websites_to_render.length) return;
+    let last_seven_days = getLastSevenDays();
+    let end = Math.min(currentIndex + PAGE_SIZE, websites_to_render.length);
+    let slice = websites_to_render.slice(currentIndex, end);
+    let tableTBody = document.getElementById("tbody-table-all-websites");
+    if (!tableTBody) return;
+    let fragment = getTBodyTable(slice, last_seven_days);
+    // getTBodyTable returns a tbody element; append its children
+    while (fragment.firstChild) {
+        tableTBody.append(fragment.firstChild);
+    }
+    currentIndex = end;
 }
 
 function applyFilter() {

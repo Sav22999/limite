@@ -86,3 +86,20 @@ function getFormattedDate(date) {
 
     return dateToReturn;
 }
+
+function localizeUI() {
+    const elements = document.querySelectorAll("[data-i18n]");
+    elements.forEach(el => {
+        const messageKey = el.getAttribute("data-i18n");
+        const message = browser.i18n.getMessage(messageKey);
+        if (message) {
+            if (el.tagName === "INPUT" && (el.type === "button" || el.type === "submit")) {
+                el.value = message;
+            } else if (el.tagName === "INPUT" || el.tagName === "TEXTAREA") {
+                el.placeholder = message;
+            } else {
+                el.textContent = message;
+            }
+        }
+    });
+}

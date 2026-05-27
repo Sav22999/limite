@@ -1,0 +1,203 @@
+{
+  "extension_name": {
+    "message": "Limite"
+  },
+  "extension_description": {
+    "message": "Check how much time you spend on each website every day. Optimise your productivity, your time and your life as well. Don't lose precious time!"
+  },
+  "settings_title": {
+    "message": "Settings"
+  },
+  "save_settings": {
+    "message": "Save settings"
+  },
+  "unsaved_changes": {
+    "message": "Unsaved changes"
+  },
+  "support_telegram": {
+    "message": "Support on Telegram"
+  },
+  "rate_addon": {
+    "message": "Rate the add-on"
+  },
+  "translate_crowdin": {
+    "message": "Translate on Crowdin"
+  },
+  "import_export_data": {
+    "message": "Import & Export data"
+  },
+  "export_data_btn": {
+    "message": "Export data…"
+  },
+  "import_data_btn": {
+    "message": "Import data…"
+  },
+  "categories_title": {
+    "message": "Categories"
+  },
+  "categories_description": {
+    "message": "Each category contains a list of websites. Limite will automatically assign the category to matching websites. You can also import/export the full categories list as a JSON file."
+  },
+  "export_categories_btn": {
+    "message": "Export categories…"
+  },
+  "import_categories_btn": {
+    "message": "Import categories…"
+  },
+  "time_thresholds_title": {
+    "message": "Time thresholds"
+  },
+  "time_thresholds_description": {
+    "message": "Define the time limits (in minutes) that trigger each warning level. The icon colour and notifications will change accordingly."
+  },
+  "yellow_threshold": {
+    "message": "Yellow (minutes):"
+  },
+  "orange_threshold": {
+    "message": "Orange (minutes):"
+  },
+  "red_threshold": {
+    "message": "Red (minutes):"
+  },
+  "notifications_title": {
+    "message": "Notifications"
+  },
+  "enable_notifications": {
+    "message": "Enable notifications:"
+  },
+  "date_format_title": {
+    "message": "Date format"
+  },
+  "date_format_description": {
+    "message": "Choose how dates are displayed in the interface (does not affect stored data)."
+  },
+  "display_format": {
+    "message": "Display format:"
+  },
+  "default_sort_title": {
+    "message": "Standard-Sortierung"
+  },
+  "default_sort_description": {
+    "message": "Wählen Sie die Standard-Sortierung für die Seite 'Alle Websites'."
+  },
+  "sort_by_label": {
+    "message": "Sortieren nach:"
+  },
+  "sort_website_asc": {
+    "message": "Website (A-Z)"
+  },
+  "sort_website_desc": {
+    "message": "Website (Z-A)"
+  },
+  "sort_today_desc": {
+    "message": "Heute verbrachte Zeit (viel zu wenig)"
+  },
+  "sort_today_asc": {
+    "message": "Heute verbrachte Zeit (wenig zu viel)"
+  },
+  "sort_since_install_desc": {
+    "message": "Gesamt verbrachte Zeit (viel zu wenig)"
+  },
+  "sort_since_install_asc": {
+    "message": "Gesamt verbrachte Zeit (wenig zu viel)"
+  },
+  "new_websites_title": {
+    "message": "New websites"
+  },
+  "new_websites_description": {
+    "message": "Choose whether time tracking is enabled by default for new websites."
+  },
+  "enable_tracking_default": {
+    "message": "Enable tracking by default:"
+  },
+  "whitelist_title": {
+    "message": "Whitelist"
+  },
+  "whitelist_hint": {
+    "message": "(tracking always ON)"
+  },
+  "blacklist_title": {
+    "message": "Blacklist"
+  },
+  "blacklist_hint": {
+    "message": "(tracking always OFF, not toggleable)"
+  },
+  "danger_zone_title": {
+    "message": "Danger zone"
+  },
+  "delete_all_data_btn": {
+    "message": "Delete all data"
+  },
+  "all_time_spent_title": {
+    "message": "All time spent"
+  },
+  "refresh_data": {
+    "message": "Refresh data"
+  },
+  "search_placeholder": {
+    "message": "Search…"
+  },
+  "today": {
+    "message": "Today"
+  },
+  "newer": {
+    "message": "Newer"
+  },
+  "older": {
+    "message": "Older"
+  },
+  "last": {
+    "message": "Last"
+  },
+  "enable_limite_on_domain": {
+    "message": "Enable Limite on this domain"
+  },
+  "time_spent_on_website": {
+    "message": "Time spent on this website"
+  },
+  "since_install": {
+    "message": "Since install"
+  },
+  "see_all_time_spent": {
+    "message": "See all time spent"
+  },
+  "buy_me_coffee": {
+    "message": "Buy me a coffee on PayPal"
+  },
+  "add_website": {
+    "message": "Add website"
+  },
+  "cancel": {
+    "message": "Cancel"
+  },
+  "download_now": {
+    "message": "Download now"
+  },
+  "import_now": {
+    "message": "Import now"
+  },
+  "import_data_description": {
+    "message": "Select the JSON file you exported previously, then click the Import now button. The page will be automatically reloaded if data are successfully imported."
+  },
+  "export_data_description": {
+    "message": "You can download the JSON file containing your data by clicking the Download now button."
+  },
+  "import_categories_description": {
+    "message": "Select the JSON categories file you exported previously, then click Import now."
+  },
+  "export_categories_description": {
+    "message": "Download the JSON file containing all your categories and their website lists."
+  },
+  "milestone_thanks": {
+    "message": "Thank you for using Limite!"
+  },
+  "milestone_never": {
+    "message": "Don't show this again"
+  },
+  "milestone_later": {
+    "message": "Remind me in 30 days"
+  },
+  "milestone_donate": {
+    "message": "Donate now 💙"
+  }
+}

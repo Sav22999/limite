@@ -2,6 +2,8 @@
     <br>
     <img width="70" src="img/icon.svg" alt="Limite icon" />
     <br>
+    Limite
+    <br>
 </h1>
 Official repo of https://addons.mozilla.org/it/firefox/addon/limite/.
 

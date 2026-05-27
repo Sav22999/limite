@@ -18,7 +18,13 @@ var minimized = false;
 
 var activeTabId;
 
-const categories = {
+let categories = {};
+
+const linkReview = ["https://addons.mozilla.org/firefox/addon/limite/"]; //{firefox add-ons}
+const linkDonate = ["https://www.paypal.me/saveriomorelli", "https://ko-fi.com/saveriomorelli", "https://liberapay.com/Sav22999/donate"]; //{paypal, ko-fi}
+const icons = ["icon.png", "icon_disabled.png", "icon_yellow.png", "icon_orange.png", "icon_red.png"];
+
+const DEFAULT_CATEGORIES = {
     "social": ["facebook.com", "twitter.com", "instagram.com", "chat.openai.com", "linkedin.com", "tiktok.com", "pinterest.com", "reddit.com"],
     "travel": ["booking.com", "expedia.com", "airbnb.com", "hotels.com", "trivago.it", "trip.com", "hostelworld.com", "lastminute.com", "skyscanner.com", "thetrainline.com", "omio.it", "uber.com", "agoda.com", "edreams.it", "blablacar.com", "blablacar.it"],
     "news": ["bbc.com", "bbc.co.uk", "cnn.com", "rainews.it", "corriere.it", "repubblica.it", "msn.com", "news.yahoo.com", "aol.com", "ladige.it", "ildolomiti.it"],
@@ -33,13 +39,37 @@ const categories = {
     "messaging": ["whatsapp.com", "web.whatsapp.com", "telegram.org", "web.telegram.org", "t.me", "signal.com", "kakaocorp.com", "snapchat.com", "wechat.com", "line.me"],
     "games": ["store.steampowered.com", "ea.com", "ubisoft.com", "instant-gaming.com"],
     "cloud": ["drive.google.com", "onedrive.live.com", "mega.io", "mega.nz", "pcloud.com", "my.pcloud.com", "icedrive.net", "dropbox.com", "box.com", "sync.com", "nordlocker.com"],
-    "health": ["apss.tn.it", "asmbasilicata.it", "aspbasilicata.it", "salute.gov.it", ""],
-    "other": [] //must remain empty here
+    "health": ["apss.tn.it", "asmbasilicata.it", "aspbasilicata.it", "salute.gov.it"],
+    "other": []
 };
 
-const linkReview = ["https://addons.mozilla.org/firefox/addon/limite/"]; //{firefox add-ons}
-const linkDonate = ["https://www.paypal.me/saveriomorelli", "https://ko-fi.com/saveriomorelli", "https://liberapay.com/Sav22999/donate"]; //{paypal, ko-fi}
-const icons = ["icon.png", "icon_disabled.png", "icon_yellow.png", "icon_orange.png", "icon_red.png"];
+let thresholdYellow = 60 * 30;
+let thresholdOrange = 60 * 60;
+let thresholdRed    = 60 * 60 * 3;
+let notificationsEnabled = true;
+let defaultTrackingEnabled = true;
+let whitelist = [];
+let blacklist = [];
+
+function loadSettingsFromStorage() {
+    browser.storage.local.get("limite_settings", function (value) {
+        let settings = value["limite_settings"] || {};
+        thresholdYellow = settings["threshold_yellow"] !== undefined ? settings["threshold_yellow"] : 60 * 30;
+        thresholdOrange = settings["threshold_orange"] !== undefined ? settings["threshold_orange"] : 60 * 60;
+        thresholdRed    = settings["threshold_red"]    !== undefined ? settings["threshold_red"]    : 60 * 60 * 3;
+        notificationsEnabled = settings["notifications_enabled"] !== undefined ? settings["notifications_enabled"] : true;
+        defaultTrackingEnabled = settings["default_tracking_enabled"] !== undefined ? settings["default_tracking_enabled"] : true;
+        whitelist = settings["whitelist"] || [];
+        blacklist = settings["blacklist"] || [];
+    });
+    browser.storage.local.get("limite_categories", function (value) {
+        if (value["limite_categories"] !== undefined) {
+            categories = value["limite_categories"];
+        } else {
+            categories = JSON.parse(JSON.stringify(DEFAULT_CATEGORIES));
+        }
+    });
+}
 
 function loaded() {
     //catch changing of tab
@@ -47,9 +77,49 @@ function loaded() {
     browser.tabs.onUpdated.addListener(tabUpdated);
     browser.windows.onFocusChanged.addListener(checkLostFocus);
 
+    // Reload settings whenever storage changes (e.g. user saves settings page)
+    browser.storage.onChanged.addListener(function (changes, area) {
+        if (area === "local" && (changes["limite_settings"] || changes["limite_categories"])) {
+            loadSettingsFromStorage();
+        }
+    });
+
+    loadSettingsFromStorage();
+
+    // Save install date (only first time)
+    browser.storage.sync.get("limite_install_date", function (data) {
+        if (data["limite_install_date"] === undefined) {
+            browser.storage.sync.set({"limite_install_date": new Date().toISOString()});
+        }
+    });
+
+    // Increment total seconds (accumulate in memory, flush every 60s to avoid sync quota)
+    let _pendingSeconds = 0;
+    setInterval(function () {
+        if (enabledOrNot && !minimized) {
+            _pendingSeconds++;
+        }
+    }, 1000);
+    setInterval(function () {
+        if (_pendingSeconds > 0) {
+            let toFlush = _pendingSeconds;
+            _pendingSeconds = 0;
+            browser.storage.sync.get("limite_total_seconds", function (data) {
+                let current = data["limite_total_seconds"] || 0;
+                browser.storage.sync.set({"limite_total_seconds": current + toFlush});
+            });
+        }
+    }, 60000);
+
     //send categories to "all-websites"
     browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
         if (message !== undefined && message["from"] === "all-websites" && message["ask"] === "categories") sendResponse({"categories": categories});
+        if (message !== undefined && message["from"] === "popup" && message["ask"] === "increment_opens") {
+            browser.storage.sync.get("limite_popup_opens", function (data) {
+                let current = data["limite_popup_opens"] || 0;
+                browser.storage.sync.set({"limite_popup_opens": current + 1});
+            });
+        }
     });
 }
 
@@ -208,6 +278,17 @@ function saveUrlToData(enabled, time = 0) {
 
         if (valueToUse["category"] === undefined) valueToUse["category"] = getCategory(urlToUse);
 
+        // Apply whitelist/blacklist for new sites
+        if (valueToUse["enabled"] === undefined) {
+            if (whitelist.includes(urlToUse)) {
+                enabled = true;
+            } else if (blacklist.includes(urlToUse)) {
+                enabled = false;
+            } else {
+                enabled = defaultTrackingEnabled;
+            }
+        }
+
         timeSpentToday += time;
         //timeSpentAlways += time;
 
@@ -226,25 +307,25 @@ function saveUrlToData(enabled, time = 0) {
             }
         }
 
-        if (timeSpentToday >= 0 && timeSpentToday < 60 * 30) {
-            //30 minutes || OK
+        if (timeSpentToday >= 0 && timeSpentToday < thresholdYellow) {
+            //below yellow threshold || OK
             changeIcon(0);
             setBadgeText(((timeSpentToday - (timeSpentToday % 60)) / 60).toString() + "m");
-        } else if (timeSpentToday >= 60 * 30 && timeSpentToday < 60 * 60) {
-            //60 minutes (1 hour) || Yellow
+        } else if (timeSpentToday >= thresholdYellow && timeSpentToday < thresholdOrange) {
+            //yellow
             changeIcon(2);
-            createNotification(2, currentUrl, "30 minutes", "You have already spent 30 minutes on this site today");
+            createNotification(2, currentUrl, getTimeConverted(thresholdYellow), "You have already spent " + getTimeConverted(thresholdYellow) + " on this site today");
             setBadgeText(((timeSpentToday - (timeSpentToday % 60)) / 60).toString() + "m", "#FFD400", "#000000");
-        } else if (timeSpentToday >= 60 * 60 && timeSpentToday < 60 * 60 * 3) {
-            //3 hours || Orange
+        } else if (timeSpentToday >= thresholdOrange && timeSpentToday < thresholdRed) {
+            //orange
             changeIcon(3);
-            createNotification(3, currentUrl, "1 hour", "You have already spent 1 hour on this site today");
+            createNotification(3, currentUrl, getTimeConverted(thresholdOrange), "You have already spent " + getTimeConverted(thresholdOrange) + " on this site today");
             setBadgeText(((timeSpentToday - (timeSpentToday % (60 * 60))) / (60 * 60)).toString() + "h", "#FF7C00", "#000000");
-        } else if (timeSpentToday >= 60 * 60 * 3) {
-            //>3 hours || Red
+        } else if (timeSpentToday >= thresholdRed) {
+            //red
             changeIcon(4);
-            createNotification(4, currentUrl, "3 hours", "You have already spent 3 hours on this site today");
-            setBadgeText(">3h", "#FF0000");
+            createNotification(4, currentUrl, getTimeConverted(thresholdRed), "You have already spent " + getTimeConverted(thresholdRed) + " on this site today");
+            setBadgeText(">" + Math.round(thresholdRed / 3600) + "h", "#FF0000");
         }
     })
 }
@@ -336,6 +417,7 @@ function increaseTime(url) {
 
 function createNotification(type, url, title, content) {
     //send a notification
+    if (!notificationsEnabled) return;
     if (getToday() !== lastNotificationDate || lastNotification[url] !== type) {
         lastNotificationDate = getToday();
         lastNotification[url] = type;
@@ -350,6 +432,13 @@ function createNotification(type, url, title, content) {
     }
 
     //console.log(JSON.stringify(lastNotification));
+}
+
+function getTimeConverted(seconds) {
+    if (seconds < 60) return seconds + " seconds";
+    if (seconds < 3600) return Math.floor(seconds / 60) + " minutes";
+    if (seconds < 86400) return Math.floor(seconds / 3600) + " hour" + (Math.floor(seconds / 3600) > 1 ? "s" : "");
+    return Math.floor(seconds / 86400) + " day" + (Math.floor(seconds / 86400) > 1 ? "s" : "");
 }
 
 function getToday() {

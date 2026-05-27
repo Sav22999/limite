@@ -18,6 +18,10 @@ const linkReview = ["https://addons.mozilla.org/firefox/addon/limite/"]; //{fire
 const linkDonate = ["https://www.paypal.me/saveriomorelli", "https://liberapay.com/Sav22999/donate"]; //{paypal, liberapay}
 
 function loaded() {
+    localizeUI();
+    // Increment popup open counter
+    browser.runtime.sendMessage({"from": "popup", "ask": "increment_opens"});
+
     browser.tabs.query({active: true, currentWindow: true}, function (tabs) {
         // since only one tab should be active and in the current window at once
         // the return variable should only have one entry
@@ -105,7 +109,16 @@ function loadUI() {
                     }
                 } else {
                 }
-                disableSwitch(false);
+                // Check blacklist: if site is blacklisted, keep toggle disabled
+                browser.storage.local.get("limite_settings", function (settingsValue) {
+                    let settings = settingsValue["limite_settings"] || {};
+                    let blacklist = settings["blacklist"] || [];
+                    if (blacklist.includes(urlToUse)) {
+                        disableSwitch(true);
+                    } else {
+                        disableSwitch(false);
+                    }
+                });
                 document.getElementById("today-time").innerHTML = getTimeConverted(timeSpentToday);
                 document.getElementById("always-time").innerHTML = getTimeConverted(timeSpentAlways);
                 document.getElementById("details-container").classList = [category + "-category"];

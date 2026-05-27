@@ -1,0 +1,206 @@
+{
+  "extension_name": {
+    "message": "Limite"
+  },
+  "extension_description": {
+    "message": "Controlla quanto tempo passi su ogni sito web ogni giorno. Ottimizza la tua produttività, il tuo tempo e anche la tua vita. Non perdere tempo prezioso!"
+  },
+  "settings_title": {
+    "message": "Impostazioni"
+  },
+  "save_settings": {
+    "message": "Salva impostazioni"
+  },
+  "unsaved_changes": {
+    "message": "Modifiche non salvate"
+  },
+  "support_telegram": {
+    "message": "Supporto su Telegram"
+  },
+  "rate_addon": {
+    "message": "Valuta l'estensione"
+  },
+  "translate_crowdin": {
+    "message": "Traduci su Crowdin"
+  },
+  "import_export_data": {
+    "message": "Importa ed esporta dati"
+  },
+  "export_data_btn": {
+    "message": "Esporta dati…"
+  },
+  "import_data_btn": {
+    "message": "Importa dati…"
+  },
+  "categories_title": {
+    "message": "Categorie"
+  },
+  "categories_description": {
+    "message": "Ogni categoria contiene un elenco di siti web. Limite assegnerà automaticamente la categoria ai siti web corrispondenti. Puoi anche importare/esportare l'intero elenco delle categorie come file JSON."
+  },
+  "export_categories_btn": {
+    "message": "Esporta categorie…"
+  },
+  "import_categories_btn": {
+    "message": "Importa categorie…"
+  },
+  "time_thresholds_title": {
+    "message": "Soglie di tempo"
+  },
+  "time_thresholds_description": {
+    "message": "Definisci i limiti di tempo (in minuti) che attivano ogni livello di avviso. Il colore dell'icona e le notifiche cambieranno di conseguenza."
+  },
+  "yellow_threshold": {
+    "message": "Giallo (minuti):"
+  },
+  "orange_threshold": {
+    "message": "Arancione (minuti):"
+  },
+  "red_threshold": {
+    "message": "Rosso (minuti):"
+  },
+  "notifications_title": {
+    "message": "Notifiche"
+  },
+  "enable_notifications": {
+    "message": "Attiva notifiche:"
+  },
+  "date_format_title": {
+    "message": "Formato data"
+  },
+  "date_format_description": {
+    "message": "Scegli come vengono visualizzate le date nell'interfaccia (non influisce sui dati memorizzati)."
+  },
+  "display_format": {
+    "message": "Formato di visualizzazione:"
+  },
+  "default_sort_title": {
+    "message": "Ordinamento predefinito"
+  },
+  "default_sort_description": {
+    "message": "Scegli l'ordinamento predefinito per la pagina 'Tutti i siti web'."
+  },
+  "sort_by_label": {
+    "message": "Ordina per:"
+  },
+  "sort_website_asc": {
+    "message": "Sito web (A-Z)"
+  },
+  "sort_website_desc": {
+    "message": "Sito web (Z-A)"
+  },
+  "sort_today_desc": {
+    "message": "Tempo oggi (dal maggiore al minore)"
+  },
+  "sort_today_asc": {
+    "message": "Tempo oggi (dal minore al maggiore)"
+  },
+  "sort_since_install_desc": {
+    "message": "Tempo totale (dal maggiore al minore)"
+  },
+  "sort_since_install_asc": {
+    "message": "Tempo totale (dal minore al maggiore)"
+  },
+  "new_websites_title": {
+    "message": "Nuovi siti web"
+  },
+  "new_websites_description": {
+    "message": "Scegli se il monitoraggio del tempo è attivo di default per i nuovi siti web."
+  },
+  "enable_tracking_default": {
+    "message": "Attiva monitoraggio di default:"
+  },
+  "whitelist_title": {
+    "message": "Whitelist"
+  },
+  "whitelist_hint": {
+    "message": "(monitoraggio sempre ATTIVO)"
+  },
+  "blacklist_title": {
+    "message": "Blacklist"
+  },
+  "blacklist_hint": {
+    "message": "(monitoraggio sempre DISATTIVATO, non modificabile)"
+  },
+  "danger_zone_title": {
+    "message": "Zona pericolosa"
+  },
+  "delete_all_data_btn": {
+    "message": "Cancella tutti i dati"
+  },
+  "all_time_spent_title": {
+    "message": "Tutto il tempo trascorso"
+  },
+  "refresh_data": {
+    "message": "Aggiorna dati"
+  },
+  "search_placeholder": {
+    "message": "Cerca…"
+  },
+  "add_website_placeholder": {
+    "message": "Aggiungi sito…"
+  },
+  "today": {
+    "message": "Oggi"
+  },
+  "newer": {
+    "message": "Più recenti"
+  },
+  "older": {
+    "message": "Più vecchi"
+  },
+  "last": {
+    "message": "Ultimo"
+  },
+  "enable_limite_on_domain": {
+    "message": "Attiva Limite su questo dominio"
+  },
+  "time_spent_on_website": {
+    "message": "Tempo trascorso su questo sito"
+  },
+  "since_install": {
+    "message": "Dall'installazione"
+  },
+  "see_all_time_spent": {
+    "message": "Vedi tutto il tempo trascorso"
+  },
+  "buy_me_coffee": {
+    "message": "Offrimi un caffè su PayPal"
+  },
+  "add_website": {
+    "message": "Aggiungi sito web"
+  },
+  "cancel": {
+    "message": "Annulla"
+  },
+  "download_now": {
+    "message": "Scarica ora"
+  },
+  "import_now": {
+    "message": "Importa ora"
+  },
+  "import_data_description": {
+    "message": "Seleziona il file JSON che hai esportato in precedenza, quindi fai clic sul pulsante Importa ora. La pagina verrà ricaricata automaticamente se i dati vengono importati correttamente."
+  },
+  "export_data_description": {
+    "message": "Puoi scaricare il file JSON contenente i tuoi dati facendo clic sul pulsante Scarica ora."
+  },
+  "import_categories_description": {
+    "message": "Seleziona il file delle categorie JSON che hai esportato in precedenza, quindi fai clic su Importa ora."
+  },
+  "export_categories_description": {
+    "message": "Scarica il file JSON contenente tutte le tue categorie e i relativi elenchi di siti web."
+  },
+  "milestone_thanks": {
+    "message": "Grazie per aver usato Limite!"
+  },
+  "milestone_never": {
+    "message": "Non mostrare più"
+  },
+  "milestone_later": {
+    "message": "Ricordamelo tra 30 giorni"
+  },
+  "milestone_donate": {
+    "message": "Dona ora 💙"
+  }
+}
