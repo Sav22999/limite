@@ -369,6 +369,7 @@ function renderCategoriesUI() {
     container.textContent = "";
 
     Object.keys(currentCategories).forEach(function (cat) {
+        if (cat === "other") return;
         let wrapper = document.createElement("div");
         wrapper.classList.add("category-editor-row");
 
@@ -385,7 +386,7 @@ function renderCategoriesUI() {
         icon.style.height = "20px";
 
         let labelText = document.createElement("span");
-        labelText.textContent = cat.charAt(0).toUpperCase() + cat.slice(1);
+        labelText.textContent = browser.i18n.getMessage("category_" + cat) || (cat.charAt(0).toUpperCase() + cat.slice(1));
 
         label.append(icon, labelText);
 

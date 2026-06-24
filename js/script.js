@@ -15,7 +15,7 @@ var firstTime = true;
 var changedEdits = false;
 
 const linkReview = ["https://addons.mozilla.org/firefox/addon/limite/"]; //{firefox add-ons}
-const linkDonate = ["https://www.paypal.me/saveriomorelli", "https://liberapay.com/Sav22999/donate"]; //{paypal, liberapay}
+const linkDonate = ["https://www.saveriomorelli.com/donate/", "https://liberapay.com/Sav22999/donate"]; //{paypal, liberapay}
 
 function loaded() {
     localizeUI();

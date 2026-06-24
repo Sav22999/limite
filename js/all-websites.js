@@ -730,7 +730,7 @@ function generateCategories(selectedItem = "other", current_website, tableDataEl
         let optionElement = document.createElement("option");
         if (item === selectedItem) optionElement.selected = true;
         optionElement.value = item;
-        optionElement.textContent = item;
+        optionElement.textContent = browser.i18n.getMessage("category_" + item) || item;
         selectElement.append(optionElement);
     }
     selectElement.onchange = function () {
