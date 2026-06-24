@@ -140,6 +140,9 @@
   "add_website_placeholder": {
     "message": "Aggiungi sito…"
   },
+  "add_website_btn": {
+    "message": "Aggiungi sito"
+  },
   "today": {
     "message": "Oggi"
   },
@@ -160,6 +163,9 @@
   },
   "since_install": {
     "message": "Dall'installazione"
+  },
+  "average_time": {
+    "message": "Tempo medio"
   },
   "see_all_time_spent": {
     "message": "Vedi tutto il tempo trascorso"
@@ -244,5 +250,86 @@
   },
   "milestone_donate": {
     "message": "Dona ora 💙"
+  },
+  "second": {
+    "message": "secondo"
+  },
+  "seconds": {
+    "message": "secondi"
+  },
+  "minute": {
+    "message": "minuto"
+  },
+  "minutes": {
+    "message": "minuti"
+  },
+  "hour": {
+    "message": "ora"
+  },
+  "hours": {
+    "message": "ore"
+  },
+  "day": {
+    "message": "giorno"
+  },
+  "days": {
+    "message": "giorni"
+  },
+  "year": {
+    "message": "anno"
+  },
+  "years": {
+    "message": "anni"
+  },
+  "and": {
+    "message": "e"
+  },
+  "category_social": {
+    "message": "Social"
+  },
+  "category_travel": {
+    "message": "Viaggi"
+  },
+  "category_news": {
+    "message": "Notizie"
+  },
+  "category_education": {
+    "message": "Istruzione"
+  },
+  "category_shopping": {
+    "message": "Shopping"
+  },
+  "category_search": {
+    "message": "Ricerca"
+  },
+  "category_reference": {
+    "message": "Riferimento"
+  },
+  "category_entertainment": {
+    "message": "Intrattenimento"
+  },
+  "category_adults": {
+    "message": "Adulti"
+  },
+  "category_sav22999": {
+    "message": "Sav22999"
+  },
+  "category_develop": {
+    "message": "Sviluppo"
+  },
+  "category_messaging": {
+    "message": "Messaggistica"
+  },
+  "category_games": {
+    "message": "Giochi"
+  },
+  "category_cloud": {
+    "message": "Nuvola"
+  },
+  "category_health": {
+    "message": "Salute"
+  },
+  "category_other": {
+    "message": "Altro"
   }
 }

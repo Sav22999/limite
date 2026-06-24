@@ -3,76 +3,76 @@
     "message": "Limite"
   },
   "extension_description": {
-    "message": "Check how much time you spend on each website every day. Optimise your productivity, your time and your life as well. Don't lose precious time!"
+    "message": "Überprüfen Sie jeden Tag, wie viel Zeit Sie auf jeder Website verbringen. Optimieren Sie Ihre Produktivität, Ihre Zeit und Ihr Leben. Verlieren Sie keine kostbare Zeit!"
   },
   "settings_title": {
-    "message": "Settings"
+    "message": "Einstellungen"
   },
   "save_settings": {
-    "message": "Save settings"
+    "message": "Einstellungen speichern"
   },
   "unsaved_changes": {
-    "message": "Unsaved changes"
+    "message": "Nicht gespeicherte Änderungen"
   },
   "support_telegram": {
-    "message": "Support on Telegram"
+    "message": "Support auf Telegram"
   },
   "rate_addon": {
-    "message": "Rate the add-on"
+    "message": "Erweiterung bewerten"
   },
   "translate_crowdin": {
-    "message": "Translate on Crowdin"
+    "message": "Auf Crowdin übersetzen"
   },
   "import_export_data": {
-    "message": "Import & Export data"
+    "message": "Daten importieren & exportieren"
   },
   "export_data_btn": {
-    "message": "Export data…"
+    "message": "Daten exportieren…"
   },
   "import_data_btn": {
-    "message": "Import data…"
+    "message": "Daten importieren…"
   },
   "categories_title": {
-    "message": "Categories"
+    "message": "Kategorien"
   },
   "categories_description": {
-    "message": "Each category contains a list of websites. Limite will automatically assign the category to matching websites. You can also import/export the full categories list as a JSON file."
+    "message": "Jede Kategorie enthält eine Liste von Websites. Limite weist passenden Websites automatisch die Kategorie zu. Sie können auch die vollständige Kategorieliste als JSON-Datei importieren/exportieren."
   },
   "export_categories_btn": {
-    "message": "Export categories…"
+    "message": "Kategorien exportieren…"
   },
   "import_categories_btn": {
-    "message": "Import categories…"
+    "message": "Kategorien importieren…"
   },
   "time_thresholds_title": {
-    "message": "Time thresholds"
+    "message": "Zeitschwellenwerte"
   },
   "time_thresholds_description": {
-    "message": "Define the time limits (in minutes) that trigger each warning level. The icon colour and notifications will change accordingly."
+    "message": "Definieren Sie die Zeitlimits (in Minuten), die die jeweilige Warnstufe auslösen. Die Symbolfarbe und die Benachrichtigungen ändern sich entsprechend."
   },
   "yellow_threshold": {
-    "message": "Yellow (minutes):"
+    "message": "Gelb (Minuten):"
   },
   "orange_threshold": {
-    "message": "Orange (minutes):"
+    "message": "Orange (Minuten):"
   },
   "red_threshold": {
-    "message": "Red (minutes):"
+    "message": "Rot (Minuten):"
   },
   "notifications_title": {
-    "message": "Notifications"
+    "message": "Benachrichtigungen"
   },
   "enable_notifications": {
-    "message": "Enable notifications:"
+    "message": "Benachrichtigungen aktivieren:"
   },
   "date_format_title": {
-    "message": "Date format"
+    "message": "Datumsformat"
   },
   "date_format_description": {
-    "message": "Choose how dates are displayed in the interface (does not affect stored data)."
+    "message": "Wählen Sie, wie Daten in der Benutzeroberfläche angezeigt werden (hat keinen Einfluss auf die gespeicherten Daten)."
   },
   "display_format": {
-    "message": "Display format:"
+    "message": "Anzeigeformat:"
   },
   "default_sort_title": {
     "message": "Standard-Sortierung"
@@ -102,102 +102,234 @@
     "message": "Gesamt verbrachte Zeit (wenig zu viel)"
   },
   "new_websites_title": {
-    "message": "New websites"
+    "message": "Neue Websites"
   },
   "new_websites_description": {
-    "message": "Choose whether time tracking is enabled by default for new websites."
+    "message": "Wählen Sie, ob die Zeiterfassung für neue Websites standardmäßig aktiviert sein soll."
   },
   "enable_tracking_default": {
-    "message": "Enable tracking by default:"
+    "message": "Erfassung standardmäßig aktivieren:"
   },
   "whitelist_title": {
     "message": "Whitelist"
   },
   "whitelist_hint": {
-    "message": "(tracking always ON)"
+    "message": "(Erfassung immer AN)"
   },
   "blacklist_title": {
     "message": "Blacklist"
   },
   "blacklist_hint": {
-    "message": "(tracking always OFF, not toggleable)"
+    "message": "(Erfassung immer AUS, nicht änderbar)"
   },
   "danger_zone_title": {
-    "message": "Danger zone"
+    "message": "Gefahrenzone"
   },
   "delete_all_data_btn": {
-    "message": "Delete all data"
+    "message": "Alle Daten löschen"
   },
   "all_time_spent_title": {
-    "message": "All time spent"
+    "message": "Gesamte verbrachte Zeit"
   },
   "refresh_data": {
-    "message": "Refresh data"
+    "message": "Daten aktualisieren"
   },
   "search_placeholder": {
-    "message": "Search…"
+    "message": "Suchen…"
+  },
+  "add_website_placeholder": {
+    "message": "Website hinzufügen…"
+  },
+  "add_website_btn": {
+    "message": "Hinzufügen"
   },
   "today": {
-    "message": "Today"
+    "message": "Heute"
   },
   "newer": {
-    "message": "Newer"
+    "message": "Neuer"
   },
   "older": {
-    "message": "Older"
+    "message": "Älter"
   },
   "last": {
-    "message": "Last"
+    "message": "Zuletzt"
   },
   "enable_limite_on_domain": {
-    "message": "Enable Limite on this domain"
+    "message": "Limite auf dieser Domain aktivieren"
   },
   "time_spent_on_website": {
-    "message": "Time spent on this website"
+    "message": "Auf dieser Website verbrachte Zeit"
   },
   "since_install": {
-    "message": "Since install"
+    "message": "Seit der Installation"
+  },
+  "average_time": {
+    "message": "Durchschnittliche Zeit"
   },
   "see_all_time_spent": {
-    "message": "See all time spent"
+    "message": "Gesamte verbrachte Zeit anzeigen"
   },
   "buy_me_coffee": {
-    "message": "Buy me a coffee"
+    "message": "Spendier mir einen Kaffee"
+  },
+  "column_visibility_title": {
+    "message": "Spaltensichtbarkeit"
+  },
+  "column_visibility_description": {
+    "message": "Wählen Sie aus, welche Spalten in der Tabelle 'Alle Websites' angezeigt werden sollen."
+  },
+  "column_since_time": {
+    "message": "Gesamte verbrachte Zeit"
+  },
+  "column_average": {
+    "message": "Durchschnittliche Zeit"
+  },
+  "column_category": {
+    "message": "Kategorie"
+  },
+  "display_interval_title": {
+    "message": "Anzeigeintervall"
+  },
+  "display_interval_description": {
+    "message": "Wählen Sie die Anzahl der Tage aus, die in der Tabelle 'Alle Websites' angezeigt werden sollen (Standard: 7)."
+  },
+  "number_of_days": {
+    "message": "Anzahl der Tage (1-14):"
+  },
+  "sort_category_asc": {
+    "message": "Kategorie (A-Z)"
+  },
+  "sort_category_desc": {
+    "message": "Kategorie (Z-A)"
+  },
+  "sort_status_asc": {
+    "message": "Status (Aktiv zuerst)"
+  },
+  "sort_status_desc": {
+    "message": "Status (Deaktiviert zuerst)"
+  },
+  "sort_avg_time_desc": {
+    "message": "Durchschnittliche Zeit (viel zu wenig)"
+  },
+  "sort_avg_time_asc": {
+    "message": "Durchschnittliche Zeit (wenig zu viel)"
   },
   "add_website": {
-    "message": "Add website"
+    "message": "Website hinzufügen"
   },
   "cancel": {
-    "message": "Cancel"
+    "message": "Abbrechen"
   },
   "download_now": {
-    "message": "Download now"
+    "message": "Jetzt herunterladen"
   },
   "import_now": {
-    "message": "Import now"
+    "message": "Jetzt importieren"
   },
   "import_data_description": {
-    "message": "Select the JSON file you exported previously, then click the Import now button. The page will be automatically reloaded if data are successfully imported."
+    "message": "Wählen Sie die zuvor exportierte JSON-Datei aus und klicken Sie dann auf die Schaltfläche Jetzt importieren. Die Seite wird automatisch neu geladen, wenn die Daten erfolgreich importiert wurden."
   },
   "export_data_description": {
-    "message": "You can download the JSON file containing your data by clicking the Download now button."
+    "message": "Sie können die JSON-Datei mit Ihren Daten herunterladen, indem Sie auf die Schaltfläche Jetzt herunterladen klicken."
   },
   "import_categories_description": {
-    "message": "Select the JSON categories file you exported previously, then click Import now."
+    "message": "Wählen Sie die zuvor exportierte JSON-Kategoriendatei aus und klicken Sie dann auf Jetzt importieren."
   },
   "export_categories_description": {
-    "message": "Download the JSON file containing all your categories and their website lists."
+    "message": "Laden Sie die JSON-Datei herunter, die alle Ihre Kategorien und deren Website-Listen enthält."
   },
   "milestone_thanks": {
-    "message": "Thank you for using Limite!"
+    "message": "Vielen Dank, dass Sie Limite verwenden!"
   },
   "milestone_never": {
-    "message": "Don't show this again"
+    "message": "Nicht mehr anzeigen"
   },
   "milestone_later": {
-    "message": "Remind me in 30 days"
+    "message": "In 30 Tagen erinnern"
   },
   "milestone_donate": {
-    "message": "Donate now 💙"
+    "message": "Jetzt spenden 💙"
+  },
+  "second": {
+    "message": "Sekunde"
+  },
+  "seconds": {
+    "message": "Sekunden"
+  },
+  "minute": {
+    "message": "Minute"
+  },
+  "minutes": {
+    "message": "Minuten"
+  },
+  "hour": {
+    "message": "Stunde"
+  },
+  "hours": {
+    "message": "Stunden"
+  },
+  "day": {
+    "message": "Tag"
+  },
+  "days": {
+    "message": "Tage"
+  },
+  "year": {
+    "message": "Jahr"
+  },
+  "years": {
+    "message": "Jahre"
+  },
+  "and": {
+    "message": "und"
+  },
+  "category_social": {
+    "message": "Soziales"
+  },
+  "category_travel": {
+    "message": "Reisen"
+  },
+  "category_news": {
+    "message": "Nachrichten"
+  },
+  "category_education": {
+    "message": "Bildung"
+  },
+  "category_shopping": {
+    "message": "Shopping"
+  },
+  "category_search": {
+    "message": "Suche"
+  },
+  "category_reference": {
+    "message": "Referenz"
+  },
+  "category_entertainment": {
+    "message": "Unterhaltung"
+  },
+  "category_adults": {
+    "message": "Erwachsene"
+  },
+  "category_sav22999": {
+    "message": "Sav22999"
+  },
+  "category_develop": {
+    "message": "Entwickeln"
+  },
+  "category_messaging": {
+    "message": "Messaging"
+  },
+  "category_games": {
+    "message": "Spiele"
+  },
+  "category_cloud": {
+    "message": "Cloud"
+  },
+  "category_health": {
+    "message": "Gesundheit"
+  },
+  "category_other": {
+    "message": "Andere"
   }
 }

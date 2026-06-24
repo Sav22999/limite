@@ -83,6 +83,8 @@ function loadUI() {
             browser.storage.local.get("websites", function (value) {
                 timeSpentToday = 0;
                 timeSpentAlways = 0;
+                let timeSpentAverage = 0;
+                let daysCount = 0;
                 let category = "other";
                 if (value["websites"] !== undefined) {
                     websites_json = value["websites"];
@@ -98,12 +100,15 @@ function loadUI() {
                             timeSpentToday = websites_json[urlToUse][getToday()];
                         }
                         timeSpentAlways = 0;
+                        daysCount = 0;
                         for (var key in websites_json[currentUrl]) {
                             if (key !== "always" && key !== "enabled" && key !== "category") {
                                 //console.log(k + " : " + websites_json[currentUrl][k])
                                 timeSpentAlways += websites_json[currentUrl][key];
+                                daysCount++;
                             }
                         }
+                        if (daysCount > 0) timeSpentAverage = timeSpentAlways / daysCount;
                         if (websites_json[currentUrl]["category"] !== undefined) category = websites_json[currentUrl]["category"];
                     } else {
                     }
@@ -120,8 +125,18 @@ function loadUI() {
                     }
                 });
                 document.getElementById("today-time").innerHTML = getTimeConverted(timeSpentToday);
+                document.getElementById("today-time").title = getTimeConverted(timeSpentToday, true);
                 document.getElementById("always-time").innerHTML = getTimeConverted(timeSpentAlways);
+                document.getElementById("always-time").title = getTimeConverted(timeSpentAlways, true);
+                document.getElementById("average-time").innerHTML = getTimeConverted(timeSpentAverage);
+                document.getElementById("average-time").title = getTimeConverted(timeSpentAverage, true);
                 document.getElementById("details-container").classList = [category + "-category"];
+
+                // Set category name
+                let categoryNameElement = document.getElementById("category-name");
+                if (categoryNameElement) {
+                    categoryNameElement.textContent = browser.i18n.getMessage("category_" + category) || category;
+                }
             })
         } else {
             disableSwitch(true);

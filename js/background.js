@@ -311,23 +311,48 @@ function saveUrlToData(enabled, time = 0) {
         if (timeSpentToday >= 0 && timeSpentToday < thresholdYellow) {
             //below yellow threshold || OK
             changeIcon(0);
-            setBadgeText(((timeSpentToday - (timeSpentToday % 60)) / 60).toString() + "m");
         } else if (timeSpentToday >= thresholdYellow && timeSpentToday < thresholdOrange) {
             //yellow
             changeIcon(2);
             createNotification(2, currentUrl, getTimeConverted(thresholdYellow), "You have already spent " + getTimeConverted(thresholdYellow) + " on this site today");
-            setBadgeText(((timeSpentToday - (timeSpentToday % 60)) / 60).toString() + "m", "#FFD400", "#000000");
         } else if (timeSpentToday >= thresholdOrange && timeSpentToday < thresholdRed) {
             //orange
             changeIcon(3);
             createNotification(3, currentUrl, getTimeConverted(thresholdOrange), "You have already spent " + getTimeConverted(thresholdOrange) + " on this site today");
-            setBadgeText(((timeSpentToday - (timeSpentToday % (60 * 60))) / (60 * 60)).toString() + "h", "#FF7C00", "#000000");
         } else if (timeSpentToday >= thresholdRed) {
             //red
             changeIcon(4);
             createNotification(4, currentUrl, getTimeConverted(thresholdRed), "You have already spent " + getTimeConverted(thresholdRed) + " on this site today");
-            setBadgeText(">" + Math.round(thresholdRed / 3600) + "h", "#FF0000");
         }
+
+        // Aggiorna il badge in base al tempo trascorso oggi (indipendentemente dalla soglia di colore)
+        let badgeText = "";
+        let color = "#000000";
+        let backgroundColor = "#0080FF"; // Default blue
+        if (timeSpentToday < 60 * 60) {
+            badgeText = Math.floor(timeSpentToday / 60) + "m";
+        } else {
+            badgeText = Math.floor(timeSpentToday / 3600) + "h";
+        }
+
+        if (timeSpentToday >= thresholdYellow && timeSpentToday < thresholdOrange) {
+            backgroundColor = "#FFD400";
+        } else if (timeSpentToday >= thresholdOrange && timeSpentToday < thresholdRed) {
+            backgroundColor = "#FF7C00";
+        } else if (timeSpentToday >= thresholdRed) {
+            backgroundColor = "#FF0000";
+            color = "#FFFFFF";
+        }
+        
+        if (timeSpentToday >= thresholdRed) {
+             if (thresholdRed < 3600) {
+                 badgeText = ">" + Math.floor(thresholdRed / 60) + "m";
+             } else {
+                 badgeText = ">" + Math.floor(thresholdRed / 3600) + "h";
+             }
+        }
+
+        setBadgeText(badgeText, backgroundColor, color);
     })
 }
 

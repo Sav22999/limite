@@ -117,7 +117,10 @@ function loaded() {
         document.getElementById(id).addEventListener("change", markChanged);
     });
     ["show-column-since-time", "show-column-average", "show-column-category"].forEach(function (id) {
-        document.getElementById(id).addEventListener("change", markChanged);
+        document.getElementById(id).addEventListener("change", function () {
+            markChanged();
+            updateSortOptionsVisibility();
+        });
     });
 
     // Load saved settings
@@ -125,6 +128,29 @@ function loaded() {
 
     // Check milestone
     checkMilestone();
+}
+
+function updateSortOptionsVisibility() {
+    let showSince = document.getElementById("show-column-since-time").checked;
+    let showAvg = document.getElementById("show-column-average").checked;
+    let showCat = document.getElementById("show-column-category").checked;
+
+    let sortSelect = document.getElementById("default-sort-select");
+    if (!sortSelect) return;
+    for (let i = 0; i < sortSelect.options.length; i++) {
+        let opt = sortSelect.options[i];
+        let val = opt.value;
+        let visible = true;
+
+        if (val.startsWith("category-") && !showCat) visible = false;
+        if (val.startsWith("avg-time-") && !showAvg) visible = false;
+        if (val.startsWith("since-install-") && !showSince) visible = false;
+
+        opt.style.display = visible ? "block" : "none";
+        if (!visible && sortSelect.value === val) {
+            sortSelect.value = "website-asc";
+        }
+    }
 }
 
 // ── Settings load/save ──────────────────────────────────────────────
@@ -160,6 +186,8 @@ function loadSettings() {
         document.getElementById("show-column-since-time").checked = settings["show_column_since_time"] !== undefined ? settings["show_column_since_time"] : true;
         document.getElementById("show-column-average").checked = settings["show_column_average"] !== undefined ? settings["show_column_average"] : true;
         document.getElementById("show-column-category").checked = settings["show_column_category"] !== undefined ? settings["show_column_category"] : true;
+
+        updateSortOptionsVisibility();
 
         // Display interval
         document.getElementById("display-interval-days").value = settings["display_interval_days"] || 7;

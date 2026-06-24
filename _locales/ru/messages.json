@@ -3,76 +3,76 @@
     "message": "Limite"
   },
   "extension_description": {
-    "message": "Check how much time you spend on each website every day. Optimise your productivity, your time and your life as well. Don't lose precious time!"
+    "message": "Проверяйте, сколько времени вы проводите на каждом сайте ежедневно. Оптимизируйте свою продуктивность, время и жизнь. Не тратьте драгоценное время!"
   },
   "settings_title": {
-    "message": "Settings"
+    "message": "Настройки"
   },
   "save_settings": {
-    "message": "Save settings"
+    "message": "Сохранить настройки"
   },
   "unsaved_changes": {
-    "message": "Unsaved changes"
+    "message": "Несохраненные изменения"
   },
   "support_telegram": {
-    "message": "Support on Telegram"
+    "message": "Поддержка в Telegram"
   },
   "rate_addon": {
-    "message": "Rate the add-on"
+    "message": "Оценить расширение"
   },
   "translate_crowdin": {
-    "message": "Translate on Crowdin"
+    "message": "Перевести на Crowdin"
   },
   "import_export_data": {
-    "message": "Import & Export data"
+    "message": "Импорт и экспорт данных"
   },
   "export_data_btn": {
-    "message": "Export data…"
+    "message": "Экспорт данных…"
   },
   "import_data_btn": {
-    "message": "Import data…"
+    "message": "Импорт данных…"
   },
   "categories_title": {
-    "message": "Categories"
+    "message": "Категории"
   },
   "categories_description": {
-    "message": "Each category contains a list of websites. Limite will automatically assign the category to matching websites. You can also import/export the full categories list as a JSON file."
+    "message": "Каждая категория содержит список веб-сайтов. Limite автоматически назначит категорию соответствующим сайтам. Вы также можете импортировать/экспортировать полный список категорий в виде JSON-файла."
   },
   "export_categories_btn": {
-    "message": "Export categories…"
+    "message": "Экспорт категорий…"
   },
   "import_categories_btn": {
-    "message": "Import categories…"
+    "message": "Импорт категорий…"
   },
   "time_thresholds_title": {
-    "message": "Time thresholds"
+    "message": "Временные пороги"
   },
   "time_thresholds_description": {
-    "message": "Define the time limits (in minutes) that trigger each warning level. The icon colour and notifications will change accordingly."
+    "message": "Определите лимиты времени (в минутах), которые активируют каждый уровень предупреждения. Цвет иконки и уведомления будут меняться соответственно."
   },
   "yellow_threshold": {
-    "message": "Yellow (minutes):"
+    "message": "Желтый (минуты):"
   },
   "orange_threshold": {
-    "message": "Orange (minutes):"
+    "message": "Оранжевый (минуты):"
   },
   "red_threshold": {
-    "message": "Red (minutes):"
+    "message": "Красный (минуты):"
   },
   "notifications_title": {
-    "message": "Notifications"
+    "message": "Уведомления"
   },
   "enable_notifications": {
-    "message": "Enable notifications:"
+    "message": "Включить уведомления:"
   },
   "date_format_title": {
-    "message": "Date format"
+    "message": "Формат даты"
   },
   "date_format_description": {
-    "message": "Choose how dates are displayed in the interface (does not affect stored data)."
+    "message": "Выберите способ отображения дат в интерфейсе (не влияет на сохраненные данные)."
   },
   "display_format": {
-    "message": "Display format:"
+    "message": "Формат отображения:"
   },
   "default_sort_title": {
     "message": "Сортировка по умолчанию"
@@ -102,102 +102,234 @@
     "message": "Общее время (от меньшего к большему)"
   },
   "new_websites_title": {
-    "message": "New websites"
+    "message": "Новые веб-сайты"
   },
   "new_websites_description": {
-    "message": "Choose whether time tracking is enabled by default for new websites."
+    "message": "Выберите, включено ли отслеживание времени по умолчанию для новых веб-сайтов."
   },
   "enable_tracking_default": {
-    "message": "Enable tracking by default:"
+    "message": "Включить отслеживание по умолчанию:"
   },
   "whitelist_title": {
-    "message": "Whitelist"
+    "message": "Белый список"
   },
   "whitelist_hint": {
-    "message": "(tracking always ON)"
+    "message": "(отслеживание всегда ВКЛ)"
   },
   "blacklist_title": {
-    "message": "Blacklist"
+    "message": "Черный список"
   },
   "blacklist_hint": {
-    "message": "(tracking always OFF, not toggleable)"
+    "message": "(отслеживание всегда ВЫКЛ, нельзя изменить)"
   },
   "danger_zone_title": {
-    "message": "Danger zone"
+    "message": "Опасная зона"
   },
   "delete_all_data_btn": {
-    "message": "Delete all data"
+    "message": "Удалить все данные"
   },
   "all_time_spent_title": {
-    "message": "All time spent"
+    "message": "Все проведенное время"
   },
   "refresh_data": {
-    "message": "Refresh data"
+    "message": "Обновить данные"
   },
   "search_placeholder": {
-    "message": "Search…"
+    "message": "Поиск…"
+  },
+  "add_website_placeholder": {
+    "message": "Добавить сайт…"
+  },
+  "add_website_btn": {
+    "message": "Добавить сайт"
   },
   "today": {
-    "message": "Today"
+    "message": "Сегодня"
   },
   "newer": {
-    "message": "Newer"
+    "message": "Новее"
   },
   "older": {
-    "message": "Older"
+    "message": "Старее"
   },
   "last": {
-    "message": "Last"
+    "message": "Последний"
   },
   "enable_limite_on_domain": {
-    "message": "Enable Limite on this domain"
+    "message": "Включить Limite на этом домене"
   },
   "time_spent_on_website": {
-    "message": "Time spent on this website"
+    "message": "Время, проведенное на этом сайте"
   },
   "since_install": {
-    "message": "Since install"
+    "message": "С момента установки"
+  },
+  "average_time": {
+    "message": "Среднее время"
   },
   "see_all_time_spent": {
-    "message": "See all time spent"
+    "message": "Посмотреть все проведенное время"
   },
   "buy_me_coffee": {
-    "message": "Buy me a coffee"
+    "message": "Угостите меня кофе"
+  },
+  "column_visibility_title": {
+    "message": "Видимость колонок"
+  },
+  "column_visibility_description": {
+    "message": "Выберите колонки для отображения в таблице 'Все сайты'."
+  },
+  "column_since_time": {
+    "message": "Общее время"
+  },
+  "column_average": {
+    "message": "Среднее время"
+  },
+  "column_category": {
+    "message": "Категория"
+  },
+  "display_interval_title": {
+    "message": "Интервал отображения"
+  },
+  "display_interval_description": {
+    "message": "Выберите количество дней для отображения в таблице 'Все сайты' (по умолчанию: 7)."
+  },
+  "number_of_days": {
+    "message": "Количество дней (1-14):"
+  },
+  "sort_category_asc": {
+    "message": "Категория (А-Я)"
+  },
+  "sort_category_desc": {
+    "message": "Категория (Я-А)"
+  },
+  "sort_status_asc": {
+    "message": "Статус (сначала активные)"
+  },
+  "sort_status_desc": {
+    "message": "Статус (сначала неактивные)"
+  },
+  "sort_avg_time_desc": {
+    "message": "Среднее время (от большего к меньшему)"
+  },
+  "sort_avg_time_asc": {
+    "message": "Среднее время (от меньшего к большему)"
   },
   "add_website": {
-    "message": "Add website"
+    "message": "Добавить веб-сайт"
   },
   "cancel": {
-    "message": "Cancel"
+    "message": "Отмена"
   },
   "download_now": {
-    "message": "Download now"
+    "message": "Скачать сейчас"
   },
   "import_now": {
-    "message": "Import now"
+    "message": "Импортировать сейчас"
   },
   "import_data_description": {
-    "message": "Select the JSON file you exported previously, then click the Import now button. The page will be automatically reloaded if data are successfully imported."
+    "message": "Выберите JSON-файл, который вы экспортировали ранее, а затем нажмите кнопку Импортировать сейчас. Страница будет автоматически перезагружена, если данные будут успешно импортированы."
   },
   "export_data_description": {
-    "message": "You can download the JSON file containing your data by clicking the Download now button."
+    "message": "Вы можете скачать JSON-файл со своими данными, нажав кнопку Скачать сейчас."
   },
   "import_categories_description": {
-    "message": "Select the JSON categories file you exported previously, then click Import now."
+    "message": "Выберите JSON-файл категорий, который вы экспортировали ранее, а затем нажмите Импортировать сейчас."
   },
   "export_categories_description": {
-    "message": "Download the JSON file containing all your categories and their website lists."
+    "message": "Скачайте JSON-файл, содержащий все ваши категории и списки веб-сайтов."
   },
   "milestone_thanks": {
-    "message": "Thank you for using Limite!"
+    "message": "Спасибо за использование Limite!"
   },
   "milestone_never": {
-    "message": "Don't show this again"
+    "message": "Больше не показывать"
   },
   "milestone_later": {
-    "message": "Remind me in 30 days"
+    "message": "Напомнить через 30 дней"
   },
   "milestone_donate": {
-    "message": "Donate now 💙"
+    "message": "Сделать пожертвование 💙"
+  },
+  "second": {
+    "message": "секунда"
+  },
+  "seconds": {
+    "message": "секунд"
+  },
+  "minute": {
+    "message": "минута"
+  },
+  "minutes": {
+    "message": "минут"
+  },
+  "hour": {
+    "message": "час"
+  },
+  "hours": {
+    "message": "часов"
+  },
+  "day": {
+    "message": "день"
+  },
+  "days": {
+    "message": "дней"
+  },
+  "year": {
+    "message": "год"
+  },
+  "years": {
+    "message": "лет"
+  },
+  "and": {
+    "message": "и"
+  },
+  "category_social": {
+    "message": "Социальные сети"
+  },
+  "category_travel": {
+    "message": "Путешествия"
+  },
+  "category_news": {
+    "message": "Новости"
+  },
+  "category_education": {
+    "message": "Образование"
+  },
+  "category_shopping": {
+    "message": "Покупки"
+  },
+  "category_search": {
+    "message": "Поиск"
+  },
+  "category_reference": {
+    "message": "Справочники"
+  },
+  "category_entertainment": {
+    "message": "Развлечения"
+  },
+  "category_adults": {
+    "message": "Для взрослых"
+  },
+  "category_sav22999": {
+    "message": "Sav22999"
+  },
+  "category_develop": {
+    "message": "Разработка"
+  },
+  "category_messaging": {
+    "message": "Мессенджеры"
+  },
+  "category_games": {
+    "message": "Игры"
+  },
+  "category_cloud": {
+    "message": "Облако"
+  },
+  "category_health": {
+    "message": "Здоровье"
+  },
+  "category_other": {
+    "message": "Другое"
   }
 }

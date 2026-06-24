@@ -6,6 +6,9 @@ let all_dates = [];
 let start_date = null;
 let days_to_show = 7; //number of days to show
 let categories = {};
+let isResizing = false;
+let hasResized = false;
+let startX, startWidth;
 let sorted_by = "";
 
 let show_column_since_time = true;
@@ -420,21 +423,81 @@ function getTHeadTable(websites, last_seven_days) {
     tableTHeadElement.id = "thead-table-all-websites";
     let tableRowElement = document.createElement("tr");
 
-    let tableHeaderElement = document.createElement("th");
-    tableHeaderElement.textContent = "Website";
-    tableHeaderElement.id = "th-website";
-    tableHeaderElement.classList.add("th-sort-by-column");
+    let thWebsite = document.createElement("th");
+    thWebsite.id = "th-website";
+    thWebsite.classList.add("th-sort-by-column");
+
+    let headerContent = document.createElement("div");
+    headerContent.textContent = "Website";
+    headerContent.classList.add("th-resizable-content");
+
+    let resizer = document.createElement("div");
+    resizer.classList.add("resizer");
+    resizer.addEventListener("dblclick", function (e) {
+        // Reset alla larghezza di default
+        thWebsite.style.width = "250px";
+        e.stopPropagation();
+    });
+
+    resizer.addEventListener("mousedown", function (e) {
+        if (e.detail > 1) { // Più di un clic (doppio clic)
+            thWebsite.style.width = "250px";
+            e.stopPropagation();
+            e.preventDefault();
+            return;
+        }
+        isResizing = true;
+        hasResized = false;
+        startX = e.pageX;
+        startWidth = thWebsite.offsetWidth;
+
+        e.preventDefault();
+        e.stopPropagation();
+    });
+
+    document.addEventListener("mousemove", function (e) {
+        if (!isResizing) return;
+        const width = startWidth + (e.pageX - startX);
+        if (width > 150 && width < 800) {
+            thWebsite.style.width = width + "px";
+            hasResized = true;
+        }
+    });
+
+    document.addEventListener("mouseup", function (e) {
+        if (isResizing) {
+            isResizing = false;
+            // Se ci siamo mossi di più di 5 pixel, consideriamolo un ridimensionamento
+            if (Math.abs(e.pageX - startX) > 5) {
+                hasResized = true;
+                setTimeout(() => {
+                    hasResized = false;
+                }, 200);
+            } else {
+                hasResized = false;
+            }
+        }
+    });
+
+    resizer.addEventListener("click", function (e) {
+        e.stopPropagation();
+    });
+
+    thWebsite.append(headerContent, resizer);
     if (sorted_by === "" || sorted_by === "website-asc") {
-        tableHeaderElement.classList.add("th-sort-by-column-sel", "sort-by-column-asc");
+        thWebsite.classList.add("th-sort-by-column-sel", "sort-by-column-asc");
         sorted_by = "website-asc";
     }
-    if (sorted_by === "website-desc") tableHeaderElement.classList.add("th-sort-by-column-sel", "sort-by-column-desc");
-    tableHeaderElement.onclick = function () {
+    if (sorted_by === "website-desc") thWebsite.classList.add("th-sort-by-column-sel", "sort-by-column-desc");
+    thWebsite.onclick = function (event) {
+        if (isResizing || hasResized) {
+            return;
+        }
         websites = sortByColumn("website", websites);
     }
-    tableRowElement.append(tableHeaderElement);
+    tableRowElement.append(thWebsite);
 
-    tableHeaderElement = document.createElement("th");
+    let tableHeaderElement = document.createElement("th");
     tableHeaderElement.textContent = "Status";
     tableHeaderElement.id = "th-status";
     tableHeaderElement.classList.add("th-sort-by-column");
@@ -483,6 +546,7 @@ function getTHeadTable(websites, last_seven_days) {
         }
         tableRowElement.append(tableHeaderElement);
     }
+    //days
     for (let date in last_seven_days) {
 
         let date_to_show = last_seven_days[date];
@@ -490,8 +554,8 @@ function getTHeadTable(websites, last_seven_days) {
         tableHeaderElement.textContent = applyDateFormat(date_to_show);
         tableHeaderElement.id = "th-date-" + date;
         tableHeaderElement.classList.add("th-sort-by-column");
-        if (sorted_by === "th-date-" + date + "-asc") tableHeaderElement.classList.add("th-sort-by-column-sel", "sort-by-column-asc");
-        if (sorted_by === "th-date-" + date + "-desc") tableHeaderElement.classList.add("th-sort-by-column-sel", "sort-by-column-desc");
+        if (sorted_by === "date-" + date + "-asc") tableHeaderElement.classList.add("th-sort-by-column-sel", "sort-by-column-asc");
+        if (sorted_by === "date-" + date + "-desc") tableHeaderElement.classList.add("th-sort-by-column-sel", "sort-by-column-desc");
         tableHeaderElement.onclick = function () {
             websites = sortByColumn("date-" + date, websites);
         }
@@ -504,14 +568,7 @@ function getTHeadTable(websites, last_seven_days) {
 }
 
 function getWebsiteToShow(website) {
-    let website_to_return = website;
-
-    let length_to_check = website_to_return.length;
-    const length_to_short = 46;
-    if (length_to_check > length_to_short) {
-        website_to_return = website_to_return.substring(0, length_to_short / 2) + "…" + website_to_return.substring(length_to_check - length_to_short / 2, length_to_check);
-    }
-    return website_to_return;
+    return website;
 }
 
 function getTBodyTable(websites, last_seven_days) {
@@ -534,7 +591,7 @@ function getTBodyTable(websites, last_seven_days) {
         let buttonDelete = document.createElement("input");
         buttonDelete.type = "button";
         buttonDelete.alt = "Delete";
-        buttonDelete.classList.add("button", "button-delete", "very-small-button", "float-left", "margin-left-minus-20-px", "margin-top-5-px", "text-align-center");
+        buttonDelete.classList.add("button", "button-delete", "very-small-button", "text-align-center");
         buttonDelete.id = "button-delete-single";
         buttonDelete.onclick = function () {
             deleteAWebsite(websites[website]["website"]);
@@ -542,8 +599,10 @@ function getTBodyTable(websites, last_seven_days) {
 
 
         let tableDataElement = document.createElement("td");
-        tableDataElement.classList.add("padding-left-30-px");
-        tableDataElement.append(buttonDelete, currentWebsiteElement);
+        let urlFlexContainer = document.createElement("div");
+        urlFlexContainer.classList.add("url-flex-container");
+        urlFlexContainer.append(buttonDelete, currentWebsiteElement);
+        tableDataElement.append(urlFlexContainer);
         tableRowElement.append(tableDataElement);
 
         //status
@@ -597,6 +656,7 @@ function getTBodyTable(websites, last_seven_days) {
             let since_install = getTimeConverted(sum_since_install);
             tableDataElement = document.createElement("td");
             tableDataElement.textContent = since_install;
+            tableDataElement.title = getTimeConverted(sum_since_install, true);
             tableDataElement.classList.add("since-install-time");
             if (sum_since_install >= (60 * 30) * number_of_days && sum_since_install < (60 * 60) * number_of_days) {
                 tableDataElement.classList.add("yellow");
@@ -613,6 +673,7 @@ function getTBodyTable(websites, last_seven_days) {
             let avg_time_to_show = getTimeConverted(avg_time);
             tableDataElement = document.createElement("td");
             tableDataElement.textContent = avg_time_to_show;
+            tableDataElement.title = getTimeConverted(avg_time, true);
             tableDataElement.classList.add("avg-time");
             if (avg_time >= (60 * 30) * number_of_days && avg_time < (60 * 60) * number_of_days) {
                 tableDataElement.classList.add("yellow");
@@ -627,11 +688,12 @@ function getTBodyTable(websites, last_seven_days) {
         //days
         for (let date in last_seven_days) {
             let date_to_show = last_seven_days[date];
-            let time_to_show = getTimeConverted(websites[website]["date-" + date]);
-            let time = websites[website]["date-" + date];
+            let time = websites[website]["date-" + date] || 0;
+            let time_to_show = getTimeConverted(time);
             if (time_to_show === "") time_to_show = getTimeConverted(0);
             tableDataElement = document.createElement("td");
             tableDataElement.textContent = time_to_show;
+            tableDataElement.title = getTimeConverted(time, true);
             if (time >= 60 * 30 && time < 60 * 60) {
                 tableDataElement.classList.add("yellow");
             } else if (time >= 60 * 60 && time < 60 * 60 * 3) {
@@ -661,11 +723,6 @@ function showWebsitesTable(websites, apply_filter = true) {
 
     // Initial sort
     let column_to_sort = sorted_by.replace("-asc", "").replace("-desc", "");
-    websites = sortByColumn(column_to_sort, websites, true, false);
-
-    // Infinite scroll: store sorted list and render first page
-    websites_to_render = websites;
-    currentIndex = 0;
 
     let tableTBodyElement = document.createElement("tbody");
     tableTBodyElement.id = "tbody-table-all-websites";
@@ -674,7 +731,9 @@ function showWebsitesTable(websites, apply_filter = true) {
     section.append(tableElement);
     document.getElementById("all-websites-sections").append(section);
 
-    renderNextPage();
+    sortByColumn(column_to_sort, websites, true, false);
+
+    // renderNextPage(); // Removed, already called by sortByColumn
 
     if (apply_filter) {
         applyFilter();
