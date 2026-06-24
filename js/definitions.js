@@ -25,14 +25,49 @@ function getTimeConverted(time, includeSeconds = false) {
     }
 
     if (!includeSeconds) {
-        // Se non includiamo i secondi, restituiamo solo la parte più significativa (comportamento originale approssimato)
-        // tranne per il caso "anni e giorni" che era esplicitamente gestito
+        // Approssimazione più corretta: se la parte successiva è >= metà dell'unità superiore, arrotondiamo per eccesso
         if (years > 0) {
-            if (days > 0) {
+            // Se giorni >= 182 (circa metà anno), arrotondiamo gli anni
+            let yearsToDisplay = years;
+            if (days >= 182) yearsToDisplay++;
+            
+            if (days > 0 && yearsToDisplay === years) {
                 return getYearOrYears(years * 60 * 60 * 24 * 365) + " " + browser.i18n.getMessage("and") + " " + getDayOrDays(days * 60 * 60 * 24);
             }
-            return getYearOrYears(years * 60 * 60 * 24 * 365);
+            return getYearOrYears(yearsToDisplay * 60 * 60 * 24 * 365);
         }
+        if (days > 0) {
+            // Se ore >= 12, arrotondiamo i giorni
+            let daysToDisplay = days;
+            if (hours >= 12) daysToDisplay++;
+            
+            // Se arriviamo a 365 giorni, arrotondiamo a 1 anno
+            if (daysToDisplay >= 365) return getYearOrYears(365 * 60 * 60 * 24);
+            
+            return getDayOrDays(daysToDisplay * 60 * 60 * 24);
+        }
+        if (hours > 0) {
+            // Se minuti >= 30, arrotondiamo le ore
+            let hoursToDisplay = hours;
+            if (minutes >= 30) hoursToDisplay++;
+            
+            // Se arriviamo a 24 ore, arrotondiamo a 1 giorno
+            if (hoursToDisplay >= 24) return getDayOrDays(24 * 60 * 60);
+            
+            return getHourOrHours(hoursToDisplay * 60 * 60);
+        }
+        if (minutes > 0) {
+            // Se secondi >= 30, arrotondiamo i minuti
+            let minutesToDisplay = minutes;
+            if (seconds >= 30) minutesToDisplay++;
+            
+            // Se arriviamo a 60 minuti, arrotondiamo a 1 ora
+            if (minutesToDisplay >= 60) return getHourOrHours(60 * 60);
+            
+            return getMinuteOrMinutes(minutesToDisplay * 60);
+        }
+        // Per i secondi
+        if (seconds >= 30) return getMinuteOrMinutes(60);
         return parts[0];
     }
 

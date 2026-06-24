@@ -331,5 +331,14 @@
   },
   "category_other": {
     "message": "Другое"
+  },
+  "days_label": {
+    "message": "Дни"
+  },
+  "column_website": {
+    "message": "Веб-сайт"
+  },
+  "column_status": {
+    "message": "Статус"
   }
 }

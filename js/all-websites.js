@@ -124,7 +124,7 @@ function goOlder() {
 }
 
 function setDateInterval(from, to) {
-    document.getElementById("from-to-date-label").textContent = "Days: " + formatDateDisplay(from) + " – " + formatDateDisplay(to);
+    document.getElementById("from-to-date-label").textContent = (browser.i18n.getMessage("days_label") || "Days") + ": " + formatDateDisplay(from) + " – " + formatDateDisplay(to);
 }
 
 function formatDateDisplay(dateStr) {
@@ -428,7 +428,7 @@ function getTHeadTable(websites, last_seven_days) {
     thWebsite.classList.add("th-sort-by-column");
 
     let headerContent = document.createElement("div");
-    headerContent.textContent = "Website";
+    headerContent.textContent = browser.i18n.getMessage("column_website") || "Website";
     headerContent.classList.add("th-resizable-content");
 
     let resizer = document.createElement("div");
@@ -498,7 +498,7 @@ function getTHeadTable(websites, last_seven_days) {
     tableRowElement.append(thWebsite);
 
     let tableHeaderElement = document.createElement("th");
-    tableHeaderElement.textContent = "Status";
+    tableHeaderElement.textContent = browser.i18n.getMessage("column_status") || "Status";
     tableHeaderElement.id = "th-status";
     tableHeaderElement.classList.add("th-sort-by-column");
     if (sorted_by === "status-asc") tableHeaderElement.classList.add("th-sort-by-column-sel", "sort-by-column-asc");
@@ -510,7 +510,7 @@ function getTHeadTable(websites, last_seven_days) {
 
     if (show_column_category) {
         tableHeaderElement = document.createElement("th");
-        tableHeaderElement.textContent = "Category";
+        tableHeaderElement.textContent = browser.i18n.getMessage("column_category") || "Category";
         tableHeaderElement.id = "th-category";
         tableHeaderElement.classList.add("th-sort-by-column");
         if (sorted_by === "category-asc") tableHeaderElement.classList.add("th-sort-by-column-sel", "sort-by-column-asc");
@@ -523,7 +523,7 @@ function getTHeadTable(websites, last_seven_days) {
 
     if (show_column_since_time) {
         tableHeaderElement = document.createElement("th");
-        tableHeaderElement.textContent = "Since install";
+        tableHeaderElement.textContent = browser.i18n.getMessage("since_install") || "Since install";
         tableHeaderElement.id = "th-since-install";
         tableHeaderElement.classList.add("th-sort-by-column");
         if (sorted_by === "since-install-asc") tableHeaderElement.classList.add("th-sort-by-column-sel", "sort-by-column-asc");
@@ -536,7 +536,7 @@ function getTHeadTable(websites, last_seven_days) {
 
     if (show_column_average) {
         tableHeaderElement = document.createElement("th");
-        tableHeaderElement.textContent = "Average";
+        tableHeaderElement.textContent = browser.i18n.getMessage("average_time") || "Average";
         tableHeaderElement.id = "th-avg-time";
         tableHeaderElement.classList.add("th-sort-by-column");
         if (sorted_by === "avg-time-asc") tableHeaderElement.classList.add("th-sort-by-column-sel", "sort-by-column-asc");

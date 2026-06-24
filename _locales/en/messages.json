@@ -331,5 +331,14 @@
   },
   "category_other": {
     "message": "Other"
+  },
+  "days_label": {
+    "message": "Days"
+  },
+  "column_website": {
+    "message": "Website"
+  },
+  "column_status": {
+    "message": "Status"
   }
 }
