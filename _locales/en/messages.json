@@ -340,5 +340,17 @@
   },
   "column_status": {
     "message": "Status"
+  },
+  "enable_infinite_scrolling": {
+    "message": "Enable infinite scrolling:"
+  },
+  "infinite_scrolling_title": {
+    "message": "Infinite scrolling"
+  },
+  "infinite_scrolling_description": {
+    "message": "Enable or disable infinite scrolling in the 'All websites' table. If disabled, a classic pagination will be shown."
+  },
+  "items_per_page_label": {
+    "message": "Items per page:"
   }
 }

@@ -340,5 +340,17 @@
   },
   "column_status": {
     "message": "Stato"
+  },
+  "enable_infinite_scrolling": {
+    "message": "Attiva lo scorrimento infinito:"
+  },
+  "infinite_scrolling_title": {
+    "message": "Scorrimento infinito"
+  },
+  "infinite_scrolling_description": {
+    "message": "Attiva o disattiva lo scorrimento infinito nella tabella 'Tutti i siti web'. Se disattivato, verrà mostrata una paginazione classica."
+  },
+  "items_per_page_label": {
+    "message": "Elementi per pagina:"
   }
 }

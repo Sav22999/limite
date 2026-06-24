@@ -340,5 +340,17 @@
   },
   "column_status": {
     "message": "Статус"
+  },
+  "enable_infinite_scrolling": {
+    "message": "Включить бесконечную прокрутку:"
+  },
+  "infinite_scrolling_title": {
+    "message": "Бесконечная прокрутка"
+  },
+  "infinite_scrolling_description": {
+    "message": "Включите или выключите бесконечную прокрутку в таблице 'Все веб-сайты'. Если она выключена, будет отображаться классическая пагинация."
+  },
+  "items_per_page_label": {
+    "message": "Элементов на странице:"
   }
 }

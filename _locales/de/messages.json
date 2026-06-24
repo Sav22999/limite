@@ -340,5 +340,17 @@
   },
   "column_status": {
     "message": "Status"
+  },
+  "enable_infinite_scrolling": {
+    "message": "Aktivieren Sie das unendliche Scrollen:"
+  },
+  "infinite_scrolling_title": {
+    "message": "Unendliches Scrollen"
+  },
+  "infinite_scrolling_description": {
+    "message": "Aktivieren oder deaktivieren Sie das unendliche Scrollen in der Tabelle 'Alle Webseiten'. Wenn deaktiviert, wird eine klassische Seitennummerierung angezeigt."
+  },
+  "items_per_page_label": {
+    "message": "Elemente pro Seite:"
   }
 }

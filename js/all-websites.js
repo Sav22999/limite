@@ -14,10 +14,11 @@ let sorted_by = "";
 let show_column_since_time = true;
 let show_column_average = true;
 let show_column_category = true;
+let infinite_scrolling = true;
 
 let websites_to_render = [];
 let currentIndex = 0;
-const PAGE_SIZE = 20;
+let PAGE_SIZE = 20;
 
 function loaded() {
     localizeUI();
@@ -53,6 +54,20 @@ function loaded() {
             show_column_since_time = settings["show_column_since_time"] !== undefined ? settings["show_column_since_time"] : true;
             show_column_average = settings["show_column_average"] !== undefined ? settings["show_column_average"] : true;
             show_column_category = settings["show_column_category"] !== undefined ? settings["show_column_category"] : true;
+            infinite_scrolling = settings["infinite_scrolling"] !== undefined ? settings["infinite_scrolling"] : true;
+            if (settings["items_per_page"]) {
+                PAGE_SIZE = parseInt(settings["items_per_page"]);
+            }
+
+            if (!infinite_scrolling) {
+                document.getElementById("pagination-footer").classList.remove("hidden");
+                document.getElementById("items-per-page-all-websites").value = PAGE_SIZE;
+                document.getElementById("items-per-page-all-websites").onchange = function() {
+                    PAGE_SIZE = parseInt(this.value) || 20;
+                    renderPaginationPage(0);
+                    renderPaginationControls();
+                };
+            }
 
             browser.runtime.sendMessage({from: "all-websites", ask: "categories"}, (response) => {
                 if (response !== undefined) {
@@ -80,9 +95,11 @@ function loaded() {
         }
 
         // Infinite scrolling
-        let section = document.getElementById("all-websites-dedication-section");
-        if (section.scrollTop + section.clientHeight >= section.scrollHeight - 100) {
-            renderNextPage();
+        if (infinite_scrolling) {
+            let section = document.getElementById("all-websites-dedication-section");
+            if (section.scrollTop + section.clientHeight >= section.scrollHeight - 100) {
+                renderNextPage();
+            }
         }
     }
 
@@ -294,7 +311,7 @@ function sortByColumn(column, websites, generate_ui = true, toggle = true) {
             if (response["websites"] !== undefined) {
                 websites_json = response["websites"];
             }
-            // Re-sort and reset infinite scroll
+            // Re-sort and reset infinite scroll / pagination
             websites_to_render = websites;
             currentIndex = 0;
             let oldTBody = document.getElementById("tbody-table-all-websites");
@@ -302,7 +319,16 @@ function sortByColumn(column, websites, generate_ui = true, toggle = true) {
             let tableTBodyElement = document.createElement("tbody");
             tableTBodyElement.id = "tbody-table-all-websites";
             document.getElementById("table-all-websites").append(tableTBodyElement);
-            renderNextPage();
+            
+            if (infinite_scrolling) {
+                renderNextPage();
+                document.getElementById("pagination-controls").classList.add("hidden");
+            } else {
+                renderPaginationPage(0);
+                renderPaginationControls();
+                // Ensure we scroll to top when changing page/sorting in pagination mode
+                document.getElementById("all-websites-dedication-section").scrollTop = 0;
+            }
         });
     }
     return websites;
@@ -513,6 +539,7 @@ function getTHeadTable(websites, last_seven_days) {
         tableHeaderElement.textContent = browser.i18n.getMessage("column_category") || "Category";
         tableHeaderElement.id = "th-category";
         tableHeaderElement.classList.add("th-sort-by-column");
+        tableHeaderElement.style.width = "170px";
         if (sorted_by === "category-asc") tableHeaderElement.classList.add("th-sort-by-column-sel", "sort-by-column-asc");
         if (sorted_by === "category-desc") tableHeaderElement.classList.add("th-sort-by-column-sel", "sort-by-column-desc");
         tableHeaderElement.onclick = function () {
@@ -753,6 +780,93 @@ function renderNextPage() {
         tableTBody.append(fragment.firstChild);
     }
     currentIndex = end;
+}
+
+function renderPaginationPage(page) {
+    currentIndex = page * PAGE_SIZE;
+    let last_seven_days = getLastSevenDays();
+    let end = Math.min(currentIndex + PAGE_SIZE, websites_to_render.length);
+    let slice = websites_to_render.slice(currentIndex, end);
+    let tableTBody = document.getElementById("tbody-table-all-websites");
+    if (!tableTBody) return;
+    tableTBody.textContent = "";
+    let fragment = getTBodyTable(slice, last_seven_days);
+    while (fragment.firstChild) {
+        tableTBody.append(fragment.firstChild);
+    }
+    // Scroll to top of table
+    document.getElementById("all-websites-dedication-section").scrollTop = 0;
+}
+
+function renderPaginationControls() {
+    let container = document.getElementById("pagination-controls");
+    container.textContent = "";
+    if (websites_to_render.length === 0) {
+        document.getElementById("pagination-footer").classList.add("hidden");
+        return;
+    }
+    document.getElementById("pagination-footer").classList.remove("hidden");
+
+    let totalPages = Math.ceil(websites_to_render.length / PAGE_SIZE);
+    let currentPage = Math.floor(currentIndex / PAGE_SIZE);
+    if (currentPage >= totalPages) currentPage = totalPages - 1;
+    if (currentPage < 0) currentPage = 0;
+
+    // First page
+    let btnFirst = document.createElement("button");
+    btnFirst.classList.add("button", "button-page-navigation");
+    btnFirst.disabled = currentPage === 0;
+    let imgFirst = document.createElement("img");
+    imgFirst.src = "../img/last.svg";
+    imgFirst.style.transform = "rotate(180deg)";
+    btnFirst.append(imgFirst);
+    btnFirst.onclick = () => {
+        renderPaginationPage(0);
+        renderPaginationControls();
+    };
+
+    // Prev page
+    let btnPrev = document.createElement("button");
+    btnPrev.classList.add("button", "button-page-navigation");
+    btnPrev.disabled = currentPage === 0;
+    let imgPrev = document.createElement("img");
+    imgPrev.src = "../img/newer.svg";
+    btnPrev.append(imgPrev);
+    btnPrev.onclick = () => {
+        renderPaginationPage(currentPage - 1);
+        renderPaginationControls();
+    };
+
+    // Info
+    let info = document.createElement("span");
+    info.id = "pagination-info";
+    info.textContent = (currentPage + 1) + " / " + totalPages;
+
+    // Next page
+    let btnNext = document.createElement("button");
+    btnNext.classList.add("button", "button-page-navigation");
+    btnNext.disabled = currentPage === totalPages - 1;
+    let imgNext = document.createElement("img");
+    imgNext.src = "../img/older.svg";
+    btnNext.append(imgNext);
+    btnNext.onclick = () => {
+        renderPaginationPage(currentPage + 1);
+        renderPaginationControls();
+    };
+
+    // Last page
+    let btnLast = document.createElement("button");
+    btnLast.classList.add("button", "button-page-navigation");
+    btnLast.disabled = currentPage === totalPages - 1;
+    let imgLast = document.createElement("img");
+    imgLast.src = "../img/last.svg";
+    btnLast.append(imgLast);
+    btnLast.onclick = () => {
+        renderPaginationPage(totalPages - 1);
+        renderPaginationControls();
+    };
+
+    container.append(btnFirst, btnPrev, info, btnNext, btnLast);
 }
 
 function applyFilter() {

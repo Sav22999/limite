@@ -153,6 +153,14 @@ function updateSortOptionsVisibility() {
     }
 }
 
+function updateInfiniteScrollingOptionsVisibility() {
+    let isInfiniteScrollingEnabled = document.getElementById("infinite-scrolling-checkbox").checked;
+    let itemsPerPageRow = document.getElementById("items-per-page-row");
+    if (itemsPerPageRow) {
+        itemsPerPageRow.style.display = isInfiniteScrollingEnabled ? "none" : "flex";
+    }
+}
+
 // ── Settings load/save ──────────────────────────────────────────────
 
 function loadSettings() {
@@ -188,6 +196,19 @@ function loadSettings() {
         document.getElementById("show-column-category").checked = settings["show_column_category"] !== undefined ? settings["show_column_category"] : true;
 
         updateSortOptionsVisibility();
+
+        // Infinite scrolling
+        document.getElementById("infinite-scrolling-checkbox").checked = settings["infinite_scrolling"] !== undefined ? settings["infinite_scrolling"] : true;
+        document.getElementById("infinite-scrolling-checkbox").onchange = function() {
+            markChanged();
+            updateInfiniteScrollingOptionsVisibility();
+        };
+
+        // Items per page
+        document.getElementById("items-per-page-input").value = settings["items_per_page"] || 20;
+        document.getElementById("items-per-page-input").onchange = markChanged;
+
+        updateInfiniteScrollingOptionsVisibility();
 
         // Display interval
         document.getElementById("display-interval-days").value = settings["display_interval_days"] || 7;
@@ -237,6 +258,8 @@ function saveSettings() {
         "show_column_since_time": document.getElementById("show-column-since-time").checked,
         "show_column_average": document.getElementById("show-column-average").checked,
         "show_column_category": document.getElementById("show-column-category").checked,
+        "infinite_scrolling": document.getElementById("infinite-scrolling-checkbox").checked,
+        "items_per_page": parseInt(document.getElementById("items-per-page-input").value) || 20,
         "display_interval_days": parseInt(document.getElementById("display-interval-days").value) || 7,
         "default_tracking_enabled": defaultTrackingEnabled,
         "whitelist": Array.from(document.querySelectorAll("#whitelist-list .category-website-item span")).map(s => s.textContent),

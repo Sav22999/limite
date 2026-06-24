@@ -340,5 +340,17 @@
   },
   "column_status": {
     "message": "Statut"
+  },
+  "enable_infinite_scrolling": {
+    "message": "Activer le défilement infini :"
+  },
+  "infinite_scrolling_title": {
+    "message": "Défilement infini"
+  },
+  "infinite_scrolling_description": {
+    "message": "Activez ou désactivez le défilement infini dans le tableau 'Tous les sites Web'. Si désactivé, una pagination classique sera affichée."
+  },
+  "items_per_page_label": {
+    "message": "Éléments par page:"
   }
 }
