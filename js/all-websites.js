@@ -8,6 +8,10 @@ let days_to_show = 7; //number of days to show
 let categories = {};
 let sorted_by = "";
 
+let show_column_since_time = true;
+let show_column_average = true;
+let show_column_category = true;
+
 let websites_to_render = [];
 let currentIndex = 0;
 const PAGE_SIZE = 20;
@@ -40,6 +44,12 @@ function loaded() {
             if (settings["default_sort_by"]) {
                 sorted_by = settings["default_sort_by"];
             }
+            if (settings["display_interval_days"]) {
+                days_to_show = parseInt(settings["display_interval_days"]);
+            }
+            show_column_since_time = settings["show_column_since_time"] !== undefined ? settings["show_column_since_time"] : true;
+            show_column_average = settings["show_column_average"] !== undefined ? settings["show_column_average"] : true;
+            show_column_category = settings["show_column_category"] !== undefined ? settings["show_column_category"] : true;
 
             browser.runtime.sendMessage({from: "all-websites", ask: "categories"}, (response) => {
                 if (response !== undefined) {
@@ -235,15 +245,21 @@ function sortByColumn(column, websites, generate_ui = true, toggle = true) {
     sorted_by = column + "-" + ascOrDesc;
     if (generate_ui) {
         if (previousColumn !== "" && previousColumn !== column) {
-            if (document.getElementById("th-" + previousColumn).classList.contains("th-sort-by-column-sel")) document.getElementById("th-" + previousColumn).classList.remove("th-sort-by-column-sel");
-            if (document.getElementById("th-" + previousColumn).classList.contains("sort-by-column-asc")) document.getElementById("th-" + previousColumn).classList.remove("sort-by-column-asc");
-            if (document.getElementById("th-" + previousColumn).classList.contains("sort-by-column-desc")) document.getElementById("th-" + previousColumn).classList.remove("sort-by-column-desc");
+            let prevEl = document.getElementById("th-" + previousColumn);
+            if (prevEl) {
+                if (prevEl.classList.contains("th-sort-by-column-sel")) prevEl.classList.remove("th-sort-by-column-sel");
+                if (prevEl.classList.contains("sort-by-column-asc")) prevEl.classList.remove("sort-by-column-asc");
+                if (prevEl.classList.contains("sort-by-column-desc")) prevEl.classList.remove("sort-by-column-desc");
+            }
         }
 
-        if (!document.getElementById("th-" + column).classList.contains("th-sort-by-column-sel")) document.getElementById("th-" + column).classList.add("th-sort-by-column-sel");
-        if (document.getElementById("th-" + column).classList.contains("sort-by-column-asc")) document.getElementById("th-" + column).classList.remove("sort-by-column-asc");
-        if (document.getElementById("th-" + column).classList.contains("sort-by-column-desc")) document.getElementById("th-" + column).classList.remove("sort-by-column-desc");
-        document.getElementById("th-" + column).classList.add("sort-by-column-" + ascOrDesc);
+        let currEl = document.getElementById("th-" + column);
+        if (currEl) {
+            if (!currEl.classList.contains("th-sort-by-column-sel")) currEl.classList.add("th-sort-by-column-sel");
+            if (currEl.classList.contains("sort-by-column-asc")) currEl.classList.remove("sort-by-column-asc");
+            if (currEl.classList.contains("sort-by-column-desc")) currEl.classList.remove("sort-by-column-desc");
+            currEl.classList.add("sort-by-column-" + ascOrDesc);
+        }
     }
 
     //console.log("col " + column + " | prev " + previousColumn + " | sorted_by " + sorted_by)
@@ -251,10 +267,22 @@ function sortByColumn(column, websites, generate_ui = true, toggle = true) {
     websites = getWebsitesToUse(websites_json);
     if (sorted_by.includes("-asc")) {
         //sort as "asc"
-        websites = websites.sort((a, b) => a[column] > b[column] ? 1 : -1);
+        websites = websites.sort((a, b) => {
+            let valA = a[column];
+            let valB = b[column];
+            if (typeof valA === 'string') valA = valA.toLowerCase();
+            if (typeof valB === 'string') valB = valB.toLowerCase();
+            return valA > valB ? 1 : -1;
+        });
     } else {
         //sort as "desc"
-        websites = websites.sort((a, b) => a[column] < b[column] ? 1 : -1);
+        websites = websites.sort((a, b) => {
+            let valA = a[column];
+            let valB = b[column];
+            if (typeof valA === 'string') valA = valA.toLowerCase();
+            if (typeof valB === 'string') valB = valB.toLowerCase();
+            return valA < valB ? 1 : -1;
+        });
     }
 
     if (generate_ui) {
@@ -288,8 +316,8 @@ function getWebsitesToUse(websites_json) {
         let new_website = {};
 
         new_website["website"] = current_website;
-        new_website["status"] = websites_json[current_website]["enabled"];
-        new_website["category"] = checkCategory(current_website);
+        new_website["status"] = (websites_json[current_website]["enabled"] !== false) ? 1 : 0;
+        new_website["category"] = browser.i18n.getMessage("category_" + checkCategory(current_website)) || checkCategory(current_website);
 
         //since install
         let number_of_days = all_dates.length;
@@ -417,38 +445,44 @@ function getTHeadTable(websites, last_seven_days) {
     }
     tableRowElement.append(tableHeaderElement);
 
-    tableHeaderElement = document.createElement("th");
-    tableHeaderElement.textContent = "Category";
-    tableHeaderElement.id = "th-category";
-    tableHeaderElement.classList.add("th-sort-by-column");
-    if (sorted_by === "category-asc") tableHeaderElement.classList.add("th-sort-by-column-sel", "sort-by-column-asc");
-    if (sorted_by === "category-desc") tableHeaderElement.classList.add("th-sort-by-column-sel", "sort-by-column-desc");
-    tableHeaderElement.onclick = function () {
-        websites = sortByColumn("category", websites);
+    if (show_column_category) {
+        tableHeaderElement = document.createElement("th");
+        tableHeaderElement.textContent = "Category";
+        tableHeaderElement.id = "th-category";
+        tableHeaderElement.classList.add("th-sort-by-column");
+        if (sorted_by === "category-asc") tableHeaderElement.classList.add("th-sort-by-column-sel", "sort-by-column-asc");
+        if (sorted_by === "category-desc") tableHeaderElement.classList.add("th-sort-by-column-sel", "sort-by-column-desc");
+        tableHeaderElement.onclick = function () {
+            websites = sortByColumn("category", websites);
+        }
+        tableRowElement.append(tableHeaderElement);
     }
-    tableRowElement.append(tableHeaderElement);
 
-    tableHeaderElement = document.createElement("th");
-    tableHeaderElement.textContent = "Since install";
-    tableHeaderElement.id = "th-since-install";
-    tableHeaderElement.classList.add("th-sort-by-column");
-    if (sorted_by === "since-install-asc") tableHeaderElement.classList.add("th-sort-by-column-sel", "sort-by-column-asc");
-    if (sorted_by === "since-install-desc") tableHeaderElement.classList.add("th-sort-by-column-sel", "sort-by-column-desc");
-    tableHeaderElement.onclick = function () {
-        websites = sortByColumn("since-install", websites);
+    if (show_column_since_time) {
+        tableHeaderElement = document.createElement("th");
+        tableHeaderElement.textContent = "Since install";
+        tableHeaderElement.id = "th-since-install";
+        tableHeaderElement.classList.add("th-sort-by-column");
+        if (sorted_by === "since-install-asc") tableHeaderElement.classList.add("th-sort-by-column-sel", "sort-by-column-asc");
+        if (sorted_by === "since-install-desc") tableHeaderElement.classList.add("th-sort-by-column-sel", "sort-by-column-desc");
+        tableHeaderElement.onclick = function () {
+            websites = sortByColumn("since-install", websites);
+        }
+        tableRowElement.append(tableHeaderElement);
     }
-    tableRowElement.append(tableHeaderElement);
 
-    tableHeaderElement = document.createElement("th");
-    tableHeaderElement.textContent = "Average";
-    tableHeaderElement.id = "th-avg-time";
-    tableHeaderElement.classList.add("th-sort-by-column");
-    if (sorted_by === "avg-time-asc") tableHeaderElement.classList.add("th-sort-by-column-sel", "sort-by-column-asc");
-    if (sorted_by === "avg-time-desc") tableHeaderElement.classList.add("th-sort-by-column-sel", "sort-by-column-desc");
-    tableHeaderElement.onclick = function () {
-        websites = sortByColumn("avg-time", websites);
+    if (show_column_average) {
+        tableHeaderElement = document.createElement("th");
+        tableHeaderElement.textContent = "Average";
+        tableHeaderElement.id = "th-avg-time";
+        tableHeaderElement.classList.add("th-sort-by-column");
+        if (sorted_by === "avg-time-asc") tableHeaderElement.classList.add("th-sort-by-column-sel", "sort-by-column-asc");
+        if (sorted_by === "avg-time-desc") tableHeaderElement.classList.add("th-sort-by-column-sel", "sort-by-column-desc");
+        tableHeaderElement.onclick = function () {
+            websites = sortByColumn("avg-time", websites);
+        }
+        tableRowElement.append(tableHeaderElement);
     }
-    tableRowElement.append(tableHeaderElement);
     for (let date in last_seven_days) {
 
         let date_to_show = last_seven_days[date];
@@ -548,41 +582,47 @@ function getTBodyTable(websites, last_seven_days) {
         tableRowElement.append(tableDataElementStatus);
 
         //category
-        let tableDataElementCategory = document.createElement("td");
-        tableDataElementCategory.append(generateCategories(checkCategory(websites[website]["website"]), websites[website]["website"], tableDataElementCategory));
-        tableRowElement.append(tableDataElementCategory);
+        if (show_column_category) {
+            let tableDataElementCategory = document.createElement("td");
+            tableDataElementCategory.append(generateCategories(checkCategory(websites[website]["website"]), websites[website]["website"], tableDataElementCategory));
+            tableRowElement.append(tableDataElementCategory);
+        }
 
 
         //since install
         let number_of_days = all_dates.length;
 
-        let sum_since_install = websites[website]["since-install"];
-        let since_install = getTimeConverted(sum_since_install);
-        tableDataElement = document.createElement("td");
-        tableDataElement.textContent = since_install;
-        tableDataElement.classList.add("since-install-time");
-        if (sum_since_install >= (60 * 30) * number_of_days && sum_since_install < (60 * 60) * number_of_days) {
-            tableDataElement.classList.add("yellow");
-        } else if (sum_since_install >= (60 * 60) * number_of_days && sum_since_install < (60 * 60 * 3) * number_of_days) {
-            tableDataElement.classList.add("orange");
-        } else if (sum_since_install >= (60 * 60 * 3) * number_of_days) {
-            tableDataElement.classList.add("red");
+        if (show_column_since_time) {
+            let sum_since_install = websites[website]["since-install"];
+            let since_install = getTimeConverted(sum_since_install);
+            tableDataElement = document.createElement("td");
+            tableDataElement.textContent = since_install;
+            tableDataElement.classList.add("since-install-time");
+            if (sum_since_install >= (60 * 30) * number_of_days && sum_since_install < (60 * 60) * number_of_days) {
+                tableDataElement.classList.add("yellow");
+            } else if (sum_since_install >= (60 * 60) * number_of_days && sum_since_install < (60 * 60 * 3) * number_of_days) {
+                tableDataElement.classList.add("orange");
+            } else if (sum_since_install >= (60 * 60 * 3) * number_of_days) {
+                tableDataElement.classList.add("red");
+            }
+            tableRowElement.append(tableDataElement);
         }
-        tableRowElement.append(tableDataElement);
 
-        let avg_time = websites[website]["avg-time"];
-        let avg_time_to_show = getTimeConverted(avg_time);
-        tableDataElement = document.createElement("td");
-        tableDataElement.textContent = avg_time_to_show;
-        tableDataElement.classList.add("avg-time");
-        if (avg_time >= (60 * 30) * number_of_days && avg_time < (60 * 60) * number_of_days) {
-            tableDataElement.classList.add("yellow");
-        } else if (avg_time >= (60 * 60) * number_of_days && avg_time < (60 * 60 * 3) * number_of_days) {
-            tableDataElement.classList.add("orange");
-        } else if (avg_time >= (60 * 60 * 3) * number_of_days) {
-            tableDataElement.classList.add("red");
+        if (show_column_average) {
+            let avg_time = websites[website]["avg-time"];
+            let avg_time_to_show = getTimeConverted(avg_time);
+            tableDataElement = document.createElement("td");
+            tableDataElement.textContent = avg_time_to_show;
+            tableDataElement.classList.add("avg-time");
+            if (avg_time >= (60 * 30) * number_of_days && avg_time < (60 * 60) * number_of_days) {
+                tableDataElement.classList.add("yellow");
+            } else if (avg_time >= (60 * 60) * number_of_days && avg_time < (60 * 60 * 3) * number_of_days) {
+                tableDataElement.classList.add("orange");
+            } else if (avg_time >= (60 * 60 * 3) * number_of_days) {
+                tableDataElement.classList.add("red");
+            }
+            tableRowElement.append(tableDataElement);
         }
-        tableRowElement.append(tableDataElement);
 
         //days
         for (let date in last_seven_days) {
@@ -619,7 +659,9 @@ function showWebsitesTable(websites, apply_filter = true) {
     let tableTHeadElement = getTHeadTable(websites, getLastSevenDays());
     tableElement.append(tableTHeadElement);
 
-    websites = sortByColumn(sorted_by.replace("-asc", "").replace("-desc", ""), websites, false, false);
+    // Initial sort
+    let column_to_sort = sorted_by.replace("-asc", "").replace("-desc", "");
+    websites = sortByColumn(column_to_sort, websites, true, false);
 
     // Infinite scroll: store sorted list and render first page
     websites_to_render = websites;

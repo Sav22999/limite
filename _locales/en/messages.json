@@ -167,6 +167,48 @@
   "buy_me_coffee": {
     "message": "Buy me a coffee"
   },
+  "column_visibility_title": {
+    "message": "Column visibility"
+  },
+  "column_visibility_description": {
+    "message": "Choose which columns to show in the 'All websites' table."
+  },
+  "column_since_time": {
+    "message": "Total time spent"
+  },
+  "column_average": {
+    "message": "Average time"
+  },
+  "column_category": {
+    "message": "Category"
+  },
+  "display_interval_title": {
+    "message": "Display interval"
+  },
+  "display_interval_description": {
+    "message": "Choose the number of days to show in the 'All websites' table (default: 7)."
+  },
+  "number_of_days": {
+    "message": "Number of days (1-14):"
+  },
+  "sort_category_asc": {
+    "message": "Category (A-Z)"
+  },
+  "sort_category_desc": {
+    "message": "Category (Z-A)"
+  },
+  "sort_status_asc": {
+    "message": "Status (Enabled first)"
+  },
+  "sort_status_desc": {
+    "message": "Status (Disabled first)"
+  },
+  "sort_avg_time_desc": {
+    "message": "Average time (most to least)"
+  },
+  "sort_avg_time_asc": {
+    "message": "Average time (least to most)"
+  },
   "add_website": {
     "message": "Add website"
   },

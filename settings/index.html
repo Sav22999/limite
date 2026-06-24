@@ -107,6 +107,44 @@ Created by Saverio Morelli - saveriomorelli.com
             </div>
         </div>
 
+        <!-- Column visibility -->
+        <div class="section">
+            <h2 class="sub-section" data-i18n="column_visibility_title">Column visibility</h2>
+            <div class="sub-section">
+                <p class="settings-description" data-i18n="column_visibility_description">Choose which columns to show in the 'All websites' table.</p>
+                <div class="settings-row">
+                    <label class="settings-label">
+                        <input type="checkbox" id="show-column-since-time" checked/>
+                        <span data-i18n="column_since_time">Total time spent</span>
+                    </label>
+                </div>
+                <div class="settings-row">
+                    <label class="settings-label">
+                        <input type="checkbox" id="show-column-average" checked/>
+                        <span data-i18n="column_average">Average time</span>
+                    </label>
+                </div>
+                <div class="settings-row">
+                    <label class="settings-label">
+                        <input type="checkbox" id="show-column-category" checked/>
+                        <span data-i18n="column_category">Category</span>
+                    </label>
+                </div>
+            </div>
+        </div>
+
+        <!-- Display interval -->
+        <div class="section">
+            <h2 class="sub-section" data-i18n="display_interval_title">Display interval</h2>
+            <div class="sub-section">
+                <p class="settings-description" data-i18n="display_interval_description">Choose the number of days to show in the 'All websites' table (default: 7).</p>
+                <div class="settings-row">
+                    <label class="settings-label" data-i18n="number_of_days">Number of days (1-14):</label>
+                    <input type="number" id="display-interval-days" class="textbox settings-number" min="1" max="14" value="7"/>
+                </div>
+            </div>
+        </div>
+
         <!-- Default sorting -->
         <div class="section">
             <h2 class="sub-section" data-i18n="default_sort_title">Default sorting</h2>
@@ -117,8 +155,14 @@ Created by Saverio Morelli - saveriomorelli.com
                     <select id="default-sort-select" class="select-category settings-select">
                         <option value="website-asc" data-i18n="sort_website_asc">Website (A-Z)</option>
                         <option value="website-desc" data-i18n="sort_website_desc">Website (Z-A)</option>
+                        <option value="category-asc" data-i18n="sort_category_asc">Category (A-Z)</option>
+                        <option value="category-desc" data-i18n="sort_category_desc">Category (Z-A)</option>
+                        <option value="status-asc" data-i18n="sort_status_asc">Status (Enabled first)</option>
+                        <option value="status-desc" data-i18n="sort_status_desc">Status (Disabled first)</option>
                         <option value="date-0-desc" data-i18n="sort_today_desc">Time spent today (most to least)</option>
                         <option value="date-0-asc" data-i18n="sort_today_asc">Time spent today (least to most)</option>
+                        <option value="avg-time-desc" data-i18n="sort_avg_time_desc">Average time (most to least)</option>
+                        <option value="avg-time-asc" data-i18n="sort_avg_time_asc">Average time (least to most)</option>
                         <option value="since-install-desc" data-i18n="sort_since_install_desc">Total time spent (most to least)</option>
                         <option value="since-install-asc" data-i18n="sort_since_install_asc">Total time spent (least to most)</option>
                     </select>

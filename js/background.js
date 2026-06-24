@@ -61,6 +61,7 @@ function loadSettingsFromStorage() {
         defaultTrackingEnabled = settings["default_tracking_enabled"] !== undefined ? settings["default_tracking_enabled"] : true;
         whitelist = settings["whitelist"] || [];
         blacklist = settings["blacklist"] || [];
+        // Other settings like show_column_*, display_interval_days are used in all-websites.js
     });
     browser.storage.local.get("limite_categories", function (value) {
         if (value["limite_categories"] !== undefined) {

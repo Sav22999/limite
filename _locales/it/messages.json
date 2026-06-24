@@ -167,6 +167,48 @@
   "buy_me_coffee": {
     "message": "Offrimi un caffè"
   },
+  "column_visibility_title": {
+    "message": "Visibilità colonne"
+  },
+  "column_visibility_description": {
+    "message": "Scegli quali colonne mostrare nella tabella 'Tutti i siti web'."
+  },
+  "column_since_time": {
+    "message": "Tempo totale trascorso"
+  },
+  "column_average": {
+    "message": "Tempo medio"
+  },
+  "column_category": {
+    "message": "Categoria"
+  },
+  "display_interval_title": {
+    "message": "Intervallo di visualizzazione"
+  },
+  "display_interval_description": {
+    "message": "Scegli il numero di giorni da mostrare nella tabella 'Tutti i siti web' (default: 7)."
+  },
+  "number_of_days": {
+    "message": "Numero di giorni (1-14):"
+  },
+  "sort_category_asc": {
+    "message": "Categoria (A-Z)"
+  },
+  "sort_category_desc": {
+    "message": "Categoria (Z-A)"
+  },
+  "sort_status_asc": {
+    "message": "Stato (Attivi prima)"
+  },
+  "sort_status_desc": {
+    "message": "Stato (Disattivati prima)"
+  },
+  "sort_avg_time_desc": {
+    "message": "Tempo medio (dal maggiore al minore)"
+  },
+  "sort_avg_time_asc": {
+    "message": "Tempo medio (dal minore al maggiore)"
+  },
   "add_website": {
     "message": "Aggiungi sito web"
   },

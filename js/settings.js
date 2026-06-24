@@ -110,12 +110,15 @@ function loaded() {
         if (event.key === "Enter") addWebsiteToList("blacklist");
     };
 
-    // Mark changed on any input
-    ["threshold-yellow", "threshold-orange", "threshold-red"].forEach(function (id) {
+    ["threshold-yellow", "threshold-orange", "threshold-red", "display-interval-days"].forEach(function (id) {
         document.getElementById(id).addEventListener("input", markChanged);
     });
-    document.getElementById("date-format-select").addEventListener("change", markChanged);
-    document.getElementById("default-sort-select").addEventListener("change", markChanged);
+    ["date-format-select", "default-sort-select"].forEach(function (id) {
+        document.getElementById(id).addEventListener("change", markChanged);
+    });
+    ["show-column-since-time", "show-column-average", "show-column-category"].forEach(function (id) {
+        document.getElementById(id).addEventListener("change", markChanged);
+    });
 
     // Load saved settings
     loadSettings();
@@ -152,6 +155,14 @@ function loadSettings() {
 
         // Default sort
         document.getElementById("default-sort-select").value = settings["default_sort_by"] || "website-asc";
+
+        // Column visibility
+        document.getElementById("show-column-since-time").checked = settings["show_column_since_time"] !== undefined ? settings["show_column_since_time"] : true;
+        document.getElementById("show-column-average").checked = settings["show_column_average"] !== undefined ? settings["show_column_average"] : true;
+        document.getElementById("show-column-category").checked = settings["show_column_category"] !== undefined ? settings["show_column_category"] : true;
+
+        // Display interval
+        document.getElementById("display-interval-days").value = settings["display_interval_days"] || 7;
 
         // Whitelist / Blacklist
         let whitelist = settings["whitelist"] || [];
@@ -195,6 +206,10 @@ function saveSettings() {
         "notifications_enabled": notificationsEnabled,
         "date_format": document.getElementById("date-format-select").value,
         "default_sort_by": document.getElementById("default-sort-select").value,
+        "show_column_since_time": document.getElementById("show-column-since-time").checked,
+        "show_column_average": document.getElementById("show-column-average").checked,
+        "show_column_category": document.getElementById("show-column-category").checked,
+        "display_interval_days": parseInt(document.getElementById("display-interval-days").value) || 7,
         "default_tracking_enabled": defaultTrackingEnabled,
         "whitelist": Array.from(document.querySelectorAll("#whitelist-list .category-website-item span")).map(s => s.textContent),
         "blacklist": Array.from(document.querySelectorAll("#blacklist-list .category-website-item span")).map(s => s.textContent)
@@ -206,7 +221,6 @@ function saveSettings() {
     browser.storage.local.set({"limite_settings": settings}, function () {
         browser.storage.local.set({"limite_categories": currentCategories}, function () {
             markSaved();
-            alert("Settings saved!");
         });
     });
 }
