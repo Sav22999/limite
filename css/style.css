@@ -50,6 +50,7 @@ body {
     border: 0px solid transparent;
     position: relative;
     background-color: #0080ff;
+    border-radius: 0;
 }
 
 .section-popup {
@@ -126,6 +127,19 @@ body {
     overflow: visible;
 }
 
+#toggle-container.disabled {
+    cursor: default;
+}
+
+#toggle-container.disabled #toggle-background {
+    background-color: #cccccc55;
+}
+
+#toggle-container.disabled #toggle-thumb {
+    background-color: #cccccc;
+    box-shadow: none;
+}
+
 #toggle-background {
     width: 30px;
     height: 10px;
@@ -180,7 +194,7 @@ body {
     position: relative;
     width: auto; /*350px*/
     height: auto;
-    padding: 5px 20px;
+    padding: 5px;
     margin: 0px;
     background-color: #ffffff;
     color: #000000;
@@ -189,8 +203,8 @@ body {
 
     display: grid;
     grid-template-areas:
-            'time-spent time-spent time-spent'
             'cat cat cat'
+            'time-spent time-spent time-spent'
             'text1 text1 value1'
             'text2 text2 value2'
             'text3 text3 value3';
@@ -217,13 +231,16 @@ body {
     text-align: center;
     font-weight: bold;
     font-size: 14px;
-    padding-bottom: 5px;
+    padding: 5px;
+    background-color: #0080ffaa;
+    color: #ffffff;
+    border-radius: 5px;
 }
 
 .grid-item-text1 {
     grid-area: text1;
     border: 0px solid transparent;
-    border-right: 2px solid #0080ff;
+    border-right: 1px solid #0080ff66;
 }
 
 .grid-item-value1 {
@@ -233,7 +250,7 @@ body {
 .grid-item-text2 {
     grid-area: text2;
     border: 0px solid transparent;
-    border-right: 2px solid #0080ff;
+    border-right: 1px solid #0080ff66;
 }
 
 .grid-item-value2 {
@@ -243,7 +260,7 @@ body {
 .grid-item-text3 {
     grid-area: text3;
     border: 0px solid transparent;
-    border-right: 2px solid #0080ff;
+    border-right: 1px solid #0080ff66;
 }
 
 .grid-item-value3 {
@@ -1279,6 +1296,7 @@ th {
 .hidden {
     display: none !important;
 }
+
 /* --- Pagination --- */
 #pagination-controls {
     display: flex;

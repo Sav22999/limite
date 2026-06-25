@@ -46,6 +46,8 @@ function loaded() {
     });
 
     browser.tabs.onUpdated.addListener(tabUpdated);
+    browser.tabs.onActivated.addListener(tabActivated);
+    browser.windows.onFocusChanged.addListener(windowFocused);
     disableSwitch(true);
 
     document.getElementById("buy-me-a-coffee-section").onclick = function () {
@@ -138,29 +140,6 @@ function loadUI() {
                     categoryNameElement.textContent = browser.i18n.getMessage("category_" + category) || category;
                 }
 
-                // Threshold colors in popup
-                browser.storage.local.get("limite_settings", function (val) {
-                    let settings = val["limite_settings"] || {};
-                    let thresholdYellow = settings["threshold_yellow"] !== undefined ? settings["threshold_yellow"] : 60 * 30;
-                    let thresholdOrange = settings["threshold_orange"] !== undefined ? settings["threshold_orange"] : 60 * 60;
-                    let thresholdRed    = settings["threshold_red"]    !== undefined ? settings["threshold_red"]    : 60 * 60 * 3;
-
-                    const applyColor = (elementId, timeValue) => {
-                        let el = document.getElementById(elementId);
-                        if (!el) return;
-                        el.classList.remove("yellow", "orange", "red");
-                        if (timeValue >= thresholdYellow && timeValue < thresholdOrange) {
-                            el.classList.add("yellow");
-                        } else if (timeValue >= thresholdOrange && timeValue < thresholdRed) {
-                            el.classList.add("orange");
-                        } else if (timeValue >= thresholdRed) {
-                            el.classList.add("red");
-                        }
-                    };
-
-                    applyColor("today-time", timeSpentToday);
-                    applyColor("average-time", timeSpentAverage);
-                });
             })
         } else {
             disableSwitch(true);
@@ -177,6 +156,33 @@ function tabUpdated(tabId, changeInfo, tabInfo) {
     currentUrl = getShortUrl(tabInfo.url);
     firstTime = true;
     loadUI();
+}
+
+function tabActivated(activeInfo) {
+    browser.tabs.get(activeInfo.tabId, function (tab) {
+        if (tab && tab.url) {
+            setUrl(getShortUrl(tab.url), true);
+            oldUrl = currentUrl;
+            currentUrl = getShortUrl(tab.url);
+            firstTime = true;
+            loadUI();
+        }
+    });
+}
+
+function windowFocused(windowId) {
+    if (windowId !== browser.windows.WINDOW_ID_NONE) {
+        browser.tabs.query({active: true, windowId: windowId}, function (tabs) {
+            let tab = tabs[0];
+            if (tab && tab.url) {
+                setUrl(getShortUrl(tab.url), true);
+                oldUrl = currentUrl;
+                currentUrl = getShortUrl(tab.url);
+                firstTime = true;
+                loadUI();
+            }
+        });
+    }
 }
 
 function setFavicon(url) {
@@ -308,9 +314,11 @@ function disableSwitch(value) {
     let toggleContainer = document.getElementById("toggle-container");
     toggleContainer.style.top = (document.getElementById("switch-toggle-section").offsetHeight - toggleContainer.offsetHeight) / 2;
     if (value) {
+        toggleContainer.classList.add("disabled");
         toggleContainer.onclick = function () {
         }
     } else {
+        toggleContainer.classList.remove("disabled");
         toggleContainer.onclick = function () {
             switchToOnOrOff(true, "toggle-thumb");
         }
