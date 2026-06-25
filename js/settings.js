@@ -447,8 +447,6 @@ function renderCategoriesUI() {
         let icon = document.createElement("img");
         icon.src = "../img/categories/" + cat + ".svg";
         icon.classList.add("category-icon");
-        icon.style.width = "20px";
-        icon.style.height = "20px";
 
         let labelText = document.createElement("span");
         labelText.textContent = browser.i18n.getMessage("category_" + cat) || (cat.charAt(0).toUpperCase() + cat.slice(1));

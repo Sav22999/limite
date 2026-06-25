@@ -871,77 +871,91 @@ th {
 /*categories*/
 .other-category, .social-category, .travel-category, .news-category, .education-category, .shopping-category, .search-category, .reference-category, .entertainment-category, .adults-category, .sav22999-category, .develop-category, .messaging-category, .games-category, .health-category, .cloud-category {
     background-color: transparent;
+    position: relative;
+    z-index: 1;
+}
+
+.other-category::before, .social-category::before, .travel-category::before, .news-category::before, .education-category::before, .shopping-category::before, .search-category::before, .reference-category::before, .entertainment-category::before, .adults-category::before, .sav22999-category::before, .develop-category::before, .messaging-category::before, .games-category::before, .health-category::before, .cloud-category::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
     background-repeat: no-repeat;
     background-size: auto 100%;
     background-position: bottom -10px right -10px;
+    opacity: 0.15;
+    z-index: -1;
+    pointer-events: none;
 }
 
-.other-category {
+.other-category::before {
     background-image: url("../img/categories/other.svg");
 }
 
 
-.social-category {
+.social-category::before {
     background-image: url("../img/categories/social.svg");
 }
 
-.travel-category {
+.travel-category::before {
     background-image: url("../img/categories/travel.svg");
 }
 
-.news-category {
+.news-category::before {
     background-image: url("../img/categories/news.svg");
     background-size: auto 110%;
 }
 
-.education-category {
+.education-category::before {
     background-image: url("../img/categories/education.svg");
 }
 
-.shopping-category {
+.shopping-category::before {
     background-image: url("../img/categories/shopping.svg");
 }
 
-.search-category {
+.search-category::before {
     background-image: url("../img/categories/search.svg");
     background-position: bottom -5px right -10px;
 }
 
-.reference-category {
+.reference-category::before {
     background-image: url("../img/categories/reference.svg");
 }
 
-.entertainment-category {
+.entertainment-category::before {
     background-image: url("../img/categories/entertainment.svg");
 }
 
-.adults-category {
+.adults-category::before {
     background-image: url("../img/categories/adults.svg");
 }
 
-.sav22999-category {
+.sav22999-category::before {
     background-image: url("../img/categories/sav22999.svg");
 }
 
-.develop-category {
+.develop-category::before {
     background-image: url("../img/categories/develop.svg");
 }
 
-.messaging-category {
+.messaging-category::before {
     background-image: url("../img/categories/messaging.svg");
     background-size: auto 110%;
 }
 
-.games-category {
+.games-category::before {
     background-image: url("../img/categories/games.svg");
 }
 
-.cloud-category {
+.cloud-category::before {
     background-image: url("../img/categories/cloud.svg");
     background-size: auto 110%;
 }
 
-.health-category {
+.health-category::before {
     background-image: url("../img/categories/health.svg");
 }
 
@@ -1085,6 +1099,11 @@ th {
     border-bottom: 1px solid #eee;
     padding-bottom: 8px;
     flex-shrink: 0;
+}
+
+.category-icon {
+    width: 20px;
+    height: 20px;
 }
 
 .category-websites-list {
