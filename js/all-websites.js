@@ -9,9 +9,21 @@ let categories = {};
 let isResizing = false;
 let hasResized = false;
 let startX, startWidth, activeTh;
+let column_widths = {};
 
-function makeResizable(th, minWidth = 50) {
+function makeResizable(th, minWidth = 50, defaultWidth = null) {
     th.dataset.minWidth = minWidth;
+
+    // Apply saved width or default width
+    let savedWidth = column_widths[th.id];
+    let widthToApply = savedWidth || defaultWidth || th.style.width;
+
+    if (widthToApply && widthToApply !== "auto") {
+        th.style.width = widthToApply;
+        th.style.minWidth = widthToApply;
+        th.style.maxWidth = widthToApply;
+    }
+
     let headerContent = document.createElement("div");
     headerContent.classList.add("th-resizable-content");
     // Sposta i figli esistenti nel nuovo container
@@ -23,9 +35,11 @@ function makeResizable(th, minWidth = 50) {
     resizer.classList.add("resizer");
 
     resizer.addEventListener("dblclick", function (e) {
-        th.style.width = ""; // Reset larghezza
-        th.style.minWidth = "";
-        th.style.maxWidth = "";
+        let dWidth = defaultWidth || "";
+        th.style.width = dWidth; 
+        th.style.minWidth = dWidth;
+        th.style.maxWidth = dWidth;
+        saveColumnWidths();
         e.stopPropagation();
         e.preventDefault();
     });
@@ -69,8 +83,24 @@ document.addEventListener("mouseup", function (e) {
         } else {
             hasResized = false;
         }
+        saveColumnWidths();
     }
 });
+
+function saveColumnWidths() {
+    let widths = {};
+    document.querySelectorAll("#table-all-websites th").forEach(th => {
+        if (th.id && th.style.width) {
+            widths[th.id] = th.style.width;
+        }
+    });
+    browser.storage.local.get("limite_settings", function (val) {
+        let settings = val["limite_settings"] || {};
+        settings["column_widths"] = widths;
+        browser.storage.local.set({"limite_settings": settings});
+    });
+    column_widths = widths;
+}
 let sorted_by = "";
 
 let show_column_since_time = true;
@@ -107,6 +137,7 @@ function loaded() {
     loadDateFormat(function () {
         browser.storage.local.get("limite_settings", function (val) {
             let settings = val["limite_settings"] || {};
+            column_widths = settings["column_widths"] || {};
             if (settings["default_sort_by"]) {
                 sorted_by = settings["default_sort_by"];
             }
@@ -527,7 +558,7 @@ function getTHeadTable(websites, last_seven_days) {
         }
         websites = sortByColumn("website", websites);
     }
-    makeResizable(thWebsite, 120);
+    makeResizable(thWebsite, 120, "250px");
     tableRowElement.append(thWebsite);
 
     let tableHeaderElement = document.createElement("th");
@@ -778,6 +809,9 @@ function showWebsitesTable(websites, apply_filter = true) {
 
     section.append(tableElement);
     document.getElementById("all-websites-sections").append(section);
+
+    // Force fixed layout after appending to DOM
+    tableElement.style.tableLayout = "fixed";
 
     sortByColumn(column_to_sort, websites, true, false);
 

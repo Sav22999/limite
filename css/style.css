@@ -470,9 +470,9 @@ table {
 }
 
 #table-all-websites {
-    width: max-content;
+    width: 100%;
     min-width: 100%;
-    table-layout: fixed;
+    table-layout: fixed !important;
     border-collapse: collapse;
     border: none;
 }
@@ -716,7 +716,8 @@ h3 {
 
 #th-website {
     width: 250px;
-    min-width: 120px;
+    min-width: 250px;
+    max-width: 250px;
     position: relative;
 }
 
