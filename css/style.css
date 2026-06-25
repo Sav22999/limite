@@ -258,7 +258,7 @@ body {
 .select-category {
     background-color: transparent;
     color: #0088ff;
-    width: 100%;
+    width: calc(100% - 6px);
     padding: 5px 10px;
     border-radius: 5px;
     border: 0px solid transparent;
@@ -462,6 +462,22 @@ table {
     border-radius: 5px;
     border-top-left-radius: 0px;
     border-top-right-radius: 0px;
+}
+
+#table-section {
+    overflow: auto;
+    width: auto;
+}
+
+#table-all-websites {
+    width: max-content;
+    min-width: 100%;
+    table-layout: fixed;
+    border-collapse: collapse;
+}
+
+#table-all-websites, #table-all-websites * {
+    transition: none !important;
 }
 
 #from-to-date-label {
@@ -699,8 +715,31 @@ h3 {
 
 #th-website {
     width: 250px;
-    min-width: 150px;
-    max-width: 800px;
+    min-width: 120px;
+    position: relative;
+}
+
+#th-status {
+    min-width: 80px;
+}
+
+#th-category {
+    min-width: 100px;
+}
+
+#th-since-install {
+    min-width: 100px;
+}
+
+#th-avg-time {
+    min-width: 80px;
+}
+
+th[id^="th-date-"] {
+    min-width: 80px;
+}
+
+th {
     position: relative;
 }
 
@@ -712,6 +751,7 @@ h3 {
     white-space: nowrap;
     text-overflow: ellipsis;
     box-sizing: border-box;
+    display: block;
 }
 
 .resizer {

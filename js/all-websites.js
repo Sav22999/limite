@@ -8,7 +8,69 @@ let days_to_show = 7; //number of days to show
 let categories = {};
 let isResizing = false;
 let hasResized = false;
-let startX, startWidth;
+let startX, startWidth, activeTh;
+
+function makeResizable(th, minWidth = 50) {
+    th.dataset.minWidth = minWidth;
+    let headerContent = document.createElement("div");
+    headerContent.classList.add("th-resizable-content");
+    // Sposta i figli esistenti nel nuovo container
+    while (th.firstChild) {
+        headerContent.appendChild(th.firstChild);
+    }
+
+    let resizer = document.createElement("div");
+    resizer.classList.add("resizer");
+
+    resizer.addEventListener("dblclick", function (e) {
+        th.style.width = ""; // Reset larghezza
+        th.style.minWidth = "";
+        th.style.maxWidth = "";
+        e.stopPropagation();
+        e.preventDefault();
+    });
+
+    resizer.addEventListener("mousedown", function (e) {
+        isResizing = true;
+        hasResized = false;
+        activeTh = th;
+        startX = e.pageX;
+        startWidth = th.getBoundingClientRect().width;
+
+        e.preventDefault();
+        e.stopPropagation();
+    });
+
+    th.appendChild(headerContent);
+    th.appendChild(resizer);
+}
+
+document.addEventListener("mousemove", function (e) {
+    if (!isResizing || !activeTh) return;
+    let width = startWidth + (e.pageX - startX);
+    const minWidth = parseInt(activeTh.dataset.minWidth) || 50;
+    if (width < minWidth) width = minWidth;
+
+    activeTh.style.width = width + "px";
+    activeTh.style.minWidth = width + "px";
+    activeTh.style.maxWidth = width + "px";
+    hasResized = true;
+});
+
+document.addEventListener("mouseup", function (e) {
+    if (isResizing) {
+        isResizing = false;
+        activeTh = null;
+        if (Math.abs(e.pageX - startX) > 5) {
+            hasResized = true;
+            setTimeout(() => {
+                hasResized = false;
+            }, 200);
+        } else {
+            hasResized = false;
+        }
+    }
+});
 let sorted_by = "";
 
 let show_column_since_time = true;
@@ -452,64 +514,8 @@ function getTHeadTable(websites, last_seven_days) {
     let thWebsite = document.createElement("th");
     thWebsite.id = "th-website";
     thWebsite.classList.add("th-sort-by-column");
+    thWebsite.textContent = browser.i18n.getMessage("column_website") || "Website";
 
-    let headerContent = document.createElement("div");
-    headerContent.textContent = browser.i18n.getMessage("column_website") || "Website";
-    headerContent.classList.add("th-resizable-content");
-
-    let resizer = document.createElement("div");
-    resizer.classList.add("resizer");
-    resizer.addEventListener("dblclick", function (e) {
-        // Reset alla larghezza di default
-        thWebsite.style.width = "250px";
-        e.stopPropagation();
-    });
-
-    resizer.addEventListener("mousedown", function (e) {
-        if (e.detail > 1) { // Più di un clic (doppio clic)
-            thWebsite.style.width = "250px";
-            e.stopPropagation();
-            e.preventDefault();
-            return;
-        }
-        isResizing = true;
-        hasResized = false;
-        startX = e.pageX;
-        startWidth = thWebsite.offsetWidth;
-
-        e.preventDefault();
-        e.stopPropagation();
-    });
-
-    document.addEventListener("mousemove", function (e) {
-        if (!isResizing) return;
-        const width = startWidth + (e.pageX - startX);
-        if (width > 150 && width < 800) {
-            thWebsite.style.width = width + "px";
-            hasResized = true;
-        }
-    });
-
-    document.addEventListener("mouseup", function (e) {
-        if (isResizing) {
-            isResizing = false;
-            // Se ci siamo mossi di più di 5 pixel, consideriamolo un ridimensionamento
-            if (Math.abs(e.pageX - startX) > 5) {
-                hasResized = true;
-                setTimeout(() => {
-                    hasResized = false;
-                }, 200);
-            } else {
-                hasResized = false;
-            }
-        }
-    });
-
-    resizer.addEventListener("click", function (e) {
-        e.stopPropagation();
-    });
-
-    thWebsite.append(headerContent, resizer);
     if (sorted_by === "" || sorted_by === "website-asc") {
         thWebsite.classList.add("th-sort-by-column-sel", "sort-by-column-asc");
         sorted_by = "website-asc";
@@ -521,17 +527,21 @@ function getTHeadTable(websites, last_seven_days) {
         }
         websites = sortByColumn("website", websites);
     }
+    makeResizable(thWebsite, 120);
     tableRowElement.append(thWebsite);
 
     let tableHeaderElement = document.createElement("th");
     tableHeaderElement.textContent = browser.i18n.getMessage("column_status") || "Status";
     tableHeaderElement.id = "th-status";
     tableHeaderElement.classList.add("th-sort-by-column");
+    tableHeaderElement.style.width = "100px";
     if (sorted_by === "status-asc") tableHeaderElement.classList.add("th-sort-by-column-sel", "sort-by-column-asc");
     if (sorted_by === "status-desc") tableHeaderElement.classList.add("th-sort-by-column-sel", "sort-by-column-desc");
     tableHeaderElement.onclick = function () {
+        if (isResizing || hasResized) return;
         websites = sortByColumn("status", websites);
     }
+    makeResizable(tableHeaderElement, 80);
     tableRowElement.append(tableHeaderElement);
 
     if (show_column_category) {
@@ -543,8 +553,10 @@ function getTHeadTable(websites, last_seven_days) {
         if (sorted_by === "category-asc") tableHeaderElement.classList.add("th-sort-by-column-sel", "sort-by-column-asc");
         if (sorted_by === "category-desc") tableHeaderElement.classList.add("th-sort-by-column-sel", "sort-by-column-desc");
         tableHeaderElement.onclick = function () {
+            if (isResizing || hasResized) return;
             websites = sortByColumn("category", websites);
         }
+        makeResizable(tableHeaderElement, 100);
         tableRowElement.append(tableHeaderElement);
     }
 
@@ -553,11 +565,14 @@ function getTHeadTable(websites, last_seven_days) {
         tableHeaderElement.textContent = browser.i18n.getMessage("since_install") || "Since install";
         tableHeaderElement.id = "th-since-install";
         tableHeaderElement.classList.add("th-sort-by-column");
+        tableHeaderElement.style.width = "120px";
         if (sorted_by === "since-install-asc") tableHeaderElement.classList.add("th-sort-by-column-sel", "sort-by-column-asc");
         if (sorted_by === "since-install-desc") tableHeaderElement.classList.add("th-sort-by-column-sel", "sort-by-column-desc");
         tableHeaderElement.onclick = function () {
+            if (isResizing || hasResized) return;
             websites = sortByColumn("since-install", websites);
         }
+        makeResizable(tableHeaderElement, 100);
         tableRowElement.append(tableHeaderElement);
     }
 
@@ -566,11 +581,14 @@ function getTHeadTable(websites, last_seven_days) {
         tableHeaderElement.textContent = browser.i18n.getMessage("average_time") || "Average";
         tableHeaderElement.id = "th-avg-time";
         tableHeaderElement.classList.add("th-sort-by-column");
+        tableHeaderElement.style.width = "100px";
         if (sorted_by === "avg-time-asc") tableHeaderElement.classList.add("th-sort-by-column-sel", "sort-by-column-asc");
         if (sorted_by === "avg-time-desc") tableHeaderElement.classList.add("th-sort-by-column-sel", "sort-by-column-desc");
         tableHeaderElement.onclick = function () {
+            if (isResizing || hasResized) return;
             websites = sortByColumn("avg-time", websites);
         }
+        makeResizable(tableHeaderElement, 80);
         tableRowElement.append(tableHeaderElement);
     }
     //days
@@ -581,11 +599,14 @@ function getTHeadTable(websites, last_seven_days) {
         tableHeaderElement.textContent = applyDateFormat(date_to_show);
         tableHeaderElement.id = "th-date-" + date;
         tableHeaderElement.classList.add("th-sort-by-column");
+        tableHeaderElement.style.width = "100px";
         if (sorted_by === "date-" + date + "-asc") tableHeaderElement.classList.add("th-sort-by-column-sel", "sort-by-column-asc");
         if (sorted_by === "date-" + date + "-desc") tableHeaderElement.classList.add("th-sort-by-column-sel", "sort-by-column-desc");
         tableHeaderElement.onclick = function () {
+            if (isResizing || hasResized) return;
             websites = sortByColumn("date-" + date, websites);
         }
+        makeResizable(tableHeaderElement, 80);
         tableRowElement.append(tableHeaderElement);
     }
     setDateInterval(last_seven_days[0], last_seven_days[last_seven_days.length - 1]);
