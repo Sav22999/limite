@@ -2,6 +2,8 @@
     <br>
     <img width="70" src="img/icon.svg" alt="Limite icon" />
     <br>
+    Limite
+    <br>
 </h1>
 Official repo of https://addons.mozilla.org/it/firefox/addon/limite/.
 
@@ -10,9 +12,9 @@ Official repo of https://addons.mozilla.org/it/firefox/addon/limite/.
 
 [<img src="img/firefoxAddons.png" height="50px">](https://addons.mozilla.org/it/firefox/addon/limite/) 
 
-To support me, you can do a donation :smile: with **PayPal**, **LiberaPay** or **Ko-Fi**:
+To support me, you can do a donation :smile: on my **[personal website](https://www.saveriomorelli.com/donate/)** (which supports PayPal, LiberaPay and Ko-Fi):
 
-<a href="https://liberapay.com/Sav22999/donate"><img alt="Donate using Liberapay" src="https://liberapay.com/assets/widgets/donate.svg"></a> [<img src="img/paypal.svg" width="160px"></img>](https://paypal.me/saveriomorelli) [<img src="https://cdn.ko-fi.com/cdn/kofi1.png?v=2" width="120px"></img>](https://ko-fi.com/R5R31UQ8G)
+<a href="https://liberapay.com/Sav22999/donate"><img alt="Donate using Liberapay" src="https://liberapay.com/assets/widgets/donate.svg"></a> [<img src="img/paypal.svg" width="160px"></img>](https://www.saveriomorelli.com/donate/) [<img src="https://cdn.ko-fi.com/cdn/kofi1.png?v=2" width="120px"></img>](https://ko-fi.com/R5R31UQ8G)
 
 ## Description
 

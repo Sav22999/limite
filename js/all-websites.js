@@ -6,21 +6,120 @@ let all_dates = [];
 let start_date = null;
 let days_to_show = 7; //number of days to show
 let categories = {};
+let isResizing = false;
+let hasResized = false;
+let startX, startWidth, activeTh;
+let column_widths = {};
+
+function makeResizable(th, minWidth = 50, defaultWidth = null) {
+    th.dataset.minWidth = minWidth;
+
+    // Apply saved width or default width
+    let savedWidth = column_widths[th.id];
+    let widthToApply = savedWidth || defaultWidth || th.style.width;
+
+    if (widthToApply && widthToApply !== "auto") {
+        th.style.width = widthToApply;
+        th.style.minWidth = widthToApply;
+        th.style.maxWidth = widthToApply;
+    }
+
+    let headerContent = document.createElement("div");
+    headerContent.classList.add("th-resizable-content");
+    // Sposta i figli esistenti nel nuovo container
+    while (th.firstChild) {
+        headerContent.appendChild(th.firstChild);
+    }
+
+    let resizer = document.createElement("div");
+    resizer.classList.add("resizer");
+
+    resizer.addEventListener("dblclick", function (e) {
+        let dWidth = defaultWidth || "";
+        th.style.width = dWidth; 
+        th.style.minWidth = dWidth;
+        th.style.maxWidth = dWidth;
+        saveColumnWidths();
+        e.stopPropagation();
+        e.preventDefault();
+    });
+
+    resizer.addEventListener("mousedown", function (e) {
+        isResizing = true;
+        hasResized = false;
+        activeTh = th;
+        startX = e.pageX;
+        startWidth = th.getBoundingClientRect().width;
+
+        e.preventDefault();
+        e.stopPropagation();
+    });
+
+    th.appendChild(headerContent);
+    th.appendChild(resizer);
+}
+
+document.addEventListener("mousemove", function (e) {
+    if (!isResizing || !activeTh) return;
+    let width = startWidth + (e.pageX - startX);
+    const minWidth = parseInt(activeTh.dataset.minWidth) || 50;
+    if (width < minWidth) width = minWidth;
+
+    activeTh.style.width = width + "px";
+    activeTh.style.minWidth = width + "px";
+    activeTh.style.maxWidth = width + "px";
+    hasResized = true;
+});
+
+document.addEventListener("mouseup", function (e) {
+    if (isResizing) {
+        isResizing = false;
+        activeTh = null;
+        if (Math.abs(e.pageX - startX) > 5) {
+            hasResized = true;
+            setTimeout(() => {
+                hasResized = false;
+            }, 200);
+        } else {
+            hasResized = false;
+        }
+        saveColumnWidths();
+    }
+});
+
+function saveColumnWidths() {
+    let widths = {};
+    document.querySelectorAll("#table-all-websites th").forEach(th => {
+        if (th.id && th.style.width) {
+            widths[th.id] = th.style.width;
+        }
+    });
+    browser.storage.local.get("limite_settings", function (val) {
+        let settings = val["limite_settings"] || {};
+        settings["column_widths"] = widths;
+        browser.storage.local.set({"limite_settings": settings});
+    });
+    column_widths = widths;
+}
 let sorted_by = "";
 
+let show_column_since_time = true;
+let show_column_average = true;
+let show_column_category = true;
+let infinite_scrolling = true;
+
+let websites_to_render = [];
+let currentIndex = 0;
+let PAGE_SIZE = 20;
+
 function loaded() {
+    localizeUI();
     document.getElementById("refresh-data-button").onclick = function () {
         //location.reload();
         loadDataFromBrowser(true);
     }
-    document.getElementById("delete-all-data-button").onclick = function () {
-        deleteAllData();
-    }
-    document.getElementById("import-data-button").onclick = function () {
-        importData();
-    }
-    document.getElementById("export-data-button").onclick = function () {
-        exportData();
+    document.getElementById("open-settings-button").onclick = function () {
+        browser.tabs.create({url: browser.runtime.getURL("settings/index.html")});
     }
     document.getElementById("go-today-button").onclick = function () {
         goToday();
@@ -35,11 +134,41 @@ function loaded() {
         goOlder();
     }
 
-    browser.runtime.sendMessage({from: "all-websites", ask: "categories"}, (response) => {
-        if (response !== undefined) {
-            categories = response.categories;
-            loadDataFromBrowser(true);
-        }
+    loadDateFormat(function () {
+        browser.storage.local.get("limite_settings", function (val) {
+            let settings = val["limite_settings"] || {};
+            column_widths = settings["column_widths"] || {};
+            if (settings["default_sort_by"]) {
+                sorted_by = settings["default_sort_by"];
+            }
+            if (settings["display_interval_days"]) {
+                days_to_show = parseInt(settings["display_interval_days"]);
+            }
+            show_column_since_time = settings["show_column_since_time"] !== undefined ? settings["show_column_since_time"] : true;
+            show_column_average = settings["show_column_average"] !== undefined ? settings["show_column_average"] : true;
+            show_column_category = settings["show_column_category"] !== undefined ? settings["show_column_category"] : true;
+            infinite_scrolling = settings["infinite_scrolling"] !== undefined ? settings["infinite_scrolling"] : true;
+            if (settings["items_per_page"]) {
+                PAGE_SIZE = parseInt(settings["items_per_page"]);
+            }
+
+            if (!infinite_scrolling) {
+                document.getElementById("pagination-footer").classList.remove("hidden");
+                document.getElementById("items-per-page-all-websites").value = PAGE_SIZE;
+                document.getElementById("items-per-page-all-websites").onchange = function() {
+                    PAGE_SIZE = parseInt(this.value) || 20;
+                    renderPaginationPage(0);
+                    renderPaginationControls();
+                };
+            }
+
+            browser.runtime.sendMessage({from: "all-websites", ask: "categories"}, (response) => {
+                if (response !== undefined) {
+                    categories = response.categories;
+                    loadDataFromBrowser(true);
+                }
+            });
+        });
     });
 
     document.getElementById("all-websites-dedication-section").onscroll = function () {
@@ -55,6 +184,14 @@ function loaded() {
         } else {
             if (document.getElementById("navigator-days").classList.contains("nav-days-fixed")) {
                 document.getElementById("navigator-days").classList.remove("nav-days-fixed");
+            }
+        }
+
+        // Infinite scrolling
+        if (infinite_scrolling) {
+            let section = document.getElementById("all-websites-dedication-section");
+            if (section.scrollTop + section.clientHeight >= section.scrollHeight - 100) {
+                renderNextPage();
             }
         }
     }
@@ -97,7 +234,34 @@ function goOlder() {
 }
 
 function setDateInterval(from, to) {
-    document.getElementById("from-to-date-label").textContent = "Days: " + from + " – " + to;
+    document.getElementById("from-to-date-label").textContent = (browser.i18n.getMessage("days_label") || "Days") + ": " + formatDateDisplay(from) + " – " + formatDateDisplay(to);
+}
+
+function formatDateDisplay(dateStr) {
+    return applyDateFormat(dateStr);
+}
+
+let _dateFormat = "YYYY-MM-DD";
+
+function loadDateFormat(callback) {
+    browser.storage.local.get("limite_settings", function (value) {
+        let settings = value["limite_settings"] || {};
+        _dateFormat = settings["date_format"] || "YYYY-MM-DD";
+        if (callback) callback();
+    });
+}
+
+function applyDateFormat(dateStr) {
+    if (!dateStr || dateStr.length !== 10) return dateStr;
+    let parts = dateStr.split("-"); // [YYYY, MM, DD]
+    let y = parts[0], m = parts[1], d = parts[2];
+    switch (_dateFormat) {
+        case "DD/MM/YYYY": return d + "/" + m + "/" + y;
+        case "MM/DD/YYYY": return m + "/" + d + "/" + y;
+        case "DD-MM-YYYY": return d + "-" + m + "-" + y;
+        case "DD.MM.YYYY": return d + "." + m + "." + y;
+        default:           return dateStr; // YYYY-MM-DD
+    }
 }
 
 function loadDataFromBrowser(generate_section = true, force_generation = true) {
@@ -165,80 +329,6 @@ function onCleared() {
 function onError(e) {
 }
 
-function importData() {
-    showBackgroundOpacity();
-    document.getElementById("import-section").style.display = "block";
-    let jsonImportElement = document.getElementById("json-import")
-    jsonImportElement.value = "";
-    jsonImportElement.focus();
-
-    document.getElementById("cancel-import-data-button").onclick = function () {
-        hideBackgroundOpacity();
-        document.getElementById("import-section").style.display = "none";
-    }
-    document.getElementById("import-now-data-button").onclick = function () {
-        let value = jsonImportElement.value;
-        if (value.replaceAll(" ", "") !== "") {
-            try {
-                let websites_temp = value;
-                if (value["websites"] !== undefined && value["limite"] !== undefined) websites_temp = value["websites"];
-                websites_json = JSON.parse(websites_temp);
-                document.getElementById("import-section").style.display = "none";
-                browser.storage.local.set({"websites": websites_json}, function () {
-                    loadDataFromBrowser(true);
-                    hideBackgroundOpacity();
-                });
-            } catch (e) {
-                console.error("Error: " + e.toString());
-                let errorSubSection = document.createElement("div");
-                errorSubSection.classList.add("sub-section", "background-light-red");
-                errorSubSection.textContent = "Error: " + e.toString();
-
-                let mainSection = document.getElementById("import-sub-sections");
-                mainSection.insertBefore(errorSubSection, mainSection.childNodes[0]);
-            }
-        }
-    }
-}
-
-function exportData() {
-    showBackgroundOpacity();
-    browser.storage.local.get("websites", function (value) {
-        websites_json = {};
-        if (value["websites"] !== undefined) {
-            websites_json = value["websites"];
-        }
-        let limite_json = {
-            "version": browser.runtime.getManifest().version,
-            "author": browser.runtime.getManifest().author,
-            "manifest_version": browser.runtime.getManifest().manifest_version
-        };
-        let export_json = {"limite": limite_json, "websites": websites_json};
-        document.getElementById("export-section").style.display = "block";
-        document.getElementById("json-export").value = JSON.stringify(export_json);
-
-        document.getElementById("cancel-export-data-button").onclick = function () {
-            hideBackgroundOpacity();
-            document.getElementById("export-section").style.display = "none";
-        }
-        document.getElementById("copy-now-data-button").onclick = function () {
-            document.getElementById("cancel-export-data-button").value = "Close";
-
-            document.getElementById("json-export").value = JSON.stringify(websites_json);
-            document.getElementById("json-export").select();
-            document.execCommand("copy");
-        }
-        loadDataFromBrowser(true);
-    });
-}
-
-function showBackgroundOpacity() {
-    document.getElementById("background-opacity").style.display = "block";
-}
-
-function hideBackgroundOpacity() {
-    document.getElementById("background-opacity").style.display = "none";
-}
 
 /**
  * Sort by column!
@@ -268,15 +358,21 @@ function sortByColumn(column, websites, generate_ui = true, toggle = true) {
     sorted_by = column + "-" + ascOrDesc;
     if (generate_ui) {
         if (previousColumn !== "" && previousColumn !== column) {
-            if (document.getElementById("th-" + previousColumn).classList.contains("th-sort-by-column-sel")) document.getElementById("th-" + previousColumn).classList.remove("th-sort-by-column-sel");
-            if (document.getElementById("th-" + previousColumn).classList.contains("sort-by-column-asc")) document.getElementById("th-" + previousColumn).classList.remove("sort-by-column-asc");
-            if (document.getElementById("th-" + previousColumn).classList.contains("sort-by-column-desc")) document.getElementById("th-" + previousColumn).classList.remove("sort-by-column-desc");
+            let prevEl = document.getElementById("th-" + previousColumn);
+            if (prevEl) {
+                if (prevEl.classList.contains("th-sort-by-column-sel")) prevEl.classList.remove("th-sort-by-column-sel");
+                if (prevEl.classList.contains("sort-by-column-asc")) prevEl.classList.remove("sort-by-column-asc");
+                if (prevEl.classList.contains("sort-by-column-desc")) prevEl.classList.remove("sort-by-column-desc");
+            }
         }
 
-        if (!document.getElementById("th-" + column).classList.contains("th-sort-by-column-sel")) document.getElementById("th-" + column).classList.add("th-sort-by-column-sel");
-        if (document.getElementById("th-" + column).classList.contains("sort-by-column-asc")) document.getElementById("th-" + column).classList.remove("sort-by-column-asc");
-        if (document.getElementById("th-" + column).classList.contains("sort-by-column-desc")) document.getElementById("th-" + column).classList.remove("sort-by-column-desc");
-        document.getElementById("th-" + column).classList.add("sort-by-column-" + ascOrDesc);
+        let currEl = document.getElementById("th-" + column);
+        if (currEl) {
+            if (!currEl.classList.contains("th-sort-by-column-sel")) currEl.classList.add("th-sort-by-column-sel");
+            if (currEl.classList.contains("sort-by-column-asc")) currEl.classList.remove("sort-by-column-asc");
+            if (currEl.classList.contains("sort-by-column-desc")) currEl.classList.remove("sort-by-column-desc");
+            currEl.classList.add("sort-by-column-" + ascOrDesc);
+        }
     }
 
     //console.log("col " + column + " | prev " + previousColumn + " | sorted_by " + sorted_by)
@@ -284,10 +380,22 @@ function sortByColumn(column, websites, generate_ui = true, toggle = true) {
     websites = getWebsitesToUse(websites_json);
     if (sorted_by.includes("-asc")) {
         //sort as "asc"
-        websites = websites.sort((a, b) => a[column] > b[column] ? 1 : -1);
+        websites = websites.sort((a, b) => {
+            let valA = a[column];
+            let valB = b[column];
+            if (typeof valA === 'string') valA = valA.toLowerCase();
+            if (typeof valB === 'string') valB = valB.toLowerCase();
+            return valA > valB ? 1 : -1;
+        });
     } else {
         //sort as "desc"
-        websites = websites.sort((a, b) => a[column] < b[column] ? 1 : -1);
+        websites = websites.sort((a, b) => {
+            let valA = a[column];
+            let valB = b[column];
+            if (typeof valA === 'string') valA = valA.toLowerCase();
+            if (typeof valB === 'string') valB = valB.toLowerCase();
+            return valA < valB ? 1 : -1;
+        });
     }
 
     if (generate_ui) {
@@ -296,9 +404,24 @@ function sortByColumn(column, websites, generate_ui = true, toggle = true) {
             if (response["websites"] !== undefined) {
                 websites_json = response["websites"];
             }
-            document.getElementById("table-all-websites").removeChild(document.getElementById("tbody-table-all-websites"));
-            let tableTBodyElement = getTBodyTable(websites, getLastSevenDays());
+            // Re-sort and reset infinite scroll / pagination
+            websites_to_render = websites;
+            currentIndex = 0;
+            let oldTBody = document.getElementById("tbody-table-all-websites");
+            if (oldTBody) document.getElementById("table-all-websites").removeChild(oldTBody);
+            let tableTBodyElement = document.createElement("tbody");
+            tableTBodyElement.id = "tbody-table-all-websites";
             document.getElementById("table-all-websites").append(tableTBodyElement);
+            
+            if (infinite_scrolling) {
+                renderNextPage();
+                document.getElementById("pagination-controls").classList.add("hidden");
+            } else {
+                renderPaginationPage(0);
+                renderPaginationControls();
+                // Ensure we scroll to top when changing page/sorting in pagination mode
+                document.getElementById("all-websites-dedication-section").scrollTop = 0;
+            }
         });
     }
     return websites;
@@ -315,8 +438,8 @@ function getWebsitesToUse(websites_json) {
         let new_website = {};
 
         new_website["website"] = current_website;
-        new_website["status"] = websites_json[current_website]["enabled"];
-        new_website["category"] = checkCategory(current_website);
+        new_website["status"] = (websites_json[current_website]["enabled"] !== false) ? 1 : 0;
+        new_website["category"] = browser.i18n.getMessage("category_" + checkCategory(current_website)) || checkCategory(current_website);
 
         //since install
         let number_of_days = all_dates.length;
@@ -419,75 +542,102 @@ function getTHeadTable(websites, last_seven_days) {
     tableTHeadElement.id = "thead-table-all-websites";
     let tableRowElement = document.createElement("tr");
 
-    let tableHeaderElement = document.createElement("th");
-    tableHeaderElement.textContent = "Website";
-    tableHeaderElement.id = "th-website";
-    tableHeaderElement.classList.add("th-sort-by-column");
+    let thWebsite = document.createElement("th");
+    thWebsite.id = "th-website";
+    thWebsite.classList.add("th-sort-by-column");
+    thWebsite.textContent = browser.i18n.getMessage("column_website") || "Website";
+
     if (sorted_by === "" || sorted_by === "website-asc") {
-        tableHeaderElement.classList.add("th-sort-by-column-sel", "sort-by-column-asc");
+        thWebsite.classList.add("th-sort-by-column-sel", "sort-by-column-asc");
         sorted_by = "website-asc";
     }
-    if (sorted_by === "website-desc") tableHeaderElement.classList.add("th-sort-by-column-sel", "sort-by-column-desc");
-    tableHeaderElement.onclick = function () {
+    if (sorted_by === "website-desc") thWebsite.classList.add("th-sort-by-column-sel", "sort-by-column-desc");
+    thWebsite.onclick = function (event) {
+        if (isResizing || hasResized) {
+            return;
+        }
         websites = sortByColumn("website", websites);
     }
-    tableRowElement.append(tableHeaderElement);
+    makeResizable(thWebsite, 120, "250px");
+    tableRowElement.append(thWebsite);
 
-    tableHeaderElement = document.createElement("th");
-    tableHeaderElement.textContent = "Status";
+    let tableHeaderElement = document.createElement("th");
+    tableHeaderElement.textContent = browser.i18n.getMessage("column_status") || "Status";
     tableHeaderElement.id = "th-status";
     tableHeaderElement.classList.add("th-sort-by-column");
+    tableHeaderElement.style.width = "100px";
     if (sorted_by === "status-asc") tableHeaderElement.classList.add("th-sort-by-column-sel", "sort-by-column-asc");
     if (sorted_by === "status-desc") tableHeaderElement.classList.add("th-sort-by-column-sel", "sort-by-column-desc");
     tableHeaderElement.onclick = function () {
+        if (isResizing || hasResized) return;
         websites = sortByColumn("status", websites);
     }
+    makeResizable(tableHeaderElement, 80);
     tableRowElement.append(tableHeaderElement);
 
-    tableHeaderElement = document.createElement("th");
-    tableHeaderElement.textContent = "Category";
-    tableHeaderElement.id = "th-category";
-    tableHeaderElement.classList.add("th-sort-by-column");
-    if (sorted_by === "category-asc") tableHeaderElement.classList.add("th-sort-by-column-sel", "sort-by-column-asc");
-    if (sorted_by === "category-desc") tableHeaderElement.classList.add("th-sort-by-column-sel", "sort-by-column-desc");
-    tableHeaderElement.onclick = function () {
-        websites = sortByColumn("category", websites);
+    if (show_column_category) {
+        tableHeaderElement = document.createElement("th");
+        tableHeaderElement.textContent = browser.i18n.getMessage("column_category") || "Category";
+        tableHeaderElement.id = "th-category";
+        tableHeaderElement.classList.add("th-sort-by-column");
+        tableHeaderElement.style.width = "170px";
+        if (sorted_by === "category-asc") tableHeaderElement.classList.add("th-sort-by-column-sel", "sort-by-column-asc");
+        if (sorted_by === "category-desc") tableHeaderElement.classList.add("th-sort-by-column-sel", "sort-by-column-desc");
+        tableHeaderElement.onclick = function () {
+            if (isResizing || hasResized) return;
+            websites = sortByColumn("category", websites);
+        }
+        makeResizable(tableHeaderElement, 100);
+        tableRowElement.append(tableHeaderElement);
     }
-    tableRowElement.append(tableHeaderElement);
 
-    tableHeaderElement = document.createElement("th");
-    tableHeaderElement.textContent = "Since install";
-    tableHeaderElement.id = "th-since-install";
-    tableHeaderElement.classList.add("th-sort-by-column");
-    if (sorted_by === "since-install-asc") tableHeaderElement.classList.add("th-sort-by-column-sel", "sort-by-column-asc");
-    if (sorted_by === "since-install-desc") tableHeaderElement.classList.add("th-sort-by-column-sel", "sort-by-column-desc");
-    tableHeaderElement.onclick = function () {
-        websites = sortByColumn("since-install", websites);
+    if (show_column_since_time) {
+        tableHeaderElement = document.createElement("th");
+        tableHeaderElement.textContent = browser.i18n.getMessage("since_install") || "Since install";
+        tableHeaderElement.id = "th-since-install";
+        tableHeaderElement.classList.add("th-sort-by-column");
+        tableHeaderElement.style.width = "120px";
+        if (sorted_by === "since-install-asc") tableHeaderElement.classList.add("th-sort-by-column-sel", "sort-by-column-asc");
+        if (sorted_by === "since-install-desc") tableHeaderElement.classList.add("th-sort-by-column-sel", "sort-by-column-desc");
+        tableHeaderElement.onclick = function () {
+            if (isResizing || hasResized) return;
+            websites = sortByColumn("since-install", websites);
+        }
+        makeResizable(tableHeaderElement, 100);
+        tableRowElement.append(tableHeaderElement);
     }
-    tableRowElement.append(tableHeaderElement);
 
-    tableHeaderElement = document.createElement("th");
-    tableHeaderElement.textContent = "Average";
-    tableHeaderElement.id = "th-avg-time";
-    tableHeaderElement.classList.add("th-sort-by-column");
-    if (sorted_by === "avg-time-asc") tableHeaderElement.classList.add("th-sort-by-column-sel", "sort-by-column-asc");
-    if (sorted_by === "avg-time-desc") tableHeaderElement.classList.add("th-sort-by-column-sel", "sort-by-column-desc");
-    tableHeaderElement.onclick = function () {
-        websites = sortByColumn("avg-time", websites);
+    if (show_column_average) {
+        tableHeaderElement = document.createElement("th");
+        tableHeaderElement.textContent = browser.i18n.getMessage("average_time") || "Average";
+        tableHeaderElement.id = "th-avg-time";
+        tableHeaderElement.classList.add("th-sort-by-column");
+        tableHeaderElement.style.width = "100px";
+        if (sorted_by === "avg-time-asc") tableHeaderElement.classList.add("th-sort-by-column-sel", "sort-by-column-asc");
+        if (sorted_by === "avg-time-desc") tableHeaderElement.classList.add("th-sort-by-column-sel", "sort-by-column-desc");
+        tableHeaderElement.onclick = function () {
+            if (isResizing || hasResized) return;
+            websites = sortByColumn("avg-time", websites);
+        }
+        makeResizable(tableHeaderElement, 80);
+        tableRowElement.append(tableHeaderElement);
     }
-    tableRowElement.append(tableHeaderElement);
+    //days
     for (let date in last_seven_days) {
 
         let date_to_show = last_seven_days[date];
         tableHeaderElement = document.createElement("th");
-        tableHeaderElement.textContent = date_to_show;
+        tableHeaderElement.textContent = applyDateFormat(date_to_show);
         tableHeaderElement.id = "th-date-" + date;
         tableHeaderElement.classList.add("th-sort-by-column");
-        if (sorted_by === "th-date-" + date + "-asc") tableHeaderElement.classList.add("th-sort-by-column-sel", "sort-by-column-asc");
-        if (sorted_by === "th-date-" + date + "-desc") tableHeaderElement.classList.add("th-sort-by-column-sel", "sort-by-column-desc");
+        tableHeaderElement.style.width = "100px";
+        if (sorted_by === "date-" + date + "-asc") tableHeaderElement.classList.add("th-sort-by-column-sel", "sort-by-column-asc");
+        if (sorted_by === "date-" + date + "-desc") tableHeaderElement.classList.add("th-sort-by-column-sel", "sort-by-column-desc");
         tableHeaderElement.onclick = function () {
+            if (isResizing || hasResized) return;
             websites = sortByColumn("date-" + date, websites);
         }
+        makeResizable(tableHeaderElement, 80);
         tableRowElement.append(tableHeaderElement);
     }
     setDateInterval(last_seven_days[0], last_seven_days[last_seven_days.length - 1]);
@@ -497,14 +647,7 @@ function getTHeadTable(websites, last_seven_days) {
 }
 
 function getWebsiteToShow(website) {
-    let website_to_return = website;
-
-    let length_to_check = website_to_return.length;
-    const length_to_short = 46;
-    if (length_to_check > length_to_short) {
-        website_to_return = website_to_return.substring(0, length_to_short / 2) + "…" + website_to_return.substring(length_to_check - length_to_short / 2, length_to_check);
-    }
-    return website_to_return;
+    return website;
 }
 
 function getTBodyTable(websites, last_seven_days) {
@@ -518,7 +661,7 @@ function getTBodyTable(websites, last_seven_days) {
         let currentWebsiteElement = document.createElement("h2");
         let current_full_url = "https://" + websites[website]["website"];
         currentWebsiteElement.textContent = getWebsiteToShow(current_full_url);
-        currentWebsiteElement.classList.add("link", "go-to-external");
+        currentWebsiteElement.classList.add("link", "go-to-external", "website-url-cell");
         currentWebsiteElement.onclick = function () {
             browser.tabs.create({url: current_full_url});
         }
@@ -527,7 +670,7 @@ function getTBodyTable(websites, last_seven_days) {
         let buttonDelete = document.createElement("input");
         buttonDelete.type = "button";
         buttonDelete.alt = "Delete";
-        buttonDelete.classList.add("button", "button-delete", "very-small-button", "float-left", "margin-left-minus-20-px", "margin-top-5-px", "text-align-center");
+        buttonDelete.classList.add("button", "button-delete", "very-small-button", "text-align-center");
         buttonDelete.id = "button-delete-single";
         buttonDelete.onclick = function () {
             deleteAWebsite(websites[website]["website"]);
@@ -535,8 +678,10 @@ function getTBodyTable(websites, last_seven_days) {
 
 
         let tableDataElement = document.createElement("td");
-        tableDataElement.classList.add("padding-left-30-px");
-        tableDataElement.append(buttonDelete, currentWebsiteElement);
+        let urlFlexContainer = document.createElement("div");
+        urlFlexContainer.classList.add("url-flex-container");
+        urlFlexContainer.append(buttonDelete, currentWebsiteElement);
+        tableDataElement.append(urlFlexContainer);
         tableRowElement.append(tableDataElement);
 
         //status
@@ -575,50 +720,59 @@ function getTBodyTable(websites, last_seven_days) {
         tableRowElement.append(tableDataElementStatus);
 
         //category
-        let tableDataElementCategory = document.createElement("td");
-        tableDataElementCategory.append(generateCategories(checkCategory(websites[website]["website"]), websites[website]["website"], tableDataElementCategory));
-        tableRowElement.append(tableDataElementCategory);
+        if (show_column_category) {
+            let tableDataElementCategory = document.createElement("td");
+            tableDataElementCategory.append(generateCategories(checkCategory(websites[website]["website"]), websites[website]["website"], tableDataElementCategory));
+            tableRowElement.append(tableDataElementCategory);
+        }
 
 
         //since install
         let number_of_days = all_dates.length;
 
-        let sum_since_install = websites[website]["since-install"];
-        let since_install = getTimeConverted(sum_since_install);
-        tableDataElement = document.createElement("td");
-        tableDataElement.textContent = since_install;
-        tableDataElement.classList.add("since-install-time");
-        if (sum_since_install >= (60 * 30) * number_of_days && sum_since_install < (60 * 60) * number_of_days) {
-            tableDataElement.classList.add("yellow");
-        } else if (sum_since_install >= (60 * 60) * number_of_days && sum_since_install < (60 * 60 * 3) * number_of_days) {
-            tableDataElement.classList.add("orange");
-        } else if (sum_since_install >= (60 * 60 * 3) * number_of_days) {
-            tableDataElement.classList.add("red");
+        if (show_column_since_time) {
+            let sum_since_install = websites[website]["since-install"];
+            let since_install = getTimeConverted(sum_since_install);
+            tableDataElement = document.createElement("td");
+            tableDataElement.textContent = since_install;
+            tableDataElement.title = getTimeConverted(sum_since_install, true);
+            tableDataElement.classList.add("since-install-time");
+            if (sum_since_install >= (60 * 30) * number_of_days && sum_since_install < (60 * 60) * number_of_days) {
+                tableDataElement.classList.add("yellow");
+            } else if (sum_since_install >= (60 * 60) * number_of_days && sum_since_install < (60 * 60 * 3) * number_of_days) {
+                tableDataElement.classList.add("orange");
+            } else if (sum_since_install >= (60 * 60 * 3) * number_of_days) {
+                tableDataElement.classList.add("red");
+            }
+            tableRowElement.append(tableDataElement);
         }
-        tableRowElement.append(tableDataElement);
 
-        let avg_time = websites[website]["avg-time"];
-        let avg_time_to_show = getTimeConverted(avg_time);
-        tableDataElement = document.createElement("td");
-        tableDataElement.textContent = avg_time_to_show;
-        tableDataElement.classList.add("avg-time");
-        if (avg_time >= (60 * 30) * number_of_days && avg_time < (60 * 60) * number_of_days) {
-            tableDataElement.classList.add("yellow");
-        } else if (avg_time >= (60 * 60) * number_of_days && avg_time < (60 * 60 * 3) * number_of_days) {
-            tableDataElement.classList.add("orange");
-        } else if (avg_time >= (60 * 60 * 3) * number_of_days) {
-            tableDataElement.classList.add("red");
+        if (show_column_average) {
+            let avg_time = websites[website]["avg-time"];
+            let avg_time_to_show = getTimeConverted(avg_time);
+            tableDataElement = document.createElement("td");
+            tableDataElement.textContent = avg_time_to_show;
+            tableDataElement.title = getTimeConverted(avg_time, true);
+            tableDataElement.classList.add("avg-time");
+            if (avg_time >= (60 * 30) * number_of_days && avg_time < (60 * 60) * number_of_days) {
+                tableDataElement.classList.add("yellow");
+            } else if (avg_time >= (60 * 60) * number_of_days && avg_time < (60 * 60 * 3) * number_of_days) {
+                tableDataElement.classList.add("orange");
+            } else if (avg_time >= (60 * 60 * 3) * number_of_days) {
+                tableDataElement.classList.add("red");
+            }
+            tableRowElement.append(tableDataElement);
         }
-        tableRowElement.append(tableDataElement);
 
         //days
         for (let date in last_seven_days) {
             let date_to_show = last_seven_days[date];
-            let time_to_show = getTimeConverted(websites[website]["date-" + date]);
-            let time = websites[website]["date-" + date];
+            let time = websites[website]["date-" + date] || 0;
+            let time_to_show = getTimeConverted(time);
             if (time_to_show === "") time_to_show = getTimeConverted(0);
             tableDataElement = document.createElement("td");
             tableDataElement.textContent = time_to_show;
+            tableDataElement.title = getTimeConverted(time, true);
             if (time >= 60 * 30 && time < 60 * 60) {
                 tableDataElement.classList.add("yellow");
             } else if (time >= 60 * 60 && time < 60 * 60 * 3) {
@@ -646,16 +800,128 @@ function showWebsitesTable(websites, apply_filter = true) {
     let tableTHeadElement = getTHeadTable(websites, getLastSevenDays());
     tableElement.append(tableTHeadElement);
 
-    websites = sortByColumn(sorted_by.replace("-asc", "").replace("-desc", ""), websites, false, false);
+    // Initial sort
+    let column_to_sort = sorted_by.replace("-asc", "").replace("-desc", "");
 
-    let tableTBodyElement = getTBodyTable(websites, getLastSevenDays());
+    let tableTBodyElement = document.createElement("tbody");
+    tableTBodyElement.id = "tbody-table-all-websites";
     tableElement.append(tableTBodyElement);
 
     section.append(tableElement);
     document.getElementById("all-websites-sections").append(section);
+
+    // Force fixed layout after appending to DOM
+    tableElement.style.tableLayout = "fixed";
+
+    sortByColumn(column_to_sort, websites, true, false);
+
+    // renderNextPage(); // Removed, already called by sortByColumn
+
     if (apply_filter) {
         applyFilter();
     }
+}
+
+function renderNextPage() {
+    if (currentIndex >= websites_to_render.length) return;
+    let last_seven_days = getLastSevenDays();
+    let end = Math.min(currentIndex + PAGE_SIZE, websites_to_render.length);
+    let slice = websites_to_render.slice(currentIndex, end);
+    let tableTBody = document.getElementById("tbody-table-all-websites");
+    if (!tableTBody) return;
+    let fragment = getTBodyTable(slice, last_seven_days);
+    // getTBodyTable returns a tbody element; append its children
+    while (fragment.firstChild) {
+        tableTBody.append(fragment.firstChild);
+    }
+    currentIndex = end;
+}
+
+function renderPaginationPage(page) {
+    currentIndex = page * PAGE_SIZE;
+    let last_seven_days = getLastSevenDays();
+    let end = Math.min(currentIndex + PAGE_SIZE, websites_to_render.length);
+    let slice = websites_to_render.slice(currentIndex, end);
+    let tableTBody = document.getElementById("tbody-table-all-websites");
+    if (!tableTBody) return;
+    tableTBody.textContent = "";
+    let fragment = getTBodyTable(slice, last_seven_days);
+    while (fragment.firstChild) {
+        tableTBody.append(fragment.firstChild);
+    }
+    // Scroll to top of table
+    document.getElementById("all-websites-dedication-section").scrollTop = 0;
+}
+
+function renderPaginationControls() {
+    let container = document.getElementById("pagination-controls");
+    container.textContent = "";
+    if (websites_to_render.length === 0) {
+        document.getElementById("pagination-footer").classList.add("hidden");
+        return;
+    }
+    document.getElementById("pagination-footer").classList.remove("hidden");
+
+    let totalPages = Math.ceil(websites_to_render.length / PAGE_SIZE);
+    let currentPage = Math.floor(currentIndex / PAGE_SIZE);
+    if (currentPage >= totalPages) currentPage = totalPages - 1;
+    if (currentPage < 0) currentPage = 0;
+
+    // First page
+    let btnFirst = document.createElement("button");
+    btnFirst.classList.add("button", "button-page-navigation");
+    btnFirst.disabled = currentPage === 0;
+    let imgFirst = document.createElement("img");
+    imgFirst.src = "../img/last.svg";
+    imgFirst.style.transform = "rotate(180deg)";
+    btnFirst.append(imgFirst);
+    btnFirst.onclick = () => {
+        renderPaginationPage(0);
+        renderPaginationControls();
+    };
+
+    // Prev page
+    let btnPrev = document.createElement("button");
+    btnPrev.classList.add("button", "button-page-navigation");
+    btnPrev.disabled = currentPage === 0;
+    let imgPrev = document.createElement("img");
+    imgPrev.src = "../img/newer.svg";
+    btnPrev.append(imgPrev);
+    btnPrev.onclick = () => {
+        renderPaginationPage(currentPage - 1);
+        renderPaginationControls();
+    };
+
+    // Info
+    let info = document.createElement("span");
+    info.id = "pagination-info";
+    info.textContent = (currentPage + 1) + " / " + totalPages;
+
+    // Next page
+    let btnNext = document.createElement("button");
+    btnNext.classList.add("button", "button-page-navigation");
+    btnNext.disabled = currentPage === totalPages - 1;
+    let imgNext = document.createElement("img");
+    imgNext.src = "../img/older.svg";
+    btnNext.append(imgNext);
+    btnNext.onclick = () => {
+        renderPaginationPage(currentPage + 1);
+        renderPaginationControls();
+    };
+
+    // Last page
+    let btnLast = document.createElement("button");
+    btnLast.classList.add("button", "button-page-navigation");
+    btnLast.disabled = currentPage === totalPages - 1;
+    let imgLast = document.createElement("img");
+    imgLast.src = "../img/last.svg";
+    btnLast.append(imgLast);
+    btnLast.onclick = () => {
+        renderPaginationPage(totalPages - 1);
+        renderPaginationControls();
+    };
+
+    container.append(btnFirst, btnPrev, info, btnNext, btnLast);
 }
 
 function applyFilter() {
@@ -734,7 +1000,7 @@ function generateCategories(selectedItem = "other", current_website, tableDataEl
         let optionElement = document.createElement("option");
         if (item === selectedItem) optionElement.selected = true;
         optionElement.value = item;
-        optionElement.textContent = item;
+        optionElement.textContent = browser.i18n.getMessage("category_" + item) || item;
         selectElement.append(optionElement);
     }
     selectElement.onchange = function () {

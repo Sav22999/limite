@@ -1,0 +1,340 @@
+<!---
+Created by Saverio Morelli - saveriomorelli.com
+--->
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="../css/style.css"/>
+    <title data-i18n="settings_title">Limite - Settings</title>
+    <link rel="icon" href="../img/icon.svg"/>
+</head>
+
+<body>
+<div id="settings-dedication-section">
+    <h1 id="title-settings-dedication-section" data-i18n="settings_title">Settings</h1>
+    <div class="section sticky-section" id="actions">
+        <div id="left-actions">
+            <input type="button" value="Support on Telegram" id="support-telegram-button" class="button telegram-button" data-i18n="support_telegram"/>
+            <input type="button" value="Rate the add-on" id="review-on-firefox-addons-button"
+                   class="button firefox-button" data-i18n="rate_addon"/>
+            <input type="button" value="Translate on Crowdin" id="translate-addon" class="button translate-button hidden"
+                   data-i18n="translate_crowdin"/>
+        </div>
+        <div id="right-actions">
+            <span id="save-settings-hint" style="display:none; color:#e07000; font-weight:bold; margin-right:8px;" data-i18n="unsaved_changes">⚠ Unsaved changes</span>
+            <input type="button" value="Save settings" id="save-settings-button" class="button save-button" data-i18n="save_settings"/>
+        </div>
+    </div>
+
+    <span id="settings-sections">
+
+        <!-- Import & Export data -->
+        <div class="section">
+            <h2 class="sub-section" data-i18n="import_export_data">Import &amp; Export data</h2>
+            <div class="sub-section">
+                <input type="button" value="Export data…" id="export-data-button" class="button button-export" data-i18n="export_data_btn"/>
+                <input type="button" value="Import data…" id="import-data-button" class="button button-import" data-i18n="import_data_btn"/>
+            </div>
+        </div>
+
+        <!-- Categories -->
+        <div class="section">
+            <h2 class="sub-section" data-i18n="categories_title">Categories</h2>
+            <div class="sub-section">
+                <p class="settings-description" data-i18n="categories_description">Each category contains a list of websites (one per line). Limite will automatically assign the category to matching websites. You can also import/export the full categories list as a JSON file.</p>
+                <div id="categories-container">
+                    <!-- populated by JS -->
+                </div>
+                <div class="settings-row" style="margin-top:8px;">
+                    <input type="button" value="Export categories…" id="export-categories-button" class="button button-export" data-i18n="export_categories_btn"/>
+                    <input type="button" value="Import categories…" id="import-categories-button" class="button button-import" data-i18n="import_categories_btn"/>
+                </div>
+            </div>
+        </div>
+
+        <!-- Time thresholds -->
+        <div class="section">
+            <h2 class="sub-section" data-i18n="time_thresholds_title">Time thresholds</h2>
+            <div class="sub-section">
+                <p class="settings-description" data-i18n="time_thresholds_description">Define the time limits (in minutes) that trigger each warning level. The icon colour and notifications will change accordingly.</p>
+                <div class="settings-row">
+                    <label class="settings-label yellow-label" data-i18n="yellow_threshold">🟡 Yellow (minutes):</label>
+                    <input type="number" id="threshold-yellow" class="textbox settings-number" min="1" value="30"/>
+                </div>
+                <div class="settings-row">
+                    <label class="settings-label orange-label" data-i18n="orange_threshold">🟠 Orange (minutes):</label>
+                    <input type="number" id="threshold-orange" class="textbox settings-number" min="1" value="60"/>
+                </div>
+                <div class="settings-row">
+                    <label class="settings-label red-label" data-i18n="red_threshold">🔴 Red (minutes):</label>
+                    <input type="number" id="threshold-red" class="textbox settings-number" min="1" value="180"/>
+                </div>
+            </div>
+        </div>
+
+        <!-- Notifications -->
+        <div class="section">
+            <h2 class="sub-section" data-i18n="notifications_title">Notifications</h2>
+            <div class="sub-section">
+                <div class="settings-row">
+                    <label class="settings-label" data-i18n="enable_notifications">Enable notifications:</label>
+                    <div id="switch-toggle-section-notifications">
+                        <div id="toggle-container-notifications" class="toggle-container-settings">
+                            <div id="toggle-background-notifications" class="toggle-background-settings"></div>
+                            <div id="toggle-thumb-notifications" class="toggle-thumb-settings"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Date format -->
+        <div class="section">
+            <h2 class="sub-section" data-i18n="date_format_title">Date format</h2>
+            <div class="sub-section">
+                <p class="settings-description" data-i18n="date_format_description">Choose how dates are displayed in the interface (does not affect stored data).</p>
+                <div class="settings-row">
+                    <label class="settings-label" data-i18n="display_format">Display format:</label>
+                    <select id="date-format-select" class="select-category settings-select">
+                        <option value="YYYY-MM-DD">YYYY-MM-DD (default)</option>
+                        <option value="DD/MM/YYYY">DD/MM/YYYY</option>
+                        <option value="MM/DD/YYYY">MM/DD/YYYY</option>
+                        <option value="DD-MM-YYYY">DD-MM-YYYY</option>
+                        <option value="DD.MM.YYYY">DD.MM.YYYY</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- Column visibility -->
+        <div class="section">
+            <h2 class="sub-section" data-i18n="column_visibility_title">Column visibility</h2>
+            <div class="sub-section">
+                <p class="settings-description" data-i18n="column_visibility_description">Choose which columns to show in the 'All websites' table.</p>
+                <div class="settings-row">
+                    <label class="settings-label">
+                        <input type="checkbox" id="show-column-since-time" checked/>
+                        <span data-i18n="column_since_time">Total time spent</span>
+                    </label>
+                </div>
+                <div class="settings-row">
+                    <label class="settings-label">
+                        <input type="checkbox" id="show-column-average" checked/>
+                        <span data-i18n="column_average">Average time</span>
+                    </label>
+                </div>
+                <div class="settings-row">
+                    <label class="settings-label">
+                        <input type="checkbox" id="show-column-category" checked/>
+                        <span data-i18n="column_category">Category</span>
+                    </label>
+                </div>
+            </div>
+        </div>
+
+        <!-- Display interval -->
+        <div class="section">
+            <h2 class="sub-section" data-i18n="display_interval_title">Display interval</h2>
+            <div class="sub-section">
+                <p class="settings-description" data-i18n="display_interval_description">Choose the number of days to show in the 'All websites' table (default: 7).</p>
+                <div class="settings-row">
+                    <label class="settings-label" data-i18n="number_of_days">Number of days (1-14):</label>
+                    <input type="number" id="display-interval-days" class="textbox settings-number" min="1" max="14" value="7"/>
+                </div>
+            </div>
+        </div>
+
+        <!-- Infinite scrolling -->
+        <div class="section">
+            <h2 class="sub-section" data-i18n="infinite_scrolling_title">Infinite scrolling</h2>
+            <div class="sub-section">
+                <p class="settings-description" data-i18n="infinite_scrolling_description">Enable or disable infinite scrolling in the 'All websites' table. If disabled, a classic pagination will be shown.</p>
+                <div class="settings-row">
+                    <label class="settings-label" data-i18n="enable_infinite_scrolling">Enable infinite scrolling:</label>
+                    <input type="checkbox" id="infinite-scrolling-checkbox" checked/>
+                </div>
+                <div class="settings-row" id="items-per-page-row">
+                    <label class="settings-label" data-i18n="items_per_page_label">Items per page:</label>
+                    <select id="items-per-page-input" class="select-category settings-select">
+                        <option value="5">5</option>
+                        <option value="10">10</option>
+                        <option value="15">15</option>
+                        <option value="20">20</option>
+                        <option value="25">25</option>
+                        <option value="30">30</option>
+                        <option value="35">35</option>
+                        <option value="40">40</option>
+                        <option value="45">45</option>
+                        <option value="50">50</option>
+                        <option value="60">60</option>
+                        <option value="70">70</option>
+                        <option value="80">80</option>
+                        <option value="90">90</option>
+                        <option value="100">100</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- Default sorting -->
+        <div class="section">
+            <h2 class="sub-section" data-i18n="default_sort_title">Default sorting</h2>
+            <div class="sub-section">
+                <p class="settings-description" data-i18n="default_sort_description">Choose the default sorting for the 'All websites' page.</p>
+                <div class="settings-row">
+                    <label class="settings-label" data-i18n="sort_by_label">Sort by:</label>
+                    <select id="default-sort-select" class="select-category settings-select">
+                        <option value="website-asc" data-i18n="sort_website_asc">Website (A-Z)</option>
+                        <option value="website-desc" data-i18n="sort_website_desc">Website (Z-A)</option>
+                        <option value="category-asc" data-i18n="sort_category_asc">Category (A-Z)</option>
+                        <option value="category-desc" data-i18n="sort_category_desc">Category (Z-A)</option>
+                        <option value="status-asc" data-i18n="sort_status_asc">Status (Enabled first)</option>
+                        <option value="status-desc" data-i18n="sort_status_desc">Status (Disabled first)</option>
+                        <option value="date-0-desc" data-i18n="sort_today_desc">Time spent today (most to least)</option>
+                        <option value="date-0-asc" data-i18n="sort_today_asc">Time spent today (least to most)</option>
+                        <option value="avg-time-desc" data-i18n="sort_avg_time_desc">Average time (most to least)</option>
+                        <option value="avg-time-asc" data-i18n="sort_avg_time_asc">Average time (least to most)</option>
+                        <option value="since-install-desc" data-i18n="sort_since_install_desc">Total time spent (most to least)</option>
+                        <option value="since-install-asc" data-i18n="sort_since_install_asc">Total time spent (least to most)</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- New websites default -->
+        <div class="section">
+            <h2 class="sub-section" data-i18n="new_websites_title">New websites</h2>
+            <div class="sub-section">
+                <p class="settings-description" data-i18n="new_websites_description">Choose whether time tracking is enabled by default for new websites.</p>
+                <div class="settings-row">
+                    <label class="settings-label" data-i18n="enable_tracking_default">Enable tracking by default:</label>
+                    <div id="switch-toggle-section-default-tracking">
+                        <div id="toggle-container-default-tracking" class="toggle-container-settings">
+                            <div id="toggle-background-default-tracking" class="toggle-background-settings"></div>
+                            <div id="toggle-thumb-default-tracking" class="toggle-thumb-settings"></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="whitelist-blacklist-container" class="hidden">
+                    <div class="category-editor-row" id="whitelist-card">
+                        <div class="category-editor-label">
+                            <span data-i18n="whitelist_title">Whitelist</span>
+                            <span class="settings-hint" data-i18n="whitelist_hint">(tracking always ON)</span>
+                        </div>
+                        <div class="category-websites-list" id="whitelist-list"></div>
+                        <div class="category-add-wrapper">
+                            <input type="text" id="whitelist-add-input" class="textbox category-add-input" data-i18n="add_website_placeholder" placeholder="Add website…"/>
+                            <input type="button" value="+" id="whitelist-add-button" class="button category-add-button"/>
+                        </div>
+                    </div>
+                    <div class="category-editor-row" id="blacklist-card">
+                        <div class="category-editor-label">
+                            <span data-i18n="blacklist_title">Blacklist</span>
+                            <span class="settings-hint" data-i18n="blacklist_hint">(tracking always OFF, not toggleable)</span>
+                        </div>
+                        <div class="category-websites-list" id="blacklist-list"></div>
+                        <div class="category-add-wrapper">
+                            <input type="text" id="blacklist-add-input" class="textbox category-add-input" data-i18n="add_website_placeholder" placeholder="Add website…"/>
+                            <input type="button" value="+" id="blacklist-add-button" class="button category-add-button"/>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Danger zone -->
+        <div class="section">
+            <h2 class="sub-section" data-i18n="danger_zone_title">Danger zone</h2>
+            <div class="sub-section">
+                <input type="button" value="Delete all data" id="delete-all-data-button" class="button button-delete" data-i18n="delete_all_data_btn"/>
+            </div>
+        </div>
+
+    </span>
+</div>
+
+<!-- Overlays -->
+<div id="background-opacity"></div>
+
+<div id="import-section">
+    <div class="section" id="import-sub-sections">
+        <div class="sub-section">
+            <div id="text-import" data-i18n="import_data_description">
+                Select the JSON file you exported previously, then click the <span
+                    class="button-code">Import now</span>
+                button. The page will be automatically reloaded if data are successfully imported.
+            </div>
+        </div>
+        <div class="sub-section">
+            <input type="file" id="file-import" accept=".json" class="textbox"/>
+        </div>
+        <div class="sub-section text-align-right">
+            <input type="button" value="Cancel" id="cancel-import-data-button" class="button" data-i18n="cancel"/>
+            <input type="button" value="Import now" id="import-now-data-button" class="button button-import" data-i18n="import_now"/>
+        </div>
+    </div>
+</div>
+
+<div id="export-section">
+    <div class="section" id="export-sub-sections">
+        <div class="sub-section">
+            <div id="text-export" data-i18n="export_data_description">
+                You can download the JSON file containing your data by clicking the <span class="button-code">Download now</span> button.
+            </div>
+        </div>
+        <div class="sub-section text-align-right">
+            <input type="button" value="Cancel" id="cancel-export-data-button" class="button" data-i18n="cancel"/>
+            <input type="button" value="Download now" id="download-now-data-button" class="button button-export" data-i18n="download_now"/>
+        </div>
+    </div>
+</div>
+
+<div id="import-categories-section">
+    <div class="section" id="import-categories-sub-sections">
+        <div class="sub-section">
+            <div data-i18n="import_categories_description">Select the JSON categories file you exported previously, then click <span class="button-code">Import now</span>.</div>
+        </div>
+        <div class="sub-section">
+            <input type="file" id="file-import-categories" accept=".json" class="textbox"/>
+        </div>
+        <div class="sub-section text-align-right">
+            <input type="button" value="Cancel" id="cancel-import-categories-button" class="button" data-i18n="cancel"/>
+            <input type="button" value="Import now" id="import-now-categories-button" class="button button-import" data-i18n="import_now"/>
+        </div>
+    </div>
+</div>
+
+<div id="export-categories-section">
+    <div class="section" id="export-categories-sub-sections">
+        <div class="sub-section">
+            <div data-i18n="export_categories_description">Download the JSON file containing all your categories and their website lists.</div>
+        </div>
+        <div class="sub-section text-align-right">
+            <input type="button" value="Cancel" id="cancel-export-categories-button" class="button" data-i18n="cancel"/>
+            <input type="button" value="Download now" id="download-now-categories-button" class="button button-export" data-i18n="download_now"/>
+        </div>
+    </div>
+</div>
+
+<!-- Milestone overlay -->
+<div id="milestone-section">
+    <div class="section" id="milestone-sub-sections">
+        <div class="sub-section">
+            <h2 class="sub-section" id="milestone-title" data-i18n="milestone_thanks">🎉 Thank you for using Limite!</h2>
+            <div id="milestone-message"></div>
+        </div>
+        <div class="sub-section text-align-right">
+            <input type="button" value="Don't show this again" id="milestone-never-button" class="button" data-i18n="milestone_never"/>
+            <input type="button" value="Remind me in 30 days" id="milestone-later-button" class="button" data-i18n="milestone_later"/>
+            <input type="button" value="Donate now 💙" id="milestone-donate-button" class="button button-export" data-i18n="milestone_donate"/>
+        </div>
+    </div>
+</div>
+
+<script src="../js/definitions.js"></script>
+<script src="../js/settings.js"></script>
+</body>
+
+</html>

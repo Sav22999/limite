@@ -1,9 +1,10 @@
 {
   "manifest_version": 2,
-  "name": "Limite",
-  "version": "2.2",
+  "name": "__MSG_extension_name__",
+  "version": "3.0.1",
   "author": "Saverio Morelli (Sav22999)",
-  "description": "Check how much time you spend on each website every day.\nOptimise your productivity, your time and your life as well.\nDon't lose precious time!",
+  "description": "__MSG_extension_description__",
+  "default_locale": "en",
   "icons": {
     "16": "./img/icon-16.png",
     "24": "./img/icon-24.png",
@@ -61,5 +62,8 @@
     "notifications",
     "activeTab",
     "<all_urls>"
-  ]
+  ],
+  "options_ui": {
+    "page": "./settings/index.html"
+  }
 }

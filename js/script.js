@@ -15,9 +15,13 @@ var firstTime = true;
 var changedEdits = false;
 
 const linkReview = ["https://addons.mozilla.org/firefox/addon/limite/"]; //{firefox add-ons}
-const linkDonate = ["https://www.paypal.me/saveriomorelli", "https://liberapay.com/Sav22999/donate"]; //{paypal, liberapay}
+const linkDonate = ["https://www.saveriomorelli.com/donate/", "https://liberapay.com/Sav22999/donate"]; //{paypal, liberapay}
 
 function loaded() {
+    localizeUI();
+    // Increment popup open counter
+    browser.runtime.sendMessage({"from": "popup", "ask": "increment_opens"});
+
     browser.tabs.query({active: true, currentWindow: true}, function (tabs) {
         // since only one tab should be active and in the current window at once
         // the return variable should only have one entry
@@ -79,6 +83,8 @@ function loadUI() {
             browser.storage.local.get("websites", function (value) {
                 timeSpentToday = 0;
                 timeSpentAlways = 0;
+                let timeSpentAverage = 0;
+                let daysCount = 0;
                 let category = "other";
                 if (value["websites"] !== undefined) {
                     websites_json = value["websites"];
@@ -94,21 +100,43 @@ function loadUI() {
                             timeSpentToday = websites_json[urlToUse][getToday()];
                         }
                         timeSpentAlways = 0;
+                        daysCount = 0;
                         for (var key in websites_json[currentUrl]) {
                             if (key !== "always" && key !== "enabled" && key !== "category") {
                                 //console.log(k + " : " + websites_json[currentUrl][k])
                                 timeSpentAlways += websites_json[currentUrl][key];
+                                daysCount++;
                             }
                         }
+                        if (daysCount > 0) timeSpentAverage = timeSpentAlways / daysCount;
                         if (websites_json[currentUrl]["category"] !== undefined) category = websites_json[currentUrl]["category"];
                     } else {
                     }
                 } else {
                 }
-                disableSwitch(false);
+                // Check blacklist: if site is blacklisted, keep toggle disabled
+                browser.storage.local.get("limite_settings", function (settingsValue) {
+                    let settings = settingsValue["limite_settings"] || {};
+                    let blacklist = settings["blacklist"] || [];
+                    if (blacklist.includes(urlToUse)) {
+                        disableSwitch(true);
+                    } else {
+                        disableSwitch(false);
+                    }
+                });
                 document.getElementById("today-time").innerHTML = getTimeConverted(timeSpentToday);
+                document.getElementById("today-time").title = getTimeConverted(timeSpentToday, true);
                 document.getElementById("always-time").innerHTML = getTimeConverted(timeSpentAlways);
+                document.getElementById("always-time").title = getTimeConverted(timeSpentAlways, true);
+                document.getElementById("average-time").innerHTML = getTimeConverted(timeSpentAverage);
+                document.getElementById("average-time").title = getTimeConverted(timeSpentAverage, true);
                 document.getElementById("details-container").classList = [category + "-category"];
+
+                // Set category name
+                let categoryNameElement = document.getElementById("category-name");
+                if (categoryNameElement) {
+                    categoryNameElement.textContent = browser.i18n.getMessage("category_" + category) || category;
+                }
             })
         } else {
             disableSwitch(true);

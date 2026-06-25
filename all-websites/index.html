@@ -6,69 +6,54 @@ Created by Saverio Morelli - saveriomorelli.com
 <head>
     <meta charset="utf-8">
     <link rel="stylesheet" href="../css/style.css"/>
-    <title>Limite: all time spent</title>
+    <title data-i18n="all_time_spent_title">Limite: all time spent</title>
     <link rel="icon" href="../img/icon.svg"/>
 </head>
 
 <body>
 <div id="all-websites-dedication-section">
-    <h1 id="title-all-time-spent">All time spent</h1>
+    <h1 id="title-all-time-spent" data-i18n="all_time_spent_title">All time spent</h1>
     <div class="section text-align-right sticky-section" id="actions">
-        <input type="button" value="Export data…" id="export-data-button" class="button button-export"/>
-        <input type="button" value="Import data…" id="import-data-button" class="button button-import"/>
-        <input type="button" value="Refresh data" id="refresh-data-button" class="button button-refresh"/>
-        <input type="button" value="Delete all data" id="delete-all-data-button" class="button button-delete"/>
+        <input type="button" value="Settings" id="open-settings-button" class="button button-settings" data-i18n="settings_title"/>
+        <input type="button" value="Refresh data" id="refresh-data-button" class="button button-refresh" data-i18n="refresh_data"/>
     </div>
     <div id="navigator-days">
         <span id="search-container">
             <input type="search" value="" placeholder="Search…" id="search-all-websites-text"
-                   class="textbox search-box"/>
+                   class="textbox search-box" data-i18n="search_placeholder"/>
         </span>
         <span id="nav-days-container">
             <label id="from-to-date-label"></label>
             <input type="button" value="Today" id="go-today-button"
-                   class="button button-invert-colors button-go-today"/>
-            <input type="button" value="Newer" id="go-newer-button" class="button button-invert-colors button-newer"/>
-            <input type="button" value="Older" id="go-older-button" class="button button-invert-colors button-older"/>
+                   class="button button-invert-colors button-go-today" data-i18n="today"/>
+            <input type="button" value="Newer" id="go-newer-button" class="button button-invert-colors button-newer" data-i18n="newer"/>
+            <input type="button" value="Older" id="go-older-button" class="button button-invert-colors button-older" data-i18n="older"/>
             <input type="button" value="Last" id="go-last-button"
-                   class="button button-invert-colors button-go-last-day"/>
+                   class="button button-invert-colors button-go-last-day" data-i18n="last"/>
         </span>
     </div>
     <span id="all-websites-sections"></span>
-    <div id="background-opacity"></div>
-    <div id="import-section">
-        <div class="section" id="import-sub-sections">
-            <div class="sub-section">
-                <div id="text-import">
-                    Paste here the JSON (or text) file content you exported previously, then click the <span
-                        class="button-code">Import now</span>
-                    button. The page will be automatically reloaded if data are successfully imported.
-                </div>
-            </div>
-            <div class="sub-section">
-                <textarea id="json-import"></textarea>
-            </div>
-            <div class="sub-section text-align-right">
-                <input type="button" value="Cancel" id="cancel-import-data-button" class="button"/>
-                <input type="button" value="Import now" id="import-now-data-button" class="button button-import"/>
-            </div>
-        </div>
-    </div>
-    <div id="export-section">
-        <div class="section" id="export-sub-sections">
-            <div class="sub-section">
-                <div id="text-export">
-                    Create a new JSON (or text) file and paste the code below <strong>without modifying
-                    it</strong> (you can click the <span class="button-code">Copy now</span> button to copy the code).
-                </div>
-            </div>
-            <div class="sub-section">
-                <textarea id="json-export" readonly></textarea>
-            </div>
-            <div class="sub-section text-align-right">
-                <input type="button" value="Cancel" id="cancel-export-data-button" class="button"/>
-                <input type="button" value="Copy now" id="copy-now-data-button" class="button button-copy"/>
-            </div>
+    <div id="pagination-footer" class="hidden">
+        <div id="pagination-controls"></div>
+        <div id="pagination-items-per-page-container">
+            <label id="items-per-page-label" data-i18n="items_per_page_label">Items per page:</label>
+            <select id="items-per-page-all-websites" class="select-category settings-select">
+                <option value="5">5</option>
+                <option value="10">10</option>
+                <option value="15">15</option>
+                <option value="20">20</option>
+                <option value="25">25</option>
+                <option value="30">30</option>
+                <option value="35">35</option>
+                <option value="40">40</option>
+                <option value="45">45</option>
+                <option value="50">50</option>
+                <option value="60">60</option>
+                <option value="70">70</option>
+                <option value="80">80</option>
+                <option value="90">90</option>
+                <option value="100">100</option>
+            </select>
         </div>
     </div>
 </div>
