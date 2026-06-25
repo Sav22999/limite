@@ -450,7 +450,6 @@ textarea {
 
 table {
     border-collapse: collapse;
-    padding: 5px;
     width: 100%;
 }
 
@@ -467,6 +466,7 @@ table {
 #table-section {
     overflow: auto;
     width: auto;
+    box-shadow: none;
 }
 
 #table-all-websites {
@@ -474,6 +474,7 @@ table {
     min-width: 100%;
     table-layout: fixed;
     border-collapse: collapse;
+    border: none;
 }
 
 #table-all-websites, #table-all-websites * {
@@ -684,7 +685,7 @@ th {
 td {
     font-size: 14px;
     text-align: center;
-    border: 1px solid transparent;
+    border: none;
 }
 
 td:first-child {
