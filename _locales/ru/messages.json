@@ -62,6 +62,15 @@
   "notifications_title": {
     "message": "Уведомления"
   },
+  "icon_badge_title": {
+    "message": "Icon & Badge"
+  },
+  "enable_colored_icon": {
+    "message": "Enable colored icon based on time:"
+  },
+  "enable_badge": {
+    "message": "Enable badge on icon:"
+  },
   "enable_notifications": {
     "message": "Включить уведомления:"
   },
@@ -156,7 +165,7 @@
     "message": "Последний"
   },
   "enable_limite_on_domain": {
-    "message": "Включить Limite на этом домене"
+    "message": "Включить <span class=\"limite-text font-size-24px\">Limite</span> на этом домене"
   },
   "time_spent_on_website": {
     "message": "Время, проведенное на этом сайте"
@@ -352,5 +361,13 @@
   },
   "items_per_page_label": {
     "message": "Элементов на странице:"
+  },
+  "notification_spent_time": {
+    "message": "You have already spent $TIME$ on this site today",
+    "placeholders": {
+      "time": {
+        "content": "$1"
+      }
+    }
   }
 }

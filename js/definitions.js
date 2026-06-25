@@ -21,7 +21,7 @@ function getTimeConverted(time, includeSeconds = false) {
     if (includeSeconds && seconds > 0) parts.push(getSecondOrSeconds(seconds));
 
     if (parts.length === 0) {
-        return getSecondOrSeconds(0);
+        return getSecondOrSeconds(seconds);
     }
 
     if (!includeSeconds) {
@@ -66,9 +66,6 @@ function getTimeConverted(time, includeSeconds = false) {
             
             return getMinuteOrMinutes(minutesToDisplay * 60);
         }
-        // Per i secondi
-        if (seconds >= 30) return getMinuteOrMinutes(60);
-        return parts[0];
     }
 
     // Tempo per esteso: uniamo tutte le parti con virgole e "and" per l'ultima parte
@@ -137,7 +134,7 @@ function localizeUI() {
             } else if (el.tagName === "INPUT" || el.tagName === "TEXTAREA") {
                 el.placeholder = message;
             } else {
-                el.textContent = message;
+                el.innerHTML = message;
             }
         }
     });

@@ -48,6 +48,8 @@ let thresholdOrange = 60 * 60;
 let thresholdRed    = 60 * 60 * 3;
 let notificationsEnabled = true;
 let defaultTrackingEnabled = true;
+let coloredIconEnabled = true;
+let badgeEnabled = true;
 let whitelist = [];
 let blacklist = [];
 
@@ -59,6 +61,8 @@ function loadSettingsFromStorage() {
         thresholdRed    = settings["threshold_red"]    !== undefined ? settings["threshold_red"]    : 60 * 60 * 3;
         notificationsEnabled = settings["notifications_enabled"] !== undefined ? settings["notifications_enabled"] : true;
         defaultTrackingEnabled = settings["default_tracking_enabled"] !== undefined ? settings["default_tracking_enabled"] : true;
+        coloredIconEnabled = settings["colored_icon_enabled"] !== undefined ? settings["colored_icon_enabled"] : true;
+        badgeEnabled = settings["badge_enabled"] !== undefined ? settings["badge_enabled"] : true;
         whitelist = settings["whitelist"] || [];
         blacklist = settings["blacklist"] || [];
         // Other settings like show_column_*, display_interval_days, infinite_scrolling are used in all-websites.js
@@ -310,19 +314,27 @@ function saveUrlToData(enabled, time = 0) {
 
         if (timeSpentToday >= 0 && timeSpentToday < thresholdYellow) {
             //below yellow threshold || OK
-            changeIcon(0);
+            if (coloredIconEnabled) changeIcon(0);
         } else if (timeSpentToday >= thresholdYellow && timeSpentToday < thresholdOrange) {
             //yellow
-            changeIcon(2);
-            createNotification(2, currentUrl, getTimeConverted(thresholdYellow), "You have already spent " + getTimeConverted(thresholdYellow) + " on this site today");
+            if (coloredIconEnabled) changeIcon(2);
+            createNotification(2, currentUrl, getTimeConverted(thresholdYellow), browser.i18n.getMessage("notification_spent_time", [getTimeConverted(thresholdYellow)]));
         } else if (timeSpentToday >= thresholdOrange && timeSpentToday < thresholdRed) {
             //orange
-            changeIcon(3);
-            createNotification(3, currentUrl, getTimeConverted(thresholdOrange), "You have already spent " + getTimeConverted(thresholdOrange) + " on this site today");
+            if (coloredIconEnabled) changeIcon(3);
+            createNotification(3, currentUrl, getTimeConverted(thresholdOrange), browser.i18n.getMessage("notification_spent_time", [getTimeConverted(thresholdOrange)]));
         } else if (timeSpentToday >= thresholdRed) {
             //red
-            changeIcon(4);
-            createNotification(4, currentUrl, getTimeConverted(thresholdRed), "You have already spent " + getTimeConverted(thresholdRed) + " on this site today");
+            if (coloredIconEnabled) changeIcon(4);
+            createNotification(4, currentUrl, getTimeConverted(thresholdRed), browser.i18n.getMessage("notification_spent_time", [getTimeConverted(thresholdRed)]));
+        }
+
+        if (!coloredIconEnabled) {
+            if (enabledOrNot) {
+                changeIcon(0);
+            } else {
+                changeIcon(1);
+            }
         }
 
         // Aggiorna il badge in base al tempo trascorso oggi (indipendentemente dalla soglia di colore)
@@ -352,7 +364,11 @@ function saveUrlToData(enabled, time = 0) {
              }
         }
 
-        setBadgeText(badgeText, backgroundColor, color);
+        if (badgeEnabled) {
+            setBadgeText(badgeText, backgroundColor, color);
+        } else {
+            setBadgeText("");
+        }
     })
 }
 
@@ -445,7 +461,10 @@ function createNotification(type, url, title, content) {
     //send a notification
     if (!notificationsEnabled) return;
     if (getToday() !== lastNotificationDate || lastNotification[url] !== type) {
-        lastNotificationDate = getToday();
+        if (getToday() !== lastNotificationDate) {
+            lastNotificationDate = getToday();
+            lastNotification = {};
+        }
         lastNotification[url] = type;
         browser.notifications.create({
             "type": "basic",
@@ -460,26 +479,6 @@ function createNotification(type, url, title, content) {
     //console.log(JSON.stringify(lastNotification));
 }
 
-function getTimeConverted(seconds) {
-    if (seconds < 60) return seconds + " seconds";
-    if (seconds < 3600) return Math.floor(seconds / 60) + " minutes";
-    if (seconds < 86400) return Math.floor(seconds / 3600) + " hour" + (Math.floor(seconds / 3600) > 1 ? "s" : "");
-    return Math.floor(seconds / 86400) + " day" + (Math.floor(seconds / 86400) > 1 ? "s" : "");
-}
-
-function getToday() {
-    let todayDate = new Date();
-    let today = "";
-    today = todayDate.getFullYear() + "-";
-    let month = todayDate.getMonth() + 1;
-    if (month < 10) today = today + "0" + month + "-";
-    else today = today + "" + month + "-";
-    let day = todayDate.getDate();
-    if (day < 10) today = today + "0" + day;
-    else today = today + "" + day;
-
-    return today;
-}
 
 function isInteger(value) {
     if (Number.isNaN(value) === false) {
