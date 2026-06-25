@@ -137,6 +137,30 @@ function loadUI() {
                 if (categoryNameElement) {
                     categoryNameElement.textContent = browser.i18n.getMessage("category_" + category) || category;
                 }
+
+                // Threshold colors in popup
+                browser.storage.local.get("limite_settings", function (val) {
+                    let settings = val["limite_settings"] || {};
+                    let thresholdYellow = settings["threshold_yellow"] !== undefined ? settings["threshold_yellow"] : 60 * 30;
+                    let thresholdOrange = settings["threshold_orange"] !== undefined ? settings["threshold_orange"] : 60 * 60;
+                    let thresholdRed    = settings["threshold_red"]    !== undefined ? settings["threshold_red"]    : 60 * 60 * 3;
+
+                    const applyColor = (elementId, timeValue) => {
+                        let el = document.getElementById(elementId);
+                        if (!el) return;
+                        el.classList.remove("yellow", "orange", "red");
+                        if (timeValue >= thresholdYellow && timeValue < thresholdOrange) {
+                            el.classList.add("yellow");
+                        } else if (timeValue >= thresholdOrange && timeValue < thresholdRed) {
+                            el.classList.add("orange");
+                        } else if (timeValue >= thresholdRed) {
+                            el.classList.add("red");
+                        }
+                    };
+
+                    applyColor("today-time", timeSpentToday);
+                    applyColor("average-time", timeSpentAverage);
+                });
             })
         } else {
             disableSwitch(true);

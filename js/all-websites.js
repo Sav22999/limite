@@ -108,6 +108,10 @@ let show_column_average = true;
 let show_column_category = true;
 let infinite_scrolling = true;
 
+let thresholdYellow = 60 * 30;
+let thresholdOrange = 60 * 60;
+let thresholdRed    = 60 * 60 * 3;
+
 let websites_to_render = [];
 let currentIndex = 0;
 let PAGE_SIZE = 20;
@@ -148,6 +152,11 @@ function loaded() {
             show_column_average = settings["show_column_average"] !== undefined ? settings["show_column_average"] : true;
             show_column_category = settings["show_column_category"] !== undefined ? settings["show_column_category"] : true;
             infinite_scrolling = settings["infinite_scrolling"] !== undefined ? settings["infinite_scrolling"] : true;
+
+            thresholdYellow = settings["threshold_yellow"] !== undefined ? settings["threshold_yellow"] : 60 * 30;
+            thresholdOrange = settings["threshold_orange"] !== undefined ? settings["threshold_orange"] : 60 * 60;
+            thresholdRed    = settings["threshold_red"]    !== undefined ? settings["threshold_red"]    : 60 * 60 * 3;
+
             if (settings["items_per_page"]) {
                 PAGE_SIZE = parseInt(settings["items_per_page"]);
             }
@@ -737,11 +746,11 @@ function getTBodyTable(websites, last_seven_days) {
             tableDataElement.textContent = since_install;
             tableDataElement.title = getTimeConverted(sum_since_install, true);
             tableDataElement.classList.add("since-install-time");
-            if (sum_since_install >= (60 * 30) * number_of_days && sum_since_install < (60 * 60) * number_of_days) {
+            if (sum_since_install >= (thresholdYellow) * number_of_days && sum_since_install < (thresholdOrange) * number_of_days) {
                 tableDataElement.classList.add("yellow");
-            } else if (sum_since_install >= (60 * 60) * number_of_days && sum_since_install < (60 * 60 * 3) * number_of_days) {
+            } else if (sum_since_install >= (thresholdOrange) * number_of_days && sum_since_install < (thresholdRed) * number_of_days) {
                 tableDataElement.classList.add("orange");
-            } else if (sum_since_install >= (60 * 60 * 3) * number_of_days) {
+            } else if (sum_since_install >= (thresholdRed) * number_of_days) {
                 tableDataElement.classList.add("red");
             }
             tableRowElement.append(tableDataElement);
@@ -754,11 +763,11 @@ function getTBodyTable(websites, last_seven_days) {
             tableDataElement.textContent = avg_time_to_show;
             tableDataElement.title = getTimeConverted(avg_time, true);
             tableDataElement.classList.add("avg-time");
-            if (avg_time >= (60 * 30) * number_of_days && avg_time < (60 * 60) * number_of_days) {
+            if (avg_time >= (thresholdYellow) && avg_time < (thresholdOrange)) {
                 tableDataElement.classList.add("yellow");
-            } else if (avg_time >= (60 * 60) * number_of_days && avg_time < (60 * 60 * 3) * number_of_days) {
+            } else if (avg_time >= (thresholdOrange) && avg_time < (thresholdRed)) {
                 tableDataElement.classList.add("orange");
-            } else if (avg_time >= (60 * 60 * 3) * number_of_days) {
+            } else if (avg_time >= (thresholdRed)) {
                 tableDataElement.classList.add("red");
             }
             tableRowElement.append(tableDataElement);
@@ -773,11 +782,11 @@ function getTBodyTable(websites, last_seven_days) {
             tableDataElement = document.createElement("td");
             tableDataElement.textContent = time_to_show;
             tableDataElement.title = getTimeConverted(time, true);
-            if (time >= 60 * 30 && time < 60 * 60) {
+            if (time >= thresholdYellow && time < thresholdOrange) {
                 tableDataElement.classList.add("yellow");
-            } else if (time >= 60 * 60 && time < 60 * 60 * 3) {
+            } else if (time >= thresholdOrange && time < thresholdRed) {
                 tableDataElement.classList.add("orange");
-            } else if (time >= 60 * 60 * 3) {
+            } else if (time >= thresholdRed) {
                 tableDataElement.classList.add("red");
             }
             tableRowElement.append(tableDataElement);
