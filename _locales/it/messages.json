@@ -62,6 +62,15 @@
   "notifications_title": {
     "message": "Notifiche"
   },
+  "icon_badge_title": {
+    "message": "Icona e Badge"
+  },
+  "enable_colored_icon": {
+    "message": "Attiva icona colorata in base al tempo:"
+  },
+  "enable_badge": {
+    "message": "Attiva etichetta (badge) sull'icona:"
+  },
   "enable_notifications": {
     "message": "Attiva notifiche:"
   },
@@ -156,7 +165,7 @@
     "message": "Ultimo"
   },
   "enable_limite_on_domain": {
-    "message": "Attiva Limite su questo dominio"
+    "message": "Attiva <span class=\"limite-text font-size-24px\">Limite</span> su questo dominio"
   },
   "time_spent_on_website": {
     "message": "Tempo trascorso su questo sito"
@@ -352,5 +361,13 @@
   },
   "items_per_page_label": {
     "message": "Elementi per pagina:"
+  },
+  "notification_spent_time": {
+    "message": "Hai già passato $TIME$ su questo sito oggi",
+    "placeholders": {
+      "time": {
+        "content": "$1"
+      }
+    }
   }
 }

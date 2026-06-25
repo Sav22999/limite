@@ -22,6 +22,8 @@ const DEFAULT_CATEGORIES = {
 let currentCategories = {};
 let notificationsEnabled = true;
 let defaultTrackingEnabled = true;
+let coloredIconEnabled = true;
+let badgeEnabled = true;
 let settingsChanged = false;
 
 function markChanged() {
@@ -88,6 +90,20 @@ function loaded() {
         toggleNotifications();
         markChanged();
     }
+
+    // Colored icon toggle
+    document.getElementById("toggle-container-colored-icon").onclick = function () {
+        coloredIconEnabled = !coloredIconEnabled;
+        updateColoredIconToggleUI(coloredIconEnabled);
+        markChanged();
+    };
+
+    // Badge toggle
+    document.getElementById("toggle-container-badge").onclick = function () {
+        badgeEnabled = !badgeEnabled;
+        updateBadgeToggleUI(badgeEnabled);
+        markChanged();
+    };
 
     // Default tracking toggle
     document.getElementById("toggle-container-default-tracking").onclick = function () {
@@ -179,6 +195,12 @@ function loadSettings() {
         notificationsEnabled = settings["notifications_enabled"] !== undefined ? settings["notifications_enabled"] : true;
         updateNotificationToggleUI(notificationsEnabled);
 
+        // Icon & Badge
+        coloredIconEnabled = settings["colored_icon_enabled"] !== undefined ? settings["colored_icon_enabled"] : true;
+        updateColoredIconToggleUI(coloredIconEnabled);
+        badgeEnabled = settings["badge_enabled"] !== undefined ? settings["badge_enabled"] : true;
+        updateBadgeToggleUI(badgeEnabled);
+
         // Date format
         let fmt = settings["date_format"] || "YYYY-MM-DD";
         document.getElementById("date-format-select").value = fmt;
@@ -253,6 +275,8 @@ function saveSettings() {
         "threshold_orange": orangeMin * 60,
         "threshold_red": redMin * 60,
         "notifications_enabled": notificationsEnabled,
+        "colored_icon_enabled": coloredIconEnabled,
+        "badge_enabled": badgeEnabled,
         "date_format": document.getElementById("date-format-select").value,
         "default_sort_by": document.getElementById("default-sort-select").value,
         "show_column_since_time": document.getElementById("show-column-since-time").checked,
@@ -306,6 +330,36 @@ function updateNotificationToggleUI(enabled) {
         thumb.style.left = "0px";
         thumb.style.right = "auto";
         thumb.style.backgroundImage = "url('../img/no.png')";
+    }
+}
+
+function updateColoredIconToggleUI(enabled) {
+    let thumb = document.getElementById("toggle-thumb-colored-icon");
+    if (thumb) {
+        if (enabled) {
+            thumb.style.left = "auto";
+            thumb.style.right = "0px";
+            thumb.style.backgroundImage = "url('../img/yes.png')";
+        } else {
+            thumb.style.left = "0px";
+            thumb.style.right = "auto";
+            thumb.style.backgroundImage = "url('../img/no.png')";
+        }
+    }
+}
+
+function updateBadgeToggleUI(enabled) {
+    let thumb = document.getElementById("toggle-thumb-badge");
+    if (thumb) {
+        if (enabled) {
+            thumb.style.left = "auto";
+            thumb.style.right = "0px";
+            thumb.style.backgroundImage = "url('../img/yes.png')";
+        } else {
+            thumb.style.left = "0px";
+            thumb.style.right = "auto";
+            thumb.style.backgroundImage = "url('../img/no.png')";
+        }
     }
 }
 
